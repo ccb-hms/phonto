@@ -1,0 +1,18 @@
+
+/*
+This is a configure file for table DEMO table.
+no_change:[] contains the colunms that not suppose to change or go throug the PHESANT
+binnary:[],unordered:[],ordered:[],and continuous:[] hold specified colunms assigned to the data types.
+remove:[] hold specified colunms to remove.
+
+*/
+
+{
+   "no_change":["SEQN","SDDSRVYR","RIDSTATR"],
+   "unordered":["RIDRETH1","RIDRETH3"],
+   "binnary":["RIAGENDR"],
+   "ordered":[],
+   "continuous":[],
+   "remove":[]
+
+}
