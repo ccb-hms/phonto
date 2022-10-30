@@ -1,0 +1,92 @@
+---
+title: "Query Data"
+date: "Updated on : `r date()`"
+output: html_document
+---
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+## Setup functions
+
+
+```{r setup,warning=FALSE,message=FALSE}
+library(phonto)
+```
+
+
+### Check the data availability over the years
+In the following matrix, 0 means the tables have no data in that year, and 1 means they have data in corresponding years.
+
+```{r years,warning=FALSE,message=FALSE}
+mtx <- check_data()
+knitr::kable(mtx)
+```
+
+
+
+### Query and joint data
+Based on the above, it seems we can joint PhytoestrogensUrine, PhthalatesUrine, and MetalsUrine. However, it will get an empty data frame if we do that.
+
+
+```{r query1,warning=FALSE,message=FALSE}
+df <- query_joint_data(config = "./phenotypes2.json")
+nrow(df)
+```
+
+
+### Query and joint data
+We can joint PhytoestrogensUrine, PhthalatesUrine, and DietaryInterviewTotalNutrientIntakesFirstDay along with BodyMeasures, and BloodPressure. we got some data for those participants from the year 2003 to 2008 and attended all of those survey. 
+
+
+```{r query2,warning=FALSE,message=FALSE}
+df1 <- query_joint_data(config = "./phenotypes3.json")
+nrow(df1)
+unique(df1$years)
+```
+
+
+
+
+
+### Check the data availability over the years
+We have much more data if we just query and join PhytoestrogensUrine, PhthalatesUrine,BodyMeasures, and BloodPressure or join DietaryInterviewTotalNutrientIntakesFirstDay with BodyMeasures, and BloodPressure.
+
+```{r query3,warning=FALSE,message=FALSE}
+df2 <- query_joint_data(config = "./phenotypes4.json")
+nrow(df2)
+unique(df2$years)
+
+df3 <- query_joint_data(config = "./phenotypes5.json")
+nrow(df3)
+unique(df3$years)
+
+```
+
+
+
+### Check Blood Pressure
+
+In the following matrix, 0 means the tables have no data in that year, and 1 means they have data in corresponding years.
+As we can see from the below, the number of missing diastolic and systolic values is the same for both the first and second reads.
+Previously, we removed the diastolic values with 0 zeros. However, NHANES shows its value range is 0 to 120 mmHg, and I also found two paper that says it could 0. Therefore, I am not 0 diastolic means dead, and we should remove them. 
+
+- "right ventricular pressure falls to its diastolic level of about [zero...."](https://www.sciencedirect.com/topics/engineering/diastolic-pressure), it says "ventricular pressure", so, I am not sure it the same thing we have in NHANES
+- [“Zero” diastolic blood pressure](http://dx.doi.org/10.4103/0973-0311.183572)
+
+```{r blood,warning=FALSE,message=FALSE}
+nhanes_db <- DBI::dbConnect(RSQLite::SQLite(), "../nhanes.sqlite")
+blood <- DBI::dbGetQuery(nhanes_db, "select  BPXDI1,BPXDI2, BPXSY1,BPXSY2 from BloodPressure")
+DBI::dbDisconnect(nhanes_db)
+sapply(blood, function(x)sum(is.na(x)))
+sapply(blood, function(x)length(which(x==0)))
+sapply(blood[blood$BPXDI1!=0,], function(x)length(which(x==0)))
+
+```
+

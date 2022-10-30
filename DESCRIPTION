@@ -1,7 +1,7 @@
 Package: phonto
 Type: Package
 Title: What the Package Does (Title Case)
-Version: 0.0.0.0007
+Version: 0.0.0.0008
 Authors@R: 
     person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
@@ -14,7 +14,8 @@ RoxygenNote: 7.2.0
 Depends: 
     R (>= 4.0)
 Imports:
-    jsonlite
+    jsonlite,
+    DBI
 LazyData: true
 Suggests: 
     rmarkdown,
