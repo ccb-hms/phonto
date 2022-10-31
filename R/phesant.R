@@ -3,27 +3,12 @@
 #' simple version of PHEnome Scan ANalysis Tool (PHESANT)
 #'
 #' @param df data frame to be processed
-#' @param df table_name table name
 #'
 #' @return suggested data types
 #' @export
 #'
-#' @examples phesant(DEMO_I,"DEMO_I")
-#' @examples phesant(df=DEMO_I,table_name="DEMO_I")
-phesant <- function(df,table_name){
-  config <- read_conf(table_name)
-
-  types <- df[,-which(names(df) %in% unlist(config))] |>
-    auto_type()
-
-  types
-}
-
-
-
-
-
-auto_type <- function(df) {
+#' @examples  phesant(df=nhanes)
+phesant <- function(df) {
   cnt_data <- nrow(df)
 
   # set default data type as unknown
@@ -64,6 +49,7 @@ auto_type <- function(df) {
 
   # **********************categorical (single) started*******************
   cat_cols <- sapply(df, is.character)
+  cat_cols <- c(cat_cols,sapply(df, is.factor))
 
   # remove categories than less than 10 participants:
   cols <- names(cat_cols[cat_cols==TRUE])
@@ -81,21 +67,20 @@ auto_type <- function(df) {
 
 
   # **********************categorical (single) end************************
-
+  continous_cols<-continous_cols[!is.na(continous_cols)]
   data_types[continous_cols] <- 'continuous'
   data_types[bin_cols] <- 'binary'
   data_types[order_cols] <- 'ordered'
   data_types[unorder_cols] <- 'unordered'
 
 
-  # df[, names(data_types[data_types %in% c("ordered", "unordered", "binary")])] <-
-  #   lapply(df[, names(data_types[data_types %in% c("ordered", "unordered", "binary")])], as.factor)
-  #
-  # df[, names(data_types[data_types == "continuous"])] <-
-  #   lapply(df[, names(data_types[data_types == "continuous"])], as.numeric)
+  df[, names(data_types[data_types %in% c("ordered", "unordered", "binary")])] <-
+    lapply(df[, names(data_types[data_types %in% c("ordered", "unordered", "binary")])], as.factor)
 
-  # return(list(data = df, phs_types = data_types))
-  data_types
+  df[, names(data_types[data_types == "continuous"])] <-
+    lapply(df[, names(data_types[data_types == "continuous"])], as.numeric)
+
+  return(list(data = df, phs_types = data_types))
 
 }
 

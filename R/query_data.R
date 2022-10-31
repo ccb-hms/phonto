@@ -48,7 +48,7 @@ query_joint_data <- function(config="./phenotypes.json",db_file="../nhanes.sqlit
     jon_string <- paste(jon_string,join)
   }
   # building the long query string
-  main_str <- paste0("SELECT demo.SEQN, RIAGENDR,RIDAGEYR,RIDRETH1",
+  main_str <- paste0("SELECT demo.SEQN, RIAGENDR,RIDAGEYR,RIDRETH1,DMDEDUC2",
                      cols_string,
                      " FROM DemographicVariablesAndSampleWeights as demo",
                      jon_string,
@@ -61,6 +61,43 @@ query_joint_data <- function(config="./phenotypes.json",db_file="../nhanes.sqlit
   DBI::dbDisconnect(nhanes_db)
   data
 }
+
+
+#' Create data frame shows the variable
+#'
+#' @param phs_types the data types assigned to phenotype by the phseant function
+#' @param dsc_config search tables
+#'
+#' @return results data frame
+#' @export
+#'
+#' @examples function(phs_types,dsc_config)
+phseant_table <- function(phs_types,dsc_config){
+
+  phs_types <- phs_types[! names(phs_types) %in% c('SEQN','years')]
+
+  exposures <- jsonlite::read_json(dsc_config)
+  desc_df <- matrix(ncol = 2, nrow = 0)
+  for(tn in names(exposures)){
+    values <- unlist(exposures[tn])
+    des <- nhanesA::nhanesTableVars(values[1], values[2])
+    des <- des[des$Variable.Name!="SEQN",]
+    desc_df <- rbind(desc_df,des)
+  }
+
+  desc_df <- desc_df[!duplicated(desc_df$Variable.Name),]
+  desc_df <- desc_df[desc_df$Variable.Name %in% names(phs_types),]
+
+  colnames(desc_df) <- c("Variable","Description")
+  phs_df <- data.frame(Variable=names(phs_types),PHSEANT=phs_types)
+  desc_df <- merge(desc_df,phs_df,by="Variable")
+  desc_df <- desc_df[,c("Variable","PHSEANT","Description")]
+
+  rownames(desc_df) <- 1:nrow(desc_df)
+  desc_df
+
+}
+
 
 
 

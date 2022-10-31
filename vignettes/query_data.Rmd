@@ -13,8 +13,9 @@ knitr::opts_chunk$set(
 ```
 
 
-## Setup functions
-
+## Setup 
+Install the package for the first time.
+`devtools::install_github("ccb-hms/phonto")`
 
 ```{r setup,warning=FALSE,message=FALSE}
 library(phonto)
@@ -47,11 +48,23 @@ We can joint PhytoestrogensUrine, PhthalatesUrine, and DietaryInterviewTotalNutr
 
 ```{r query2,warning=FALSE,message=FALSE}
 df1 <- query_joint_data(config = "./phenotypes3.json")
+
 nrow(df1)
 unique(df1$years)
 ```
 
+### PHSEANT
+We can joint PhytoestrogensUrine, PhthalatesUrine, and DietaryInterviewTotalNutrientIntakesFirstDay along with BodyMeasures, and BloodPressure. we got some data for those participants from the year 2003 to 2008 and attended all of those survey. 
 
+
+```{r PHSEANT,warning=FALSE,message=FALSE}
+df1$RIDRETH1 <- as.factor(df1$RIDRETH1)
+phs_data <- phesant(df1)
+phs_res <- phseant_table(phs_data$phs_types,"./search.json")
+library(kableExtra)
+phs_res |> kbl() |> kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+
+```
 
 
 
