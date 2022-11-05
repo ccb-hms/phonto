@@ -1,0 +1,4 @@
+{
+  "DemographicVariablesAndSampleWeights":[ "RIAGENDR","RIDAGEYR","RIDRETH1","DMDEDUC2"],
+  "BodyMeasures":["*"]
+}

@@ -19,6 +19,54 @@ Install the package for the first time.
 
 ```{r setup,warning=FALSE,message=FALSE}
 library(phonto)
+library(DT)
+library(nhanesA)
+```
+
+# Query Data 
+
+## Step 1: search tables
+
+It can be search by certain variable.
+
+Notes: the name of the functions are not really meaningful from nhanesA.
+
+```{r search_tables,warning=FALSE,message=FALSE}
+tb_names <- nhanesSearchVarName('BPXPULS')
+tb_names
+```
+It can be search by partial of the table names
+```{r search_tables1,warning=FALSE,message=FALSE}
+tb_names <- nhanesSearchTableNames('BPX')
+tb_names
+```
+More search methods can found on [nhanesA doc](https://cran.r-project.org/web/packages/nhanesA/vignettes/Introducing_nhanesA.html)
+
+## Step 2: check tables
+
+#### 1) A quick way to do it is to show the table names' details, and we can find the table named "P_BPXO" and "BPXO_J" are different from the rest of the tables that present blood pressures.
+```{r check_tables,warning=FALSE,message=FALSE}
+tb_detail <- nhanesSearchTableNames('BPX', includerdc=TRUE, nchar=42, details=TRUE)
+datatable(tb_detail)
+```
+#### 2) We can also check tables by showing the variables and descriptions in the tables.
+For example,
+```{r check_tables2,warning=FALSE,message=FALSE}
+var_detail <- variableDescr("BPX_D")
+datatable(var_detail)
+```
+
+
+## Step 3: check tables
+
+### 1) Given the information from the above two steps, we can query data by specifying tables and columns.
+
+```{r query,warning=FALSE,message=FALSE}
+tables <- c("BPX_D","BPX_E","BPX","BPX_C")
+cols <- c("BPXDI1","BPXDI2","BPXSY1","BPXSY2")
+bpx_data <- queryData(tables,cols)
+datatable(bpx_data)
+
 ```
 
 
@@ -26,80 +74,24 @@ library(phonto)
 In the following matrix, 0 means the tables have no data in that year, and 1 means they have data in corresponding years.
 
 ```{r years,warning=FALSE,message=FALSE}
+
 mtx <- check_data()
-knitr::kable(mtx)
+DT::datatable(
+  mtx
+) |> DT::formatStyle(colnames(mtx),
+                 backgroundColor = styleInterval(c(0, 1), c('gray', 'red',"white")),
+                 fontWeight = 'bold')
+
 ```
 
-
-
-### Query and joint data
-Based on the above, it seems we can joint PhytoestrogensUrine, PhthalatesUrine, and MetalsUrine. However, it will get an empty data frame if we do that.
-
-
-```{r query1,warning=FALSE,message=FALSE}
-df <- query_joint_data(config = "./phenotypes2.json")
-nrow(df)
-```
-
-
-### Query and joint data
-We can joint PhytoestrogensUrine, PhthalatesUrine, and DietaryInterviewTotalNutrientIntakesFirstDay along with BodyMeasures, and BloodPressure. we got some data for those participants from the year 2003 to 2008 and attended all of those survey. 
-
-
-```{r query2,warning=FALSE,message=FALSE}
-df1 <- query_joint_data(config = "./phenotypes3.json")
-
-nrow(df1)
-unique(df1$years)
-```
-
-### PHSEANT
-We can joint PhytoestrogensUrine, PhthalatesUrine, and DietaryInterviewTotalNutrientIntakesFirstDay along with BodyMeasures, and BloodPressure. we got some data for those participants from the year 2003 to 2008 and attended all of those survey. 
 
 
 ```{r PHSEANT,warning=FALSE,message=FALSE}
-df1$RIDRETH1 <- as.factor(df1$RIDRETH1)
-phs_data <- phesant(df1)
-phs_res <- phseant_table(phs_data$phs_types,"./search.json")
-library(kableExtra)
-phs_res |> kbl() |> kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
-
-```
-
-
-
-### Check the data availability over the years
-We have much more data if we just query and join PhytoestrogensUrine, PhthalatesUrine,BodyMeasures, and BloodPressure or join DietaryInterviewTotalNutrientIntakesFirstDay with BodyMeasures, and BloodPressure.
-
-```{r query3,warning=FALSE,message=FALSE}
-df2 <- query_joint_data(config = "./phenotypes4.json")
-nrow(df2)
-unique(df2$years)
-
-df3 <- query_joint_data(config = "./phenotypes5.json")
-nrow(df3)
-unique(df3$years)
-
-```
-
-
-
-### Check Blood Pressure
-
-In the following matrix, 0 means the tables have no data in that year, and 1 means they have data in corresponding years.
-As we can see from the below, the number of missing diastolic and systolic values is the same for both the first and second reads.
-Previously, we removed the diastolic values with 0 zeros. However, NHANES shows its value range is 0 to 120 mmHg, and I also found two paper that says it could 0. Therefore, I am not 0 diastolic means dead, and we should remove them. 
-
-- "right ventricular pressure falls to its diastolic level of about [zero...."](https://www.sciencedirect.com/topics/engineering/diastolic-pressure), it says "ventricular pressure", so, I am not sure it the same thing we have in NHANES
-- [“Zero” diastolic blood pressure](http://dx.doi.org/10.4103/0973-0311.183572)
-
-```{r blood,warning=FALSE,message=FALSE}
-nhanes_db <- DBI::dbConnect(RSQLite::SQLite(), "../nhanes.sqlite")
-blood <- DBI::dbGetQuery(nhanes_db, "select  BPXDI1,BPXDI2, BPXSY1,BPXSY2 from BloodPressure")
-DBI::dbDisconnect(nhanes_db)
-sapply(blood, function(x)sum(is.na(x)))
-sapply(blood, function(x)length(which(x==0)))
-sapply(blood[blood$BPXDI1!=0,], function(x)length(which(x==0)))
+# df1$RIDRETH1 <- as.factor(df1$RIDRETH1)
+# phs_data <- phesant(df1)
+# phs_res <- phseant_table(phs_data$phs_types,"./search.json")
+# library(kableExtra)
+# phs_res |> kbl() |> kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
 
 ```
 

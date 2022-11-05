@@ -1,0 +1,13 @@
+{
+
+  "BodyMeasures": {
+  "cols": ["BMXWAIST"],
+  "filter" : ["not null"]
+  }
+  "BloodPressure":{
+    "cols": ["(BPXDI1 + BPXDI2)/2 AS DIASTOLIC","(BPXSY1+BPXSY2)/2 AS SYSTOLIC"],
+    "filter" : ["not null","BPXDI1 <> 0", "BPXDI2 <> 0"]
+  }
+
+
+}

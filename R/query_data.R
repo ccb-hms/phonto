@@ -1,3 +1,84 @@
+
+#' Query Data with names of the tables
+#'
+#' When multiple tables have been assigned, it will query all the tables, combine them, and only keeps the columns shared by all the tables.
+#'
+#' @param tb_names names of the tables
+#' @param cols columns
+#'
+#' @return queried data frane
+#' @export
+#'
+#' @examples queryData(tb_names=c("BPX_D","BPX_E"),cols=c("BPXDI1","BPXDI2"))
+#'
+queryData <- function(tb_names, cols=NULL){
+  df <- NULL
+  if (length(tb_names)<2){
+    df <- nhanesA::nhanes(tb_names)
+  }else{
+    df <- nhanesA::nhanes(tb_names[1])
+    for (tn in tb_names[2:length(tb_names)]) {
+      tb_tmp <- nhanesA::nhanes(tn)
+      com_cols <- intersect(colnames(df), colnames(tb_tmp))
+      df <- rbind(df[, com_cols], tb_tmp[, com_cols])
+    }
+  }
+  if(!is.null(cols)){
+    cols <- intersect(colnames(df), cols)
+    df <- df[,c("SEQN",cols)]
+  }
+
+  df
+
+}
+
+
+
+#' Displays a list of variables in the specified NHANES table
+#' @description a wrap of nhanesA::nhanesTableVars()
+#'
+#' @param nh_table  The name of the specific table to retrieve.
+#' @param data_group The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE). Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q). It will check all the groups if it is NULL.
+#' @param details If TRUE then all columns in the variable description are returned (default=FALSE).
+#' @param nchar The number of characters in the Variable Description to print. Default length is 128, which is set to enhance readability cause variable descriptions can be very long.
+#' @param namesonly If TRUE then only the variable names are returned (default=FALSE).
+#'
+#' @return Returns a data frame that describes variable attributes for the specified table. If namesonly=TRUE, then a character vector of the variable names is returned.
+#' @export
+#'
+#' @examples variableDescr("DEMO")
+#' @details NHANES tables may contain more than 100 variables. Function nhanesTableVars provides a concise display of variables for a specified table, which helps to ascertain quickly if the table is of interest. NULL is returned when an HTML read error is encountered.
+variableDescr <- function(nh_table,
+                          data_group = NULL,
+                          details = FALSE,
+                          nchar = 128,
+                          namesonly = FALSE){
+  df <- NULL
+  if (!is.null(data_group)) {
+    df <- nhanesA::nhanesTableVars(data_group, nh_table, details, nchar, namesonly)
+  }else{
+    for (g in c('DEMO', 'DIET', 'EXAM', 'LAB', 'Q')) {
+      tryCatch({
+        df <- nhanesA::nhanesTableVars(g, nh_table, details, nchar, namesonly)
+      },
+      error=function(cond) {
+        # message(paste0("No information found in group ",g))
+      }
+      )
+    }
+
+  }
+  if(!is.null(df)){
+    colnames(df) <- c("Variable","Description")
+  }else{
+    print(paste("No information be found for table,",nh_table))
+  }
+
+  df
+}
+
+
+
 #' Check overlap cohorts over the years
 #' In the following matrix, 0 means the tables have no data in that year, and 1 means they have data in corresponding years.
 #'
@@ -22,7 +103,7 @@ check_data <- function(config="./phenotypes.json",db_file="../nhanes.sqlite"){
     overlap[rownames(overlap)==tname,names(table(temp))]<-1
   }
   DBI::dbDisconnect(nhanes_db)
-  rownames(overlap) <- substr(rownames(overlap),1,10)
+  # rownames(overlap) <- substr(rownames(overlap),1,10)
   overlap
 }
 
@@ -31,36 +112,66 @@ check_data <- function(config="./phenotypes.json",db_file="../nhanes.sqlite"){
 #'
 #' @param config configuration file path
 #' @param db_file data file path
+#' @param na.keep all rows with NA values are remove when set as FALSE,
 #'
 #' @return data
 #' @export
 #'
 #' @examples df <- query_joint_data("./phenotypes.json","../nhanes.sqlite")
-query_joint_data <- function(config="./phenotypes.json",db_file="../nhanes.sqlite"){
-  exposures <- jsonlite::read_json(config)
-  nhanes_db <- DBI::dbConnect(RSQLite::SQLite(), db_file)
-  cols_string = ""
-  jon_string = ""
-  for(tname  in names(exposures)){
-    cols <- paste(tname, unlist(exposures[tname]),sep=".",collapse=", ")
-    cols_string <- paste(cols_string,cols,sep=",")
-    join <- paste0("INNER JOIN ", tname," ON demo.SEQN=",tname,".SEQN")
-    jon_string <- paste(jon_string,join)
-  }
-  # building the long query string
-  main_str <- paste0("SELECT demo.SEQN, RIAGENDR,RIDAGEYR,RIDRETH1,DMDEDUC2",
-                     cols_string,
-                     " FROM DemographicVariablesAndSampleWeights as demo",
-                     jon_string,
-                     " WHERE RIDAGEYR>20")
-  data <- DBI::dbGetQuery(nhanes_db, main_str)
-  # the following query and merge will not need when docker database got fixed.
-  years <- DBI::dbGetQuery(nhanes_db, "SELECT SEQN, years from demo")
-  data <- merge(data,years, by="SEQN")
+query_data <-
+  function(config = "./phenotypes.json",
+           db_file = "./nhanes.sqlite",
+           na.keep = TRUE) {
+    exposures <- jsonlite::read_json(config)
+    nhanes_db <- DBI::dbConnect(RSQLite::SQLite(), db_file)
+    tbl1 <- names(exposures)[1]
+    select_string  <- ""
+    if(unlist(exposures[tbl1])[1]=="*"){
+      select_string <- paste0("SELECT ",tbl1,".*")
+    }else{
+      select_string <- paste0("SELECT ",
+                              tbl1,
+                              ".SEQN, ",
+                              paste(
+                                tbl1,
+                                unlist(exposures[[1]]),
+                                sep = ".",
+                                collapse = ", "
+                              ))
+    }
 
-  DBI::dbDisconnect(nhanes_db)
-  data
-}
+    join_string <- ""
+    for (tname  in names(exposures)[2:length(exposures)]) {
+      cols <-
+        paste(tname,
+              unlist(exposures[tname]),
+              sep = ".",
+              collapse = ", ")
+      select_string <- paste(select_string, cols, sep = ", ")
+      join <-
+        paste0("INNER JOIN ", tname, " ON ", tbl1, ".SEQN=", tname, ".SEQN")
+      join_string <- paste(join_string, join)
+    }
+    # not_null <- ""
+    # if (!na.keep) {
+    #   not_null <-
+    #     paste0("WHERE ",
+    #            paste(unlist(exposures), collapse = " IS NOT NULL AND "),
+    #            " IS NOT NULL")
+    # }
+    #
+    # sql_str <- paste(select_string, "FROM", tbl1, join_string, not_null)
+
+    sql_str <- paste(select_string, "FROM", tbl1,join_string)
+
+    data <- DBI::dbGetQuery(nhanes_db, sql_str)
+    if(!na.keep){
+      data <- na.omit(data)
+    }
+
+    DBI::dbDisconnect(nhanes_db)
+    data
+  }
 
 
 #' Create data frame shows the variable

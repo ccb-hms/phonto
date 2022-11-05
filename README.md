@@ -3,7 +3,7 @@ PHenome - PHenome ONTOlogy for NHANES
 
 ## Installation
 
-You can install the development version of BioImpute from [GitHub](https://github.com/) with:
+You can install the development version of `phonto` from [GitHub](https://github.com/) with:
 
 ``` {r}
 # install.packages("devtools")
