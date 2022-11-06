@@ -27,7 +27,7 @@ variableDescr(
 Returns a data frame that describes variable attributes for the specified table. If namesonly=TRUE, then a character vector of the variable names is returned.
 }
 \description{
-Displays a list of variables in the specified NHANES table
+a wrap of nhanesA::nhanesTableVars()
 }
 \details{
 NHANES tables may contain more than 100 variables. Function nhanesTableVars provides a concise display of variables for a specified table, which helps to ascertain quickly if the table is of interest. NULL is returned when an HTML read error is encountered.

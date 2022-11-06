@@ -1,7 +1,0 @@
-{
-  "BodyMeasures":["BMXWAIST","BMXBMI"],
-  "BloodPressure":["BPXDI1","BPXDI2","BPXSY1","BPXSY2"],
-  "PhytoestrogensUrine": ["URXDAZ","URXDMA","URXEQU", "URXETD","URXETL","URXGNS" ],
-  "PhthalatesUrine":["URXMBP","URXMCP","URXMEP","URXMHP","URXMNP","URXMOP","URXMZP","URXUCR"]
-
-}

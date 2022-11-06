@@ -12,8 +12,12 @@ queryData(tb_names, cols = NULL)
 \item{cols}{columns}
 }
 \value{
-queried data
+queried data frane
 }
 \description{
-Query Data with names of the tables
+When multiple tables have been assigned, it will query all the tables, combine them, and only keeps the columns shared by all the tables.
+}
+\examples{
+queryData(tb_names=c("BPX_D","BPX_E"),cols=c("BPXDI1","BPXDI2"))
+
 }

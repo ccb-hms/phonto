@@ -1,7 +1,7 @@
 Package: phonto
 Type: Package
 Title: What the Package Does (Title Case)
-Version: 0.0.0.0011
+Version: 0.0.0.0012
 Authors@R: 
     person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
@@ -10,7 +10,7 @@ License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 Depends: 
     R (>= 4.0)
 Imports:
