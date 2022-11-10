@@ -104,37 +104,3 @@ For example,
 var_detail <- variableDescr("BPX_D")
 datatable(var_detail)
 ```
-
-# To impalement the rest of functions: 
-# We need the docker database to add a table that mapping short names(eg. BPX_C) to the long descriptive name.
-
-## Step 3: check tables: 
-
-
-### 1) Given the information from the above two steps, we can query data by specifying tables and columns.
-
-```{r query,warning=FALSE,message=FALSE}
-tables <- c("BPX_D","BPX_E","BPX","BPX_C")
-cols <- c("BPXDI1","BPXDI2","BPXSY1","BPXSY2")
-# bpx_data <- queryData(tables,cols)
-# datatable(bpx_data)
-
-```
-
-
-### Check the data availability over the years
-In the following matrix, 0 means the tables have no data in that year, and 1 means they have data in corresponding years.
-
-```{r years,warning=FALSE,message=FALSE}
-
-# mtx <- check_data()
-# DT::datatable(
-#   mtx
-# ) |> DT::formatStyle(colnames(mtx),
-#                  backgroundColor = styleInterval(c(0, 1), c('gray', 'red',"white")),
-#                  fontWeight = 'bold')
-
-```
-
-
-

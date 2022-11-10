@@ -15,7 +15,7 @@ unionQuery(tb_names, cols = NULL)
 queried data frane
 }
 \description{
-When multiple tables have been assigned, it will query all the tables, combine them, and only keeps the columns shared by all the tables.
+Query Data with names of the tables
 }
 \examples{
 unionQuery(tb_names=c("BPX_D","BPX_E"),cols=c("BPXDI1","BPXDI2"))
