@@ -1,7 +1,7 @@
 Package: phonto
 Type: Package
 Title: What the Package Does (Title Case)
-Version: 0.0.0.0013
+Version: 0.0.0.0014
 Authors@R: 
     person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))

@@ -20,7 +20,7 @@ searchTablesByVar <- function(varname = NULL,
                               nchar = 128,
                               namesonly = TRUE){
 
-  sql <- paste0("SELECT DISTINCT Questionnaire
+  sql <- paste0("SELECT DISTINCT Questionnaire,TableName
                       FROM QuestionnaireVariables
                       WHERE Variable = '", varname,"'")
   if(!is.null(ystart)){
@@ -30,12 +30,8 @@ searchTablesByVar <- function(varname = NULL,
     sql <- paste(sql,"AND EndYear <=",ystop)
   }
 
-  res <- query(sql)
-  if(namesonly==TRUE){
-    res <- res$Questionnaire
-  }
+  query(sql)
 
-  res
 }
 
 
@@ -59,7 +55,7 @@ searchTableByName <-  function(pattern = NULL,
                                nchar = 128,
                                details = FALSE){
 
-  sql <- paste0("SELECT DISTINCT Questionnaire
+  sql <- paste0("SELECT DISTINCT Questionnaire,TableName
                   FROM
                       QuestionnaireVariables
                   WHERE Questionnaire LIKE '%",pattern,"%'"
@@ -71,19 +67,46 @@ searchTableByName <-  function(pattern = NULL,
     sql <- paste(sql,"AND EndYear <=",ystop)
   }
 
-  res <- query(sql)
-  if(details==FALSE){
-    res <- res$Questionnaire
-  }
+  query(sql)
 
-  res
+
+}
+
+#' Query data by variable
+#'
+#' It search the tables contain the given variables and query data union
+#' @param vars variables or phenotypes want to search
+#' @param ystart Four digit year of first survey included in search, where ystart >= 1999.
+#' @param ystop Four digit year of final survey included in search, where ystop >= ystart.
+#'
+#' @return union data frame
+#' @export
+#'
+#' @examples queryByVars(c("URXDAZ","URXDMA"))
+#' @examples vars = c("URXDAZ","URXDMA","URXEQU", "URXETD","URXETL","URXGNS")
+#' df = queryByVars(vars)
+queryByVars = function(vars=NULL,ystart = NULL,ystop = NULL){
+  if(is.null(vars) | length(vars) <1) return (NULL)
+  vars <- unique(vars)
+  sql = paste0("SELECT DISTINCT TableName
+                     FROM QuestionnaireVariables
+                     WHERE Variable='",vars[1],
+                     "'")
+  if(length(vars)>=2){
+    for(v in vars[2:length(vars)]){
+      sql = paste0(sql," OR Variable='",v,"'")
+    }
+  }
+  tables <- query(sql)$TableName
+  # need a try catch here
+  unionQuery(tables,vars)
 
 }
 
 
 #' Query Data with names of the tables
 #'
-#' When multiple tables have been assigned, it will query all the tables, combine them, and only keeps the columns shared by all the tables.
+#'
 #'
 #' @param tb_names names of the tables
 #' @param cols columns
@@ -91,14 +114,11 @@ searchTableByName <-  function(pattern = NULL,
 #' @return queried data frane
 #' @export
 #'
-#' @examples queryData(tb_names=c("BPX_D","BPX_E"),cols=c("BPXDI1","BPXDI2"))
+#' @examples unionQuery(tb_names=c("BPX_D","BPX_E"),cols=c("BPXDI1","BPXDI2"))
+#' @examples unionQuery(tb_names=c("PhthalatesPhytoestrogensAndPAHsUrine","PhytoestrogensUrine"),cols=c("URXDAZ","URXDMA"))
 #'
-queryData <- function(tb_names, cols=NULL){
-  long_table <- query(paste0("SELECT DISTINCT TableName
-                             FROM QuestionnaireVariables
-                             WHERE Questionnaire='",tb_names[1],"'"))
-  long_table <- long_table$TableName[1]
-
+unionQuery <- function(tb_names, cols=NULL){
+  tb_names = unique(tb_names)
   if(is.null(cols)){
     cols <- "*"
   }else{
@@ -106,44 +126,44 @@ queryData <- function(tb_names, cols=NULL){
   }
 
   sql<- paste0("SELECT ",cols ,
-                " FROM ",long_table,
-                 " WHERE Questionnaire IN (",toString(sprintf("'%s'", tb_names)),")")
+                " FROM ",tb_names[1])
+  if(length(tb_names)>=2){
+    for(tl_n in tb_names[2:length(tb_names)]){
+      sql = paste0(sql," UNION SELECT ",cols ,
+                   " FROM ",tl_n)
+    }
 
+  }
   query(sql)
 
 }
 
 #' Joint Query
 #'
-#' @param patterns list of the table patterns want to joint and query
+#' @param table_names list of the table names want to joint and query
 #' @param cols columns
 #'
 #' @return queried data frame
 #' @export
 #'
 #' @examples jointQuery(c("DEMO","BMX"))
-#' @examples patterns = c("DEMO","BMX")
-#' cols = c("RIDAGEYR","RIAGENDR","BMXBMI","DMDEDUC2")
-#' jointQuery(patterns,cols)
-jointQuery <- function(patterns,cols=NULL){
-  t_sql <- paste0("SELECT DISTINCT TableName
-                  FROM QuestionnaireVariables
-                  WHERE Questionnaire LIKE '%",stringr::str_trim(patterns[1]),"%'")
-  for(tb in patterns[2:length(patterns)]){
-    t_sql <- paste0(t_sql," OR Questionnaire LIKE '%",stringr::str_trim(tb),"%'")
-  }
-  long_tbs <- query(t_sql)$TableName
+#' @examples jointQuery(c("DEMO","BodyMeasures"))
+#' @example  cols = c("RIDAGEYR","RIAGENDR","BMXBMI","DMDEDUC2")
+#' jointQuery(c('BodyMeasures','DemographicVariablesAndSampleWeights'),cols)
+jointQuery <- function(table_names,cols=NULL){
 
   if(is.null(cols)){
     cols <- "*"
   }else{
-    cols <- paste0(c(paste0(long_tbs[1],".SEQN"),cols),collapse=", ")
+    cols <- paste0(c(paste0(table_names[1],".SEQN"),cols),collapse=", ")
   }
 
   sql <- paste("SELECT ",cols,
-               "FROM", long_tbs[1])
-  for(long_tb in long_tbs[2:length(long_tbs)]){
-    sql <- paste0(sql," INNER JOIN ",long_tb," ON ",long_tbs[1],".SEQN = ",long_tb,".SEQN")
+               "FROM", table_names[1])
+  if(length(table_names)>=2){
+    for(long_tb in table_names[2:length(table_names)]){
+      sql <- paste0(sql," INNER JOIN ",long_tb," ON ",table_names[1],".SEQN = ",long_tb,".SEQN")
+    }
   }
 
   query(sql)

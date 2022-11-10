@@ -4,17 +4,20 @@
 \alias{jointQuery}
 \title{Joint Query}
 \usage{
-jointQuery(patterns, cols = NULL)
+jointQuery(table_names, cols = NULL)
 }
 \arguments{
-\item{cols}{}
+\item{table_names}{list of the table names want to joint and query}
+
+\item{cols}{columns}
+}
+\value{
+queried data frame
 }
 \description{
 Joint Query
 }
 \examples{
 jointQuery(c("DEMO","BMX"))
-patterns = c("DEMO","BMX")
-cols = c("RIDAGEYR","RIAGENDR","BMXBMI","DMDEDUC2")
-jointQuery(patterns,cols)
+jointQuery(c("DEMO","BodyMeasures"))
 }
