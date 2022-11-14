@@ -28,6 +28,8 @@ nhnnes = function(nh_table){
 #' @export
 #'
 #' @examples searchTablesByVar('BPXPULS')
+#' @examples searchTablesByVar(c('BPXPULS','BMXBMI'))
+#' @examples searchTablesByVar(c('BPXPULS','BMXBMI'),ystop=2004)
 searchTablesByVar <- function(varname = NULL,
                               ystart = NULL,
                               ystop = NULL,
@@ -35,9 +37,14 @@ searchTablesByVar <- function(varname = NULL,
                               nchar = 128,
                               namesonly = TRUE){
 
-  sql <- paste0("SELECT DISTINCT Questionnaire,TableName
-                      FROM QuestionnaireVariables
-                      WHERE Variable = '", varname,"'")
+  sql <- paste0("SELECT DISTINCT Variable,
+                        Questionnaire,TableName,
+                        CONCAT(q.BeginYear, '-', q.EndYear) AS years
+                      FROM QuestionnaireVariables q
+                      WHERE Variable IN (", toString(sprintf("'%s'", varname)),")")
+
+
+
   if(!is.null(ystart)){
     sql <- paste(sql,"AND BeginYear >=",ystart)
   }
@@ -70,9 +77,10 @@ searchTableByName <-  function(pattern = NULL,
                                nchar = 128,
                                details = FALSE){
 
-  sql <- paste0("SELECT DISTINCT Questionnaire,TableName
-                  FROM
-                      QuestionnaireVariables
+  sql <- paste0("SELECT DISTINCT
+                        Questionnaire,TableName,
+                        CONCAT(q.BeginYear, '-', q.EndYear) AS years
+                      FROM QuestionnaireVariables q
                   WHERE Questionnaire LIKE '%",pattern,"%'"
   )
   if(!is.null(ystart)){

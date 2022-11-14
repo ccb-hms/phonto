@@ -37,4 +37,6 @@ The NHANES Comprehensive Variable List is scanned to find all data tables that c
 }
 \examples{
 searchTablesByVar('BPXPULS')
+searchTablesByVar(c('BPXPULS','BMXBMI'))
+searchTablesByVar(c('BPXPULS','BMXBMI'),ystop=2004)
 }
