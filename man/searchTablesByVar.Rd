@@ -5,7 +5,7 @@
 \title{Search for tables that contain a specified variable}
 \usage{
 searchTablesByVar(
-  varname = NULL,
+  varnames = NULL,
   ystart = NULL,
   ystop = NULL,
   includerdc = FALSE,
@@ -14,7 +14,7 @@ searchTablesByVar(
 )
 }
 \arguments{
-\item{varname}{Name of variable to match.}
+\item{varnames}{Names of variable to match.}
 
 \item{ystart}{Four digit year of first survey included in search, where ystart >= 1999.}
 

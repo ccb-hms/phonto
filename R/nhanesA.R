@@ -17,7 +17,7 @@ nhnnes = function(nh_table){
 #' Search for tables that contain a specified variable
 #'
 #' @details The NHANES Comprehensive Variable List is scanned to find all data tables that contain the given variable name. Only a single variable name may be entered, and only exact matches will be found.
-#' @param varname Name of variable to match.
+#' @param varnames Names of variable to match.
 #' @param ystart Four digit year of first survey included in search, where ystart >= 1999.
 #' @param ystop Four digit year of final survey included in search, where ystop >= ystart.
 #' @param includerdc If TRUE then RDC only tables are included in list (default=FALSE).
@@ -30,7 +30,7 @@ nhnnes = function(nh_table){
 #' @examples searchTablesByVar('BPXPULS')
 #' @examples searchTablesByVar(c('BPXPULS','BMXBMI'))
 #' @examples searchTablesByVar(c('BPXPULS','BMXBMI'),ystop=2004)
-searchTablesByVar <- function(varname = NULL,
+searchTablesByVar <- function(varnames = NULL,
                               ystart = NULL,
                               ystop = NULL,
                               includerdc = FALSE,
@@ -41,7 +41,7 @@ searchTablesByVar <- function(varname = NULL,
                         Questionnaire,TableName,
                         CONCAT(q.BeginYear, '-', q.EndYear) AS years
                       FROM QuestionnaireVariables q
-                      WHERE Variable IN (", toString(sprintf("'%s'", varname)),")")
+                      WHERE Variable IN (", toString(sprintf("'%s'", varnames)),")")
 
 
 
@@ -52,7 +52,13 @@ searchTablesByVar <- function(varname = NULL,
     sql <- paste(sql,"AND EndYear <=",ystop)
   }
 
-  query(sql)
+  df = query(sql)
+  for(v in varnames){
+    if(!(v %in% df$Variable)){
+      warning(paste(v, "is not found in the database!"))
+    }
+  }
+  df
 
 }
 
@@ -90,7 +96,13 @@ searchTableByName <-  function(pattern = NULL,
     sql <- paste(sql,"AND EndYear <=",ystop)
   }
 
-  query(sql)
+  df = query(sql)
+
+  if(is.null(df) | nrow(df)==0){
+    warning(paste("Cannot find any table name like:",pattern,"!"))
+  }
+
+  df
 
 
 }
