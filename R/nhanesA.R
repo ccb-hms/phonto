@@ -55,7 +55,7 @@ searchTablesByVar <- function(varnames = NULL,
   df = query(sql)
   for(v in varnames){
     if(!(v %in% df$Variable)){
-      warning(paste(v, "is not found in the database!"))
+      warning(paste("Variable ",v, "is not found in the database!"))
     }
   }
   df

@@ -82,11 +82,11 @@ phesant <- function(df) {
 
   phs_res <- data.frame(
     r_unique =round(sapply(df, function(x) length(unique(x))/nrow(df)),6),
-    r_zero = round(sapply(df, function(x) sum((x==0),na.rm=TRUE)/nrow(df)),6)
+    r_zero = round(sapply(df, function(x) sum((x==0),na.rm=TRUE)/nrow(df)),6),
+    r_NAs = round(sapply(df,function(x)sum(is.na(x))/nrow(df)),6)
 
   )
   phs_res$types = data_types
-
 
   return(list(data = df, phs_res = phs_res))
 
