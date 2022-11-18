@@ -8,7 +8,7 @@
 #'
 #' @examples nhanes('BPX_E')
 #' @description Use to download/load NHANES data tables that are in SAS format.
-nhnnes = function(nh_table){
+nhanes = function(nh_table){
   sql = paste0("SELECT * FROM ",nh_table)
   query(sql)
 }
