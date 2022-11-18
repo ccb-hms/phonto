@@ -77,8 +77,8 @@ phesant <- function(df) {
   # df[, names(data_types[data_types %in% c("Multilevel", "Factors", "Binary")])] <-
   #   lapply(df[, names(data_types[data_types %in% c("Multilevel", "Factors", "Binary")])], as.factor)
 
-  df[, names(data_types[data_types == "continuous"])] <-
-    lapply(df[, names(data_types[data_types == "continuous"])], as.numeric)
+  # df[, names(data_types[data_types == "continuous"])] <-
+  #   lapply(df[, names(data_types[data_types == "continuous"])], as.numeric)
 
   phs_res <- data.frame(
     r_unique =round(sapply(df, function(x) length(unique(x))/nrow(df)),6),
