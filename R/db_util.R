@@ -26,5 +26,6 @@ query <- function(sql){
  df
 }
 
+# nonPhenotypes = data.frame(names=c('SEQN','DR1EXMER','WTDRD1','WTDR2D'),types=c('Participant ID','Interviewer ID','sample weight','day one sample weight'))
 
 

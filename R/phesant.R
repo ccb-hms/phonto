@@ -39,7 +39,7 @@ phesant <- function(df) {
   # assign to order and binary
   bin_cols <- names(distinct_cnt[distinct_cnt <= 2])
 
-  order_cols <- names(distinct_cnt[distinct_cnt > 2 & distinct_cnt <= 20])
+  multilevel <- names(distinct_cnt[distinct_cnt > 2 & distinct_cnt <= 20])
 
 
 
@@ -62,20 +62,20 @@ phesant <- function(df) {
   distinct_cnt <- n_unique(df,cat_cols)
   bin_cols <- c(bin_cols, names(distinct_cnt[distinct_cnt <= 2]))
 
-  # NEEDS FURTHER VERY TO BE ORDER
-  unorder_cols <- names(distinct_cnt[distinct_cnt > 2])
+  # NEEDS FURTHER VERY TO BE ORDERED
+  factors_cols <- names(distinct_cnt[distinct_cnt > 2])
 
 
   # **********************categorical (single) end************************
   continous_cols<-continous_cols[!is.na(continous_cols)]
-  data_types[continous_cols] <- 'continuous'
-  data_types[bin_cols] <- 'binary'
-  data_types[order_cols] <- 'ordered'
-  data_types[unorder_cols] <- 'unordered'
+  data_types[continous_cols] <- 'Continuous'
+  data_types[bin_cols] <- 'Binary'
+  data_types[multilevel] <- 'Multilevel'
+  data_types[factors_cols] <- 'Factors'
 
 
-  df[, names(data_types[data_types %in% c("ordered", "unordered", "binary")])] <-
-    lapply(df[, names(data_types[data_types %in% c("ordered", "unordered", "binary")])], as.factor)
+  # df[, names(data_types[data_types %in% c("Multilevel", "Factors", "Binary")])] <-
+  #   lapply(df[, names(data_types[data_types %in% c("Multilevel", "Factors", "Binary")])], as.factor)
 
   df[, names(data_types[data_types == "continuous"])] <-
     lapply(df[, names(data_types[data_types == "continuous"])], as.numeric)
@@ -86,7 +86,18 @@ phesant <- function(df) {
     r_NAs = round(sapply(df,function(x)sum(is.na(x))/nrow(df)),6)
 
   )
+
+  # assign multilevel numbers
+  uniq_len = sapply(df, function(x) length(unique(x)))
+  data_types[data_types=='Multilevel'] = paste0(data_types[data_types=='Multilevel'],"-",
+                                                uniq_len[names(data_types[data_types=='Multilevel'])])
+  # filter and add non phenotype variables eg.SEQN
   phs_res$types = data_types
+  nonphtypes = intersect(rownames(phs_res),nonPhenotypes$names)
+  phs_res[rownames(phs_res) %in% nonphtypes,]$types = nonPhenotypes[nonPhenotypes$names %in%nonphtypes, ]$types
+
+
+
 
   return(list(data = df, phs_res = phs_res))
 
