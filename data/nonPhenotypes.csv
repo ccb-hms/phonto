@@ -1,0 +1,152 @@
+names,types,tables
+SEQN,Respondent sequence number,All 
+WTDRD1,Dietary day one sample weight,CBQPFA_E
+WTDRD1,Dietary day one sample weight,CBQPFA_F
+WTDRD1,Dietary day one sample weight,CBQPFA_J
+WTDRD1,Dietary day one sample weight,CBQPFC_E
+WTDRD1,Dietary day one sample weight,CBQPFC_F
+WTDRD1,Dietary day one sample weight,CBQPFC_J
+WTDRD1,Dietary day one sample weight,DR1IFF_C
+WTDRD1,Dietary day one sample weight,DR1IFF_D
+WTDRD1,Dietary day one sample weight,DR1IFF_E
+WTDRD1,Dietary day one sample weight,DR1IFF_F
+WTDRD1,Dietary day one sample weight,DR1IFF_G
+WTDRD1,Dietary day one sample weight,DR1IFF_H
+WTDRD1,Dietary day one sample weight,DR1IFF_I
+WTDRD1,Dietary day one sample weight,DR1IFF_J
+WTDRD1,Dietary day one sample weight,DR1TOT_C
+WTDRD1,Dietary day one sample weight,DR1TOT_D
+WTDRD1,Dietary day one sample weight,DR1TOT_E
+WTDRD1,Dietary day one sample weight,DR1TOT_F
+WTDRD1,Dietary day one sample weight,DR1TOT_G
+WTDRD1,Dietary day one sample weight,DR1TOT_H
+WTDRD1,Dietary day one sample weight,DR1TOT_I
+WTDRD1,Dietary day one sample weight,DR1TOT_J
+WTDRD1,Dietary day one sample weight,DR2IFF_C
+WTDRD1,Dietary day one sample weight,DR2IFF_D
+WTDRD1,Dietary day one sample weight,DR2IFF_E
+WTDRD1,Dietary day one sample weight,DR2IFF_F
+WTDRD1,Dietary day one sample weight,DR2IFF_G
+WTDRD1,Dietary day one sample weight,DR2IFF_H
+WTDRD1,Dietary day one sample weight,DR2IFF_I
+WTDRD1,Dietary day one sample weight,DR2IFF_J
+WTDRD1,Dietary day one sample weight,DR2TOT_C
+WTDRD1,Dietary day one sample weight,DR2TOT_D
+WTDRD1,Dietary day one sample weight,DR2TOT_E
+WTDRD1,Dietary day one sample weight,DR2TOT_F
+WTDRD1,Dietary day one sample weight,DR2TOT_G
+WTDRD1,Dietary day one sample weight,DR2TOT_H
+WTDRD1,Dietary day one sample weight,DR2TOT_I
+WTDRD1,Dietary day one sample weight,DR2TOT_J
+WTDRD1,Dietary day one sample weight,DRXIFF
+WTDRD1,Dietary day one sample weight,DRXIFF_B
+WTDRD1,Dietary day one sample weight,DRXTOT
+WTDRD1,Dietary day one sample weight,DRXTOT_B
+WTDRD1,Dietary day one sample weight,DS1IDS_E
+WTDRD1,Dietary day one sample weight,DS1IDS_F
+WTDRD1,Dietary day one sample weight,DS1IDS_G
+WTDRD1,Dietary day one sample weight,DS1IDS_H
+WTDRD1,Dietary day one sample weight,DS1IDS_I
+WTDRD1,Dietary day one sample weight,DS1IDS_J
+WTDRD1,Dietary day one sample weight,DS1TOT_E
+WTDRD1,Dietary day one sample weight,DS1TOT_F
+WTDRD1,Dietary day one sample weight,DS1TOT_G
+WTDRD1,Dietary day one sample weight,DS1TOT_H
+WTDRD1,Dietary day one sample weight,DS1TOT_I
+WTDRD1,Dietary day one sample weight,DS1TOT_J
+WTDRD1,Dietary day one sample weight,DS2IDS_E
+WTDRD1,Dietary day one sample weight,DS2IDS_F
+WTDRD1,Dietary day one sample weight,DS2IDS_G
+WTDRD1,Dietary day one sample weight,DS2IDS_H
+WTDRD1,Dietary day one sample weight,DS2IDS_I
+WTDRD1,Dietary day one sample weight,DS2IDS_J
+WTDRD1,Dietary day one sample weight,DS2TOT_E
+WTDRD1,Dietary day one sample weight,DS2TOT_F
+WTDRD1,Dietary day one sample weight,DS2TOT_G
+WTDRD1,Dietary day one sample weight,DS2TOT_H
+WTDRD1,Dietary day one sample weight,DS2TOT_I
+WTDRD1,Dietary day one sample weight,DS2TOT_J
+DR1EXMER,Interviewer ID code,DR1IFF_C
+DR1EXMER,Interviewer ID code,DR1IFF_D
+DR1EXMER,Interviewer ID code,DR1IFF_E
+DR1EXMER,Interviewer ID code,DR1IFF_F
+DR1EXMER,Interviewer ID code,DR1IFF_G
+DR1EXMER,Interviewer ID code,DR1IFF_H
+DR1EXMER,Interviewer ID code,DR1IFF_I
+DR1EXMER,Interviewer ID code,DR1IFF_J
+DR1EXMER,Interviewer ID code,DR1TOT_C
+DR1EXMER,Interviewer ID code,DR1TOT_D
+DR1EXMER,Interviewer ID code,DR1TOT_E
+DR1EXMER,Interviewer ID code,DR1TOT_F
+DR1EXMER,Interviewer ID code,DR1TOT_G
+DR1EXMER,Interviewer ID code,DR1TOT_H
+DR1EXMER,Interviewer ID code,DR1TOT_I
+DR1EXMER,Interviewer ID code,DR1TOT_J
+DR1EXMER,Interviewer ID code,DS1IDS_E
+DR1EXMER,Interviewer ID code,DS1IDS_F
+DR1EXMER,Interviewer ID code,DS1IDS_G
+DR1EXMER,Interviewer ID code,DS1IDS_H
+DR1EXMER,Interviewer ID code,DS1IDS_I
+DR1EXMER,Interviewer ID code,DS1IDS_J
+DR1EXMER,Interviewer ID code,DS1TOT_E
+DR1EXMER,Interviewer ID code,DS1TOT_F
+DR1EXMER,Interviewer ID code,DS1TOT_G
+DR1EXMER,Interviewer ID code,DS1TOT_H
+DR1EXMER,Interviewer ID code,DS1TOT_I
+DR1EXMER,Interviewer ID code,DS1TOT_J
+WTDR2D,Dietary two-day sample weight,DR1IFF_C
+WTDR2D,Dietary two-day sample weight,DR1IFF_D
+WTDR2D,Dietary two-day sample weight,DR1IFF_E
+WTDR2D,Dietary two-day sample weight,DR1IFF_F
+WTDR2D,Dietary two-day sample weight,DR1IFF_G
+WTDR2D,Dietary two-day sample weight,DR1IFF_H
+WTDR2D,Dietary two-day sample weight,DR1IFF_I
+WTDR2D,Dietary two-day sample weight,DR1IFF_J
+WTDR2D,Dietary two-day sample weight,DR1TOT_C
+WTDR2D,Dietary two-day sample weight,DR1TOT_D
+WTDR2D,Dietary two-day sample weight,DR1TOT_E
+WTDR2D,Dietary two-day sample weight,DR1TOT_F
+WTDR2D,Dietary two-day sample weight,DR1TOT_G
+WTDR2D,Dietary two-day sample weight,DR1TOT_H
+WTDR2D,Dietary two-day sample weight,DR1TOT_I
+WTDR2D,Dietary two-day sample weight,DR1TOT_J
+WTDR2D,Dietary two-day sample weight,DR2IFF_C
+WTDR2D,Dietary two-day sample weight,DR2IFF_D
+WTDR2D,Dietary two-day sample weight,DR2IFF_E
+WTDR2D,Dietary two-day sample weight,DR2IFF_F
+WTDR2D,Dietary two-day sample weight,DR2IFF_G
+WTDR2D,Dietary two-day sample weight,DR2IFF_H
+WTDR2D,Dietary two-day sample weight,DR2IFF_I
+WTDR2D,Dietary two-day sample weight,DR2IFF_J
+WTDR2D,Dietary two-day sample weight,DR2TOT_C
+WTDR2D,Dietary two-day sample weight,DR2TOT_D
+WTDR2D,Dietary two-day sample weight,DR2TOT_E
+WTDR2D,Dietary two-day sample weight,DR2TOT_F
+WTDR2D,Dietary two-day sample weight,DR2TOT_G
+WTDR2D,Dietary two-day sample weight,DR2TOT_H
+WTDR2D,Dietary two-day sample weight,DR2TOT_I
+WTDR2D,Dietary two-day sample weight,DR2TOT_J
+WTDR2D,Dietary two-day sample weight,DS1IDS_E
+WTDR2D,Dietary two-day sample weight,DS1IDS_F
+WTDR2D,Dietary two-day sample weight,DS1IDS_G
+WTDR2D,Dietary two-day sample weight,DS1IDS_H
+WTDR2D,Dietary two-day sample weight,DS1IDS_I
+WTDR2D,Dietary two-day sample weight,DS1IDS_J
+WTDR2D,Dietary two-day sample weight,DS1TOT_E
+WTDR2D,Dietary two-day sample weight,DS1TOT_F
+WTDR2D,Dietary two-day sample weight,DS1TOT_G
+WTDR2D,Dietary two-day sample weight,DS1TOT_H
+WTDR2D,Dietary two-day sample weight,DS1TOT_I
+WTDR2D,Dietary two-day sample weight,DS1TOT_J
+WTDR2D,Dietary two-day sample weight,DS2IDS_E
+WTDR2D,Dietary two-day sample weight,DS2IDS_F
+WTDR2D,Dietary two-day sample weight,DS2IDS_G
+WTDR2D,Dietary two-day sample weight,DS2IDS_H
+WTDR2D,Dietary two-day sample weight,DS2IDS_I
+WTDR2D,Dietary two-day sample weight,DS2IDS_J
+WTDR2D,Dietary two-day sample weight,DS2TOT_E
+WTDR2D,Dietary two-day sample weight,DS2TOT_F
+WTDR2D,Dietary two-day sample weight,DS2TOT_G
+WTDR2D,Dietary two-day sample weight,DS2TOT_H
+WTDR2D,Dietary two-day sample weight,DS2TOT_I
+WTDR2D,Dietary two-day sample weight,DS2TOT_J
