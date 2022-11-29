@@ -38,9 +38,9 @@ queryByVars = function(vars=NULL,ystart = NULL,ystop = NULL){
 #'
 #'
 #' @param tb_names names of the tables
-#' @param cols columns
+#' @param cols columns, the function will query all the columns if it is set to NULL as default.
 #'
-#' @return queried data frane
+#' @return it combines the researched results and returns the results as a data frame.
 #' @export
 #'
 #' @examples unionQuery(tb_names=c("BPX_D","BPX_E"),cols=c("BPXDI1","BPXDI2"))
@@ -72,7 +72,7 @@ unionQuery <- function(tb_names, cols=NULL){
 #' @param table_names list of the table names want to joint and query
 #' @param cols columns
 #'
-#' @return queried data frame
+#' @return it merges the researched results and returns the results as a data frame.
 #' @export
 #'
 #' @examples jointQuery(c("DEMO","BMX"))

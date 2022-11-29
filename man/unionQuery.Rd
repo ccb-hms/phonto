@@ -9,10 +9,10 @@ unionQuery(tb_names, cols = NULL)
 \arguments{
 \item{tb_names}{names of the tables}
 
-\item{cols}{columns}
+\item{cols}{columns, the function will query all the columns if it is set to NULL as default.}
 }
 \value{
-queried data frane
+it combines the researched results and returns the results as a data frame.
 }
 \description{
 Query Data with names of the tables

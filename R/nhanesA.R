@@ -10,7 +10,16 @@
 #' @description Use to download/load NHANES data tables that are in SAS format.
 nhanes = function(nh_table){
   sql = paste0("SELECT * FROM ",nh_table)
-  query(sql)
+  df = query(sql)
+
+  cols = paste0("SELECT Variable from
+                QuestionnaireVariables where Questionnaire='",
+                nh_table,
+                "'")
+  cols = query(cols)
+  cols = cols$Variable
+  cols = cols[!cols %in% c("years","DownloadUrl","Questionnaire")]
+  df[,cols]
 }
 
 

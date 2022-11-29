@@ -93,7 +93,7 @@ phesant <- function(df) {
                                                 uniq_len[names(data_types[data_types=='Multilevel'])])
   # filter and add non phenotype variables eg.SEQN
   phs_res$types = data_types
-  nonPhenotypes = read.csv("../data/nonPhenotypes.csv")
+  # nonPhenotypes = read.csv("../data/nonPhenotypes.csv")
   nonPhenotypes = unique(nonPhenotypes[,c('names','types')])
   nonphtypes = intersect(rownames(phs_res),nonPhenotypes$names)
   phs_res[rownames(phs_res) %in% nonphtypes,]$types = nonPhenotypes[nonPhenotypes$names %in%nonphtypes, ]$types

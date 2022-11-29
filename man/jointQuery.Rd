@@ -12,7 +12,7 @@ jointQuery(table_names, cols = NULL)
 \item{cols}{columns}
 }
 \value{
-queried data frame
+it merges the researched results and returns the results as a data frame.
 }
 \description{
 Joint Query
