@@ -89,8 +89,8 @@ phesant <- function(df) {
 
   # assign multilevel numbers
   uniq_len = sapply(df, function(x) length(unique(x)))
-  data_types[data_types=='Multilevel'] = paste0(data_types[data_types=='Multilevel'],"-",
-                                                uniq_len[names(data_types[data_types=='Multilevel'])])
+  data_types[data_types=='Multilevel'] = paste0(data_types[data_types=='Multilevel'],"(",
+                                                uniq_len[names(data_types[data_types=='Multilevel'])],")")
   # filter and add non phenotype variables eg.SEQN
   phs_res$types = data_types
   # nonPhenotypes = read.csv("../data/nonPhenotypes.csv")
