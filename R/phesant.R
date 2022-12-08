@@ -37,9 +37,9 @@ phesant <- function(df) {
 
 
   # assign to order and binary
-  bin_cols <- names(distinct_cnt[distinct_cnt <= 2])
+  # bin_cols <- names(distinct_cnt[distinct_cnt <= 2])
 
-  multilevel <- names(distinct_cnt[distinct_cnt > 2 & distinct_cnt <= 20])
+  multilevel <- names(distinct_cnt[distinct_cnt <= 20])
 
 
 
@@ -60,18 +60,19 @@ phesant <- function(df) {
   # ordered or un-ordered:
 
   distinct_cnt <- n_unique(df,cat_cols)
-  bin_cols <- c(bin_cols, names(distinct_cnt[distinct_cnt <= 2]))
+  # bin_cols <- c(bin_cols, names(distinct_cnt[distinct_cnt <= 2]))
 
   # NEEDS FURTHER VERY TO BE ORDERED
   factors_cols <- names(distinct_cnt[distinct_cnt > 2])
+  multilevel  <- c(multilevel,factors_cols)
 
 
   # **********************categorical (single) end************************
   continous_cols<-continous_cols[!is.na(continous_cols)]
   data_types[continous_cols] <- 'Continuous'
-  data_types[bin_cols] <- 'Binary'
+  # data_types[bin_cols] <- 'Binary'
   data_types[multilevel] <- 'Multilevel'
-  data_types[factors_cols] <- 'Factors'
+  # data_types[factors_cols] <- 'Factors'
 
 
   # df[, names(data_types[data_types %in% c("Multilevel", "Factors", "Binary")])] <-
