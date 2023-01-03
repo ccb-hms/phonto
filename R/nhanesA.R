@@ -160,4 +160,61 @@ variableDescr <- function(nh_table,
   df
 }
 
+translate = function(var_df, data){
+  for(i in 1:nrow(var_df)){
+    data[data[,var_df[i,]$Variable] == var_df[i,]$CodeOrValue,
+         var_df[i,]$Variable] = var_df[i,]$ValueDescription
+  }
+  data[unique(var_df$Variable)] = lapply(data[unique(var_df$Variable)], factor)
+  data
+}
+
+#' Display code translation information.
+#'
+#' @param nh_table The name of the NHANES table to retrieve.
+#' @param colnames 	The names of the columns to translate.
+#' @param data If a data frame is passed, then code translation will be applied directly to the data frame.
+#'             In that case the return argument is the code-translated data frame.
+#' @param nchar Applies only when data is defined. Code translations can be very long. Truncate the length by setting nchar (default = 32).
+#' @param mincategories The minimum number of categories needed for code translations to be applied to the data (default=2).
+#' @param details If TRUE then all available table translation information is displayed (default=FALSE).
+#' @param dxa If TRUE then the 2005-2006 DXA translation table will be used (default=FALSE).
+#' @details Most NHANES data tables have encoded values. E.g. 1 = 'Male', 2 = 'Female'. Thus it is often helpful to view the code translations and perhaps insert the translated values in a data frame. Only a single table may be specified, but multiple variables within that table can be selected. Code translations are retrieved for each variable.
+#'
+#' @return The code translation table (or translated data frame when data is defined). Returns NULL upon error.
+#' @export
+#'
+#' @examples nhanesTranslate("DEMO_C",c("RIAGENDR","RIDRETH1")
+#' @examples data = nhanes("DEMO_C")
+#' nhanesTranslate("DEMO_C",c("RIAGENDR","RIDRETH1"),data)
+nhanesTranslate = function(
+    nh_table,
+    colnames = NULL,
+    data = NULL,
+    nchar = 32,
+    mincategories = 2,
+    details = FALSE,
+    dxa = FALSE
+    ){
+
+  sql = "SELECT Variable,CodeOrValue,ValueDescription
+             FROM VariableCodebook WHERE Questionnaire='"
+
+  if(details==T){
+    sql = "SELECT Variable,CodeOrValue,ValueDescription,Count,Cumulative,SkipToItem FROM VariableCodebook
+            WHERE Questionnaire='"
+  }
+  sql = paste0(sql,nh_table,"'")
+  sql = paste0(sql,"AND Variable IN (", toString(sprintf("'%s'", colnames)),")")
+
+  df = query(sql)
+
+  if(!is.null(data)){
+    data = translate(df,data)
+    return(data)
+  }else{
+    return(df)
+  }
+
+}
 
