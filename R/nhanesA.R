@@ -1,3 +1,182 @@
+##some variable definitions from nhanesA package - copyright by Christopher Endres
+## # Christopher J. Endres 09/18/2022
+# Create a list of nhanes groups
+# Include convenient aliases
+nhanes_group <- list()
+nhanes_group['DEMO']          <- "DEMOGRAPHICS"
+nhanes_group['DEMOGRAPHICS']  <- "DEMOGRAPHICS"
+nhanes_group['DIETARY']       <- "DIETARY"
+nhanes_group['DIET']          <- "DIETARY"
+nhanes_group['EXAMINATION']   <- "EXAMINATION"
+nhanes_group['EXAM']          <- "EXAMINATION"
+nhanes_group['LABORATORY']    <- "LABORATORY"
+nhanes_group['LAB']           <- "LABORATORY"
+nhanes_group['QUESTIONNAIRE'] <- "QUESTIONNAIRE"
+nhanes_group['Q']             <- "QUESTIONNAIRE"
+nhanes_group['LIMITED']       <- "NON-PUBLIC"
+nhanes_group['LTD']           <- "NON-PUBLIC"
+nhanes_survey_groups <- unlist(unique(nhanes_group))
+
+# Although continuous NHANES is grouped in 2-year intervals,
+# for convenience we want to specify using a single year
+nh_years <- list()
+nh_years['1999'] <- "1999-2000"
+nh_years['2000'] <- "1999-2000"
+nh_years['2001'] <- "2001-2002"
+nh_years['2002'] <- "2001-2002"
+nh_years['2003'] <- "2003-2004"
+nh_years['2004'] <- "2003-2004"
+nh_years['2005'] <- "2005-2006"
+nh_years['2006'] <- "2005-2006"
+nh_years['2007'] <- "2007-2008"
+nh_years['2008'] <- "2007-2008"
+nh_years['2009'] <- "2009-2010"
+nh_years['2010'] <- "2009-2010"
+nh_years['2011'] <- "2011-2012"
+nh_years['2012'] <- "2011-2012"
+nh_years['2013'] <- "2013-2014"
+nh_years['2014'] <- "2013-2014"
+nh_years['2015'] <- "2015-2016"
+nh_years['2016'] <- "2015-2016"
+nh_years['2017'] <- "2017-2018"
+nh_years['2018'] <- "2017-2018"
+nh_years['2019'] <- "2019-2020"
+nh_years['2020'] <- "2019-2020"
+nh_years['2021'] <- "2021-2022"
+nh_years['2022'] <- "2021-2022"
+nh_years['2023'] <- "2023-2024"
+nh_years['2024'] <- "2023-2024"
+
+# Continuous NHANES table names have a letter suffix that indicates the collection interval
+data_idx <- list()
+data_idx["A"] <- '1999-2000'
+data_idx["a"] <- '1999-2000'
+data_idx["B"] <- '2001-2002'
+data_idx["b"] <- '2001-2002'
+data_idx["C"] <- '2003-2004'
+data_idx["c"] <- '2003-2004'
+data_idx["D"] <- '2005-2006'
+data_idx["E"] <- '2007-2008'
+data_idx["F"] <- '2009-2010'
+data_idx["G"] <- '2011-2012'
+data_idx["H"] <- '2013-2014'
+data_idx["I"] <- '2015-2016'
+data_idx["J"] <- '2017-2018'
+data_idx["K"] <- '2019-2020'
+data_idx["L"] <- '2021-2022'
+data_idx["M"] <- '2023-2024'
+
+anomalytables2005 <- c('CHLMD_DR', 'SSUECD_R', 'HSV_DR')
+nchar_max <- 1024
+nchar_default <- 128
+#------------------------------------------------------------------------------
+# An internal function that determines which survey year the table belongs to.
+# For most tables the year is indicated by the letter suffix following an underscore.
+# E.g. for table 'BPX_E', the suffix is '_E'
+# If there is no suffix, then we are likely dealing with data from 1999-2000.
+.get_year_from_nh_table <- function(nh_table) {
+  if(nh_table %in% anomalytables2005) {return('2005-2006')}
+  if(length(grep('^P_', nh_table))>0) {return('2017-2018')} # Pre-pandemic
+  if(length(grep('^Y_', nh_table))>0) {return('Nnyfs')} # Youth survey
+  nhloc <- data.frame(stringr::str_locate_all(nh_table, '_'))
+  nn <- nrow(nhloc)
+  if(nn!=0){ #Underscores were found
+    if((nhloc$start[nn]+1) == nchar(nh_table)) {
+      idx <- stringr::str_sub(nh_table, -1, -1)
+      if(idx=='r'||idx=='R') {
+        if(nn > 1) {
+          newloc <- nhloc$start[nn-1]+1
+          idx <- stringr::str_sub(nh_table, newloc, newloc)
+        } else {stop('Invalid table name')}
+      }
+      return(data_idx[idx])
+    } else { ## Underscore not 2nd to last. Assume table is from the first set.
+      return("1999-2000")}
+  } else { #If there are no underscores then table must be from first survey
+    return("1999-2000")
+  }
+#    nh_year <- "1999-2000"
+}
+
+#------------------------------------------------------------------------------
+# An internal function that converts a year into the nhanes interval.
+# E.g. 2003 is converted to '2003-2004'
+# @param year where year is numeric in yyyy format
+# @return The 2-year interval that includes the year, e.g. 2001-2002
+#
+.get_nh_survey_years <- function(year) {
+  if(as.character(year) %in% names(nh_years)) {
+    return( as.character(nh_years[as.character(year)]) )
+  }
+  else {
+    stop('Data for year ', year, ' are not available')
+    return(NULL)
+  }
+}
+
+# Internal function to determine if a number is even
+.is.even <- function(x) {x %% 2 == 0}
+
+####end of copyright Christopher J. Endres 09/18/2022
+######
+#####
+#####
+########################################################
+nhanesTables = function( data_group, year,
+      nchar = 128,  details = FALSE,
+      namesonly = FALSE, includerdc = FALSE ) {
+
+  ##check if they are using the short name
+  if( data_group %in% names(nhanes_group) ) 
+      data_group = nhanes_group[data_group]
+  if ( !(data_group %in% nhanes_group) )
+    stop("Invalid survey group")
+  
+  
+  if (is.numeric(year))
+     EVEN = .is.even(year)
+  else stop("Invalid year")
+  ##construct SQL queries        
+
+  tables = paste0("SELECT * from
+                QuestionnaireDescriptions where DataGroup='",
+                data_group, "' and ", ifelse(EVEN, "EndYear", "BeginYear"), "=",year)
+  return(query(tables))
+}
+ 
+##Arguments:
+
+##data_group: The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION,
+##          LABORATORY, QUESTIONNAIRE). Abbreviated terms may also be
+##         used: (DEMO, DIET, EXAM, LAB, Q).
+
+##    year: The year in yyyy format where 1999 <= yyyy.
+
+##   nchar: Truncates the table description to a max length of nchar.
+
+## details: If TRUE then a more detailed description of the tables is
+##          returned (default=FALSE).
+
+##namesonly: If TRUE then only the table names are returned
+##          (default=FALSE).
+
+##includerdc: If TRUE then RDC only tables are included in list
+##          (default=FALSE).
+
+
+###nhanesTableVars
+#### nhanesTableVars('EXAM', 'BMX_D')
+
+##note for our system we only need nh_table - the other details are not relevant
+##so no need to process or pay attention to them
+nhanesTableVars = function(data_group, nh_table, details = FALSE, nchar=128, namesonly = FALSE) {
+  ans = paste0("SELECT * from
+                QuestionnaireVariables where Questionnaire='", nh_table, "'")
+ 
+  data = query(ans)
+  return(data[,c("Variable", "Description")])
+
+}
 
 #' Download/Load an NHANES table and return as a data frame.
 #'
@@ -8,6 +187,9 @@
 #'
 #' @examples nhanes('BPX_E')
 #' @description Use to download/load NHANES data tables that are in SAS format.
+##FIXME - need some error checking at some time
+##in our DB we have constructed a view for each of the NHANES tables - so this query just works
+##but we have added in a few columns - DownloadUrl and Questionnaire that need to be filtered
 nhanes = function(nh_table){
   sql = paste0("SELECT * FROM ",nh_table)
   df = query(sql)
