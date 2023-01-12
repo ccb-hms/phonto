@@ -2,7 +2,7 @@
 % Please edit documentation in R/nhanesA.R
 \name{searchTableByName}
 \alias{searchTableByName}
-\title{Search for matching table names}
+\title{Search for matching table names, replicate of nhanesA::nhanesSearchTableNames()}
 \usage{
 searchTableByName(
   pattern = NULL,
@@ -30,7 +30,7 @@ searchTableByName(
 Returns a character vector of table names that match the given pattern. If details=TRUE, then a data frame of table attributes is returned. NULL is returned when an HTML read error is encountered.
 }
 \description{
-Search for matching table names
+Search for matching table names, replicate of nhanesA::nhanesSearchTableNames()
 }
 \examples{
 searchTableByName("BPX")

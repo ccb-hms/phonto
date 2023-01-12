@@ -127,23 +127,23 @@ nhanesTables = function( data_group, year,
       namesonly = FALSE, includerdc = FALSE ) {
 
   ##check if they are using the short name
-  if( data_group %in% names(nhanes_group) ) 
+  if( data_group %in% names(nhanes_group) )
       data_group = nhanes_group[data_group]
   if ( !(data_group %in% nhanes_group) )
     stop("Invalid survey group")
-  
-  
+
+
   if (is.numeric(year))
      EVEN = .is.even(year)
   else stop("Invalid year")
-  ##construct SQL queries        
+  ##construct SQL queries
 
   tables = paste0("SELECT * from
                 QuestionnaireDescriptions where DataGroup='",
                 data_group, "' and ", ifelse(EVEN, "EndYear", "BeginYear"), "=",year)
   return(query(tables))
 }
- 
+
 ##Arguments:
 
 ##data_group: The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION,
@@ -172,7 +172,7 @@ nhanesTables = function( data_group, year,
 nhanesTableVars = function(data_group, nh_table, details = FALSE, nchar=128, namesonly = FALSE) {
   ans = paste0("SELECT * from
                 QuestionnaireVariables where Questionnaire='", nh_table, "'")
- 
+
   data = query(ans)
   return(data[,c("Variable", "Description")])
 
@@ -205,7 +205,7 @@ nhanes = function(nh_table){
 }
 
 
-#' Search for tables that contain a specified variable
+#' Search for tables that contain a specified variable,replicate of nhanesA::nhanesSearchVarName()
 #'
 #' @details The NHANES Comprehensive Variable List is scanned to find all data tables that contain the given variable name. Only a single variable name may be entered, and only exact matches will be found.
 #' @param varnames Names of variable to match.
@@ -254,7 +254,7 @@ searchTablesByVar <- function(varnames = NULL,
 }
 
 
-#' Search for matching table names
+#' Search for matching table names, replicate of nhanesA::nhanesSearchTableNames()
 #'
 #' @param pattern Pattern of table names to match
 #' @param ystart Four digit year of first survey included in search, where ystart >= 1999.
@@ -397,6 +397,101 @@ nhanesTranslate = function(
   }else{
     return(df)
   }
+
+}
+
+
+#' Perform a search over the comprehensive NHANES variable list.
+#'
+#' @param search_terms List of terms or keywords.
+#' @param exclude_terms List of exclusive terms or keywords.
+#' @param data_group Which data groups (e.g. DIET, EXAM, LAB) to search. Default is to search all groups.
+#' @param ignore.case 	Ignore case if TRUE. (Default=FALSE).
+#' @param ystart Four digit year of first survey included in search, where ystart >= 1999.
+#' @param ystop Four digit year of final survey included in search, where ystop >= ystart.
+#' @param includerdc
+#' @param nchar Truncates the variable description to a max length of nchar.
+#' @param namesonly If TRUE then only the table names are returned (default=FALSE).
+#'
+#' @return Returns a data frame that describes variables that matched the search terms. If namesonly=TRUE, then a character vector of table names that contain matched variables is returned.
+#' @export
+#'
+#' @examples nhanesSearch("bladder", ystart=2001, ystop=2008, nchar=50)
+#' @examples nhanesSearch("urin", exclude_terms="During", ystart=2009)
+#' @examples  nhanesSearch(c("urine", "urinary"), ignore.case=TRUE, ystop=2006, namesonly=TRUE)
+nhanesSearch = function( search_terms = NULL,
+                         exclude_terms = NULL,
+                         data_group = NULL,
+                         ignore.case = FALSE,
+                         ystart = NULL,
+                         ystop = NULL,
+                         includerdc = FALSE,
+                         nchar = 128,
+                         namesonly = FALSE){
+
+
+  sql = "SELECT  * FROM QuestionnaireVariables V WHERE (Description LIKE '%"
+
+  if(namesonly){
+    sql="SELECT Variable FROM QuestionnaireVariables V WHERE (Description LIKE '%"
+  }
+
+
+  if(!is.null(data_group)){
+    sql="SELECT  V.* FROM QuestionnaireVariables V INNER JOIN  QuestionnaireDescriptions AS Q ON Q.Questionnaire=V.Questionnaire WHERE (V.Description LIKE '%"
+  }
+
+  # match multiple patterns
+  if (length(search_terms)>=2){
+    sql = paste0(sql,search_terms[1],"%'")
+    for (term in search_terms[2:length(search_terms)]){
+      sql = paste0(sql," OR V.Description LIKE '%",term,"%'")
+    }
+  }else{
+    sql = paste0(sql,search_terms,"%'")
+  }
+  sql = paste0(sql,")")
+
+
+
+  if(!is.null(exclude_terms)){
+      if(length(exclude_terms>1)){
+        for (term in exclude_terms){
+          sql = paste0(sql," AND V.Description NOT LIKE '%",term,"%'")
+        }
+      }else{
+        sql = paste0(sql," AND V.Description NOT LIKE '%",exclude_terms,"%'")
+      }
+
+  }
+
+
+
+  if(!is.null(data_group)){
+    if(length(data_group>1)){
+      sql = paste0(sql,"AND (DataGroup LIKE '%",data_group[1],"%'")
+      for (term in data_group[2:length(data_group)]){
+        sql = paste0(sql," OR DataGroup LIKE '%",term,"%'")
+      }
+      sql = paste0(sql,")")
+    }else{
+      sql = paste0(sql," AND DataGroup LIKE '%",data_group,"%'")
+    }
+  }
+
+
+  sql = gsub("%\\^", "", sql) # address start with ..
+
+
+
+  if(!is.null(ystart)){
+    sql = paste(sql,"AND V.BeginYear >=",ystart)
+  }
+  if(!is.null(ystop)){
+    sql <- paste(sql,"AND V.EndYear <=",ystop)
+  }
+  # print(sql)
+  query(sql)
 
 }
 

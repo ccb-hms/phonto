@@ -2,7 +2,7 @@
 % Please edit documentation in R/nhanesA.R
 \name{searchTablesByVar}
 \alias{searchTablesByVar}
-\title{Search for tables that contain a specified variable}
+\title{Search for tables that contain a specified variable,replicate of nhanesA::nhanesSearchVarName()}
 \usage{
 searchTablesByVar(
   varnames = NULL,
@@ -30,7 +30,7 @@ searchTablesByVar(
 By default, a character vector of table names that include the specified variable is returned. If namesonly=FALSE, then a data frame of table attributes is returned.
 }
 \description{
-Search for tables that contain a specified variable
+Search for tables that contain a specified variable,replicate of nhanesA::nhanesSearchVarName()
 }
 \details{
 The NHANES Comprehensive Variable List is scanned to find all data tables that contain the given variable name. Only a single variable name may be entered, and only exact matches will be found.
