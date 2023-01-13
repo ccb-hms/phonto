@@ -141,7 +141,7 @@ nhanesTables = function( data_group, year,
   tables = paste0("SELECT * from
                 QuestionnaireDescriptions where DataGroup='",
                 data_group, "' and ", ifelse(EVEN, "EndYear", "BeginYear"), "=",year)
-  return(query(tables))
+  return(nhanesQuery(tables))
 }
 
 ##Arguments:
@@ -173,7 +173,7 @@ nhanesTableVars = function(data_group, nh_table, details = FALSE, nchar=128, nam
   ans = paste0("SELECT * from
                 QuestionnaireVariables where Questionnaire='", nh_table, "'")
 
-  data = query(ans)
+  data = nhanesQuery(ans)
   return(data[,c("Variable", "Description")])
 
 }
@@ -192,13 +192,13 @@ nhanesTableVars = function(data_group, nh_table, details = FALSE, nchar=128, nam
 ##but we have added in a few columns - DownloadUrl and Questionnaire that need to be filtered
 nhanes = function(nh_table){
   sql = paste0("SELECT * FROM ",nh_table)
-  df = query(sql)
+  df = nhanesQuery(sql)
 
   cols = paste0("SELECT Variable from
                 QuestionnaireVariables where Questionnaire='",
                 nh_table,
                 "'")
-  cols = query(cols)
+  cols = nhanesQuery(cols)
   cols = cols$Variable
   cols = cols[!cols %in% c("years","DownloadUrl","Questionnaire")]
   df[,cols]
@@ -243,7 +243,7 @@ searchTablesByVar <- function(varnames = NULL,
     sql <- paste(sql,"AND EndYear <=",ystop)
   }
 
-  df = query(sql)
+  df = nhanesQuery(sql)
   for(v in varnames){
     if(!(v %in% df$Variable)){
       warning(paste("Variable ",v, "is not found in the database!"))
@@ -287,7 +287,7 @@ searchTableByName <-  function(pattern = NULL,
     sql <- paste(sql,"AND EndYear <=",ystop)
   }
 
-  df = query(sql)
+  df = nhanesQuery(sql)
 
   if(is.null(df) | nrow(df)==0){
     warning(paste("Cannot find any table name like:",pattern,"!"))
@@ -389,7 +389,7 @@ nhanesTranslate = function(
   sql = paste0(sql,nh_table,"'")
   sql = paste0(sql,"AND Variable IN (", toString(sprintf("'%s'", colnames)),")")
 
-  df = query(sql)
+  df = nhanesQuery(sql)
 
   if(!is.null(data)){
     data = translate(df,data)
@@ -418,7 +418,7 @@ nhanesTranslate = function(
 #'
 #' @examples nhanesSearch("bladder", ystart=2001, ystop=2008, nchar=50)
 #' @examples nhanesSearch("urin", exclude_terms="During", ystart=2009)
-#' @examples  nhanesSearch(c("urine", "urinary"), ignore.case=TRUE, ystop=2006, namesonly=TRUE)
+#' @examples nhanesSearch(c("urine", "urinary"), ignore.case=TRUE, ystop=2006, namesonly=TRUE)
 nhanesSearch = function( search_terms = NULL,
                          exclude_terms = NULL,
                          data_group = NULL,
@@ -491,7 +491,7 @@ nhanesSearch = function( search_terms = NULL,
     sql <- paste(sql,"AND V.EndYear <=",ystop)
   }
   # print(sql)
-  query(sql)
+  nhanesQuery(sql)
 
 }
 

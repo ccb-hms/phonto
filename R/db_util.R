@@ -1,23 +1,20 @@
-sqlHost <- "localhost"
-sqlUserName <- "sa"
-sqlPassword <- "yourStrong(!)Password"
-sqlDefaultDb <- "NhanesLandingZone"
-
 
 #' Query data from the Docker database
+#'
+#' It is an internal function.
 #'
 #' @param sql string of sql
 #'
 #' @return a data frame of the results
-#' @export
 #'
 #' @examples query("SELECT TOP(50) * FROM QuestionnaireVariables;")
-query <- function(sql){
+nhanesQuery <- function(sql){
+
   cn  <- MsSqlTools::connectMsSqlSqlLogin(
-    server <- sqlHost,
-    user <- sqlUserName,
-    password <- sqlPassword,
-    database <- sqlDefaultDb
+    server <- "localhost",
+    user <- "sa",
+    password <- "yourStrong(!)Password",
+    database <- "NhanesLandingZone"
   )
 
  df <- DBI::dbGetQuery(cn, sql)
@@ -25,7 +22,4 @@ query <- function(sql){
 
  df
 }
-
-# nonPhenotypes = data.frame(names=c('SEQN','DR1EXMER','WTDRD1','WTDR2D'),types=c('Participant ID','Interviewer ID','sample weight','day one sample weight'))
-
 
