@@ -2,6 +2,7 @@
 
 export(jointQuery)
 export(nhanes)
+export(nhanesCodebook)
 export(nhanesSearch)
 export(nhanesTranslate)
 export(phesant)

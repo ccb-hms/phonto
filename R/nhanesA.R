@@ -170,12 +170,10 @@ nhanesTables = function( data_group, year,
 ##note for our system we only need nh_table - the other details are not relevant
 ##so no need to process or pay attention to them
 nhanesTableVars = function(data_group, nh_table, details = FALSE, nchar=128, namesonly = FALSE) {
-  ans = paste0("SELECT * from
+  ans = paste0("SELECT Variable,Description from
                 QuestionnaireVariables where Questionnaire='", nh_table, "'")
 
-  data = nhanesQuery(ans)
-  return(data[,c("Variable", "Description")])
-
+  nhanesQuery(ans)
 }
 
 #' Download/Load an NHANES table and return as a data frame.
@@ -493,5 +491,23 @@ nhanesSearch = function( search_terms = NULL,
   # print(sql)
   nhanesQuery(sql)
 
+}
+
+
+#' Display codebook for selected variable.
+#'
+#' @param nh_table The name of the NHANES table that contains the desired variable.
+#' @param colname the name of the table column (variable).
+#'
+#' @return The codebook is returned as a list object. Returns NULL upon error.
+#' @export
+#'
+#' @examples nhanesCodebook('AUX_D', 'AUQ020D')
+#' @examples nhanesCodebook('DEMO_D', 'RIAGENDR')
+nhanesCodebook = function(nh_table, colname){
+  sql = paste0("SELECT Variable, Description, Target, SasLabel FROM QuestionnaireVariables WHERE Questionnaire='",nh_table,"' AND Variable='",colname,"'")
+  res = as.list(nhanesQuery(sql))
+  res[[colname]]=phonto::nhanesTranslate(nh_table, colname,details = T)
+  res
 }
 
