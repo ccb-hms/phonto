@@ -26,7 +26,7 @@ queryByVars = function(vars=NULL,ystart = NULL,ystop = NULL){
       sql = paste0(sql," OR Variable='",v,"'")
     }
   }
-  tables <- query(sql)$TableName
+  tables <- nhanesQuery(sql)$TableName
   # need a try catch here
   unionQuery(tables,vars)
 
@@ -63,7 +63,7 @@ unionQuery <- function(tb_names, cols=NULL){
     }
 
   }
-  query(sql)
+  nhanesQuery(sql)
 
 }
 
@@ -95,7 +95,7 @@ jointQuery <- function(table_names,cols=NULL){
     }
   }
 
-  query(sql)
+  nhanesQuery(sql)
 
 }
 
