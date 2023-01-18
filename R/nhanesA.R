@@ -122,11 +122,26 @@ nchar_default <- 128
 #####
 #####
 ########################################################
+
+
+#' Title
+#'
+#' @param data_group
+#' @param year
+#' @param nchar
+#' @param details
+#' @param namesonly
+#' @param includerdc
+#'
+#' @return
+#' @export
+#'
+#' @examples
 nhanesTables = function( data_group, year,
       nchar = 128,  details = FALSE,
       namesonly = FALSE, includerdc = FALSE ) {
 
-  ##check if they are using the short name
+  # ##check if they are using the short name
   if( data_group %in% names(nhanes_group) )
       data_group = nhanes_group[data_group]
   if ( !(data_group %in% nhanes_group) )
@@ -141,7 +156,8 @@ nhanesTables = function( data_group, year,
   tables = paste0("SELECT * from
                 QuestionnaireDescriptions where DataGroup='",
                 data_group, "' and ", ifelse(EVEN, "EndYear", "BeginYear"), "=",year)
-  return(nhanesQuery(tables))
+  print(tables)
+  nhanesQuery(tables)
 }
 
 ##Arguments:
@@ -510,4 +526,6 @@ nhanesCodebook = function(nh_table, colname){
   res[[colname]]=phonto::nhanesTranslate(nh_table, colname,details = T)
   res
 }
+
+
 
