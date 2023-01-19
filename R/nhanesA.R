@@ -105,6 +105,10 @@ nchar_default <- 128
 # @return The 2-year interval that includes the year, e.g. 2001-2002
 #
 .get_nh_survey_years <- function(year) {
+  if(length(year) > 1) {
+     warning("more than one year input, using only the first one")
+     year = year[1]
+  }
   if(as.character(year) %in% names(nh_years)) {
     return( as.character(nh_years[as.character(year)]) )
   }
