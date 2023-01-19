@@ -1,3 +1,8 @@
+## this function should take in a data.frame object and
+## classify each of the columns into one of continuous, multifactor (with some levels)
+## or read from a prescribed set of variable names that the variable has some special attributes
+## probably the processing should be to first figure out which of the variables are special, eg SEQN
+## 
 
 
 #' simple version of PHEnome Scan ANalysis Tool (PHESANT)
@@ -16,16 +21,13 @@ phesant <- function(df) {
   names(data_types) <- colnames(df)
 
   # **********************continuous started*******************************
-  # note the the following process including continuous and integers
-  # int_cols <- sapply(df, is.integer)
+  # note the following process including continuous and integers
   num_cols <- sapply(df, is.numeric)
 
   distinct_cnt <- n_unique(df,num_cols)
-  same_ratio <-
-    round(1 - distinct_cnt/cnt_data, 4)
+  same_ratio <- round(1 - distinct_cnt/cnt_data, 4)
 
   continous_cols <- names(same_ratio[same_ratio < 0.35])
-
 
   ex_continous_cols <- names(distinct_cnt[distinct_cnt > 20])
   continous_cols <- c(continous_cols, ex_continous_cols)
@@ -99,14 +101,15 @@ phesant <- function(df) {
   nonphtypes = intersect(rownames(phs_res),nonPhenotypes$names)
   phs_res[rownames(phs_res) %in% nonphtypes,]$types = nonPhenotypes[nonPhenotypes$names %in%nonphtypes, ]$types
 
-
-
-
+  ##FIXME: why are we returning the data - now we will have two copies of it?
   return(list(data = df, phs_res = phs_res))
 
 }
 
 
+##FIXME: what is this function supposed to do?
+##as far as I can tell this should just be sapply(df, unique)
+##
 n_unique <- function (df,cols){
   if (length(cols) == 0)
     return
