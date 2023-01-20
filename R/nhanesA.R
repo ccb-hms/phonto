@@ -360,14 +360,31 @@ variableDescr <- function(nh_table,
   df
 }
 
-translate = function(var_df, data){
-  for(i in 1:nrow(var_df)){
-    data[data[,var_df[i,]$Variable] == var_df[i,]$CodeOrValue,
-         var_df[i,]$Variable] = var_df[i,]$ValueDescription
+  ##rewritten to work columnwise
+  ##for now silently skip over any continuous variable
+  ##we have a clunky test for it - which should be replaced at some point
+  translate = function(input_codes, data) {
+     if( !all(names(input_codes) %in% names(data)))
+       stop("name mismatch in translate")  ##FIXME - maybe figure out which one?
+     for(i in names(input_codes) ) {
+        bb = input_codes[[i]]
+        if( bb[1, "ValueDescription"] == "Range of Values" ) next
+        z1 = data[,i]
+        labels = bb$ValueDescription[match(unique(z1), bb$CodeOrValue)]
+        labels = labels[!is.na(labels)]
+        data[,i] = factor(z1, labels = labels)
+     }
+     return(data)
   }
-  data[unique(var_df$Variable)] = lapply(data[unique(var_df$Variable)], factor)
-  data
-}
+##
+##translate = function(var_df, data){
+##  for(i in 1:nrow(var_df)){
+##    data[data[,var_df[i,]$Variable] == var_df[i,]$CodeOrValue,
+##         var_df[i,]$Variable] = var_df[i,]$ValueDescription
+##  }
+##  data[unique(var_df$Variable)] = lapply(data[unique(var_df$Variable)], factor)
+##  data
+##}
 
 #' Display code translation information.
 #'
@@ -390,30 +407,32 @@ translate = function(var_df, data){
 nhanesTranslate = function(
     nh_table,
     colnames = NULL,
-    data = NULL,
+    data = FALSE,
     nchar = 32,
     mincategories = 2,
     details = FALSE,
     dxa = FALSE
     ){
 
-  sql = "SELECT Variable,CodeOrValue,ValueDescription
-             FROM VariableCodebook WHERE Questionnaire='"
-
-  if(details==T){
+  if(length(nh_table) > 1 ) stop("you must select one column")
+  if(details){
     sql = "SELECT Variable,CodeOrValue,ValueDescription,Count,Cumulative,SkipToItem FROM VariableCodebook
             WHERE Questionnaire='"
+  } else {
+    sql = "SELECT Variable,CodeOrValue,ValueDescription
+             FROM VariableCodebook WHERE Questionnaire='"
   }
   sql = paste0(sql,nh_table,"'")
-  sql = paste0(sql,"AND Variable IN (", toString(sprintf("'%s'", colnames)),")")
+  if(!is.null(colnames))
+     sql = paste0(sql,"AND Variable IN (", toString(sprintf("'%s'", colnames)),")")
 
   df = nhanesQuery(sql)
-
-  if(!is.null(data)){
-    data = translate(df,data)
+  ans=split(df, df$Variable)
+  if(data){
+    data = translate(ans,nhanes(nh_table))
     return(data)
   }else{
-    return(df)
+    return(ans)
   }
 
 }
