@@ -19,8 +19,7 @@ nhanesTranslate(
 
 \item{colnames}{The names of the columns to translate.}
 
-\item{data}{If a data frame is passed, then code translation will be applied directly to the data frame.
-In that case the return argument is the code-translated data frame.}
+\item{data}{If TRUE then the table will be translated and a a dataframe returned.}
 
 \item{nchar}{Applies only when data is defined. Code translations can be very long. Truncate the length by setting nchar (default = 32).}
 
@@ -40,7 +39,7 @@ Display code translation information.
 Most NHANES data tables have encoded values. E.g. 1 = 'Male', 2 = 'Female'. Thus it is often helpful to view the code translations and perhaps insert the translated values in a data frame. Only a single table may be specified, but multiple variables within that table can be selected. Code translations are retrieved for each variable.
 }
 \examples{
-nhanesTranslate("DEMO_C",c("RIAGENDR","RIDRETH1")
-data = nhanes("DEMO_C")
-nhanesTranslate("DEMO_C",c("RIAGENDR","RIDRETH1"),data)
+nhanesTranslate("DEMO_C",c("RIAGENDR","RIDRETH1"))
+nhanesTranslate("DEMO_C",c("RIAGENDR","RIDRETH1"),data=TRUE)
+data[1:10,]
 }
