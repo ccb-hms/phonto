@@ -100,3 +100,48 @@ jointQuery <- function(table_names,cols=NULL){
 }
 
 
+
+#' Check Variable Consistency
+#'
+#' Check if the variables across over two tables and encoded as the same values.
+#'
+#'
+#' @param table1 NHANES table name 1
+#' @param table2 NHANES table name 2
+#'
+#' @return it returns a matrix, and the first and second row show whether the variable existing in table 1 or table 2, TRUE values means existing, FALSE means not existing. The third whether the variables are encoded in the same values if they shown in both tables, TRUE means encoded as the same, FALSE means they are encoded as the different value.
+#'
+#' @export
+#'
+#' @examples
+checkDataConst = function(table1,table2){
+  data1 = nhanes(table1)
+  data2 = nhanes(table2)
+  cols=union(colnames(data1), colnames(data2))
+  len_cols = length(cols)
+  res = matrix(data=FALSE,nrow=3,ncol=len_cols)
+  colnames(res) = cols
+  rownames(res) = c(table1,table2)
+  for (i in 1:len_cols) {
+    if (cols[i] %in% colnames(data1)){
+      res[1,i]=TRUE
+    }
+
+    if (cols[i] %in% colnames(data2)){
+      res[2,i]=TRUE
+    }
+
+    if(cols[i] %in% colnames(data2) & cols[i] %in% colnames(data2)){
+      code1 = nhanesTranslate(table1,cols[i])
+      code2 = nhanesTranslate(table1,cols[i])
+      res[3,i] = all.equal(code1[[cols[i]]],code2[[cols[i]]])
+    }else{
+      res[3,i] = NA
+    }
+  }
+
+  res
+
+}
+
+

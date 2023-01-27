@@ -7,7 +7,7 @@
 nhanesTranslate(
   nh_table,
   colnames = NULL,
-  data = NULL,
+  data = FALSE,
   nchar = 32,
   mincategories = 2,
   details = FALSE,
