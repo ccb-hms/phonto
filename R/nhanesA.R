@@ -164,31 +164,23 @@ nhanesTables = function( data_group, year,
   nhanesQuery(tables)
 }
 
-##Arguments:
 
-##data_group: The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION,
-##          LABORATORY, QUESTIONNAIRE). Abbreviated terms may also be
-##         used: (DEMO, DIET, EXAM, LAB, Q).
-
-##    year: The year in yyyy format where 1999 <= yyyy.
-
-##   nchar: Truncates the table description to a max length of nchar.
-
-## details: If TRUE then a more detailed description of the tables is
-##          returned (default=FALSE).
-
-##namesonly: If TRUE then only the table names are returned
-##          (default=FALSE).
-
-##includerdc: If TRUE then RDC only tables are included in list
-##          (default=FALSE).
-
-
-###nhanesTableVars
-#### nhanesTableVars('EXAM', 'BMX_D')
 
 ##note for our system we only need nh_table - the other details are not relevant
 ##so no need to process or pay attention to them
+
+#' Displays a list of variables in the specified NHANES table.
+#'
+#' @param data_group data_group: The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION,LABORATORY, QUESTIONNAIRE). Abbreviated terms may also beused: (DEMO, DIET, EXAM, LAB, Q).
+#' @param nh_tableThe name of the specific table to retrieve.
+#' @param details If TRUE then a more detailed description of the tables is returned (default=FALSE).
+#' @param nchar Truncates the table description to a max length of nchar.
+#' @param namesonly If TRUE then only the table names are returned (default=FALSE).
+#'
+#' @return The number of characters in the Variable Description to print. Default length is 128, which is set to enhance readability cause variable descriptions can be very long.
+#' @export
+#'
+#' @examples nhanesTableVars('LAB', 'CBC_E')
 nhanesTableVars = function(data_group, nh_table, details = FALSE, nchar=128, namesonly = FALSE) {
   ans = paste0("SELECT Variable,Description from
                 QuestionnaireVariables where Questionnaire='", nh_table, "'")

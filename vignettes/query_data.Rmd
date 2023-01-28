@@ -22,12 +22,6 @@ library(phonto)
 library(DT)
 library(nhanesA)
 
-
-sqlHost <- "localhost"
-sqlUserName <- "sa"
-sqlPassword <- "yourStrong(!)Password"
-sqlDefaultDb <- "NhanesLandingZone"
-
 ```
 
 
@@ -37,70 +31,5 @@ It can be search by certain variable.
 
 ### 1) The function of search table names only by veriable has been replicated
 ```{r search_tables,warning=FALSE,message=FALSE}
-# nameonly <- nhanesSearchVarName('BPXPULS')
-# nameonly
-
-# replicate function
-nameonly1 <- searchTablesByVar('BPXPULS')
-nameonly1
-```
-
-### 2) We need the meta data in the databse to replicate the details if we need them.
-```{r varsearch_tables,warning=FALSE,message=FALSE}
-# details <- nhanesSearchVarName('BPXPULS', includerdc=TRUE, ystart=2001, ystop=2008, nchar=20,namesonly=F)
-# datatable(details)
-# But we can do something like this now:
-searchTableByName("BPX",ystart=2001, ystop=2008)
-```
-
-
-
-
-### 3) Joint query
-Replicated the name only version and need meta data in database to replicate the details
-```{r search_tables1,warning=FALSE,message=FALSE}
-cols = c("RIDAGEYR","RIAGENDR","BMXBMI","DMDEDUC2")
-data = jointQuery(c('BodyMeasures','DemographicVariablesAndSampleWeights'),cols)
-DT::datatable(data)
-```
-
-### 3) Union Query
-
-```{r search_union,warning=FALSE,message=FALSE}
-tablnames = searchTableByName('BPX[_]')
-tablnames
-blood_df <- unionQuery(tablnames$TableName,cols =c("BPXDI1","BPXDI2","BPXSY1","BPXSY2"))
-DT::datatable(blood_df)
-```
-
-
-### 3) query by variables
-
-We need to ensure all the variables can be found across the same table group; otherwise, the function will throw an error.
-
-```{r search_unionvar,warning=FALSE,message=FALSE}
-searchTablesByVar("URXDMA")
-phy_urine = c("URXDAZ","URXDMA","URXEQU", "URXETD","URXETL","URXGNS")
-
-# another new function that allow users query data by a group variables
-phy_urine_df = queryByVars(phy_urine)
-DT::datatable(phy_urine_df)
-```
-
-
-
-
-
-## Step 2: check tables
-
-#### 1) A quick way to do it is to show the table names' details, and we can find the table named "P_BPXO" and "BPXO_J" are different from the rest of the tables that present blood pressures.
-```{r check_tables,warning=FALSE,message=FALSE}
-tb_detail <- nhanesSearchTableNames('BPX', includerdc=TRUE, nchar=42, details=TRUE)
-datatable(tb_detail)
-```
-#### 2) We can also check tables by showing the variables and descriptions in the tables.
-For example,
-```{r check_tables2,warning=FALSE,message=FALSE}
-var_detail <- variableDescr("BPX_D")
-datatable(var_detail)
+checkDataConst("DEMO_C","DEMO_D")
 ```

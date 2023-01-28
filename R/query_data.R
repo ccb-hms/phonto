@@ -113,7 +113,7 @@ jointQuery <- function(table_names,cols=NULL){
 #'
 #' @export
 #'
-#' @examples
+#' @examples checkDataConst("DEMO_C","DEMO_D")
 checkDataConst = function(table1,table2){
   data1 = nhanes(table1)
   data2 = nhanes(table2)
@@ -121,7 +121,7 @@ checkDataConst = function(table1,table2){
   len_cols = length(cols)
   res = matrix(data=FALSE,nrow=3,ncol=len_cols)
   colnames(res) = cols
-  rownames(res) = c(table1,table2)
+  rownames(res) = c(table1,table2,"Encode")
   for (i in 1:len_cols) {
     if (cols[i] %in% colnames(data1)){
       res[1,i]=TRUE
