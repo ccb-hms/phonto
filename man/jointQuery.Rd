@@ -4,20 +4,14 @@
 \alias{jointQuery}
 \title{Joint Query}
 \usage{
-jointQuery(table_names, cols = NULL)
+jointQuery(tables_n_cols)
 }
 \arguments{
-\item{table_names}{list of the table names want to joint and query}
-
-\item{cols}{columns}
-}
-\value{
-it merges the researched results and returns the results as a data frame.
+\item{tables_n_cols}{}
 }
 \description{
 Joint Query
 }
 \examples{
-jointQuery(c("DEMO","BMX"))
-jointQuery(c("DEMO","BodyMeasures"))
+jointQuery( list(BPQ_J=c("BPQ020", "BPQ050A"), DEMO_J=c("RIDAGEYR","RIAGENDR")))
 }

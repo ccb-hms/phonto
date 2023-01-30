@@ -2,23 +2,16 @@
 % Please edit documentation in R/query_data.R
 \name{unionQuery}
 \alias{unionQuery}
-\title{Query Data with names of the tables}
+\title{Union Query}
 \usage{
-unionQuery(tb_names, cols = NULL)
+unionQuery(table_names, cols = NULL)
 }
 \arguments{
-\item{tb_names}{names of the tables}
-
-\item{cols}{columns, the function will query all the columns if it is set to NULL as default.}
-}
-\value{
-it combines the researched results and returns the results as a data frame.
+\item{cols}{}
 }
 \description{
-Query Data with names of the tables
+Union Query
 }
 \examples{
-unionQuery(tb_names=c("BPX_D","BPX_E"),cols=c("BPXDI1","BPXDI2"))
-unionQuery(tb_names=c("PhthalatesPhytoestrogensAndPAHsUrine","PhytoestrogensUrine"),cols=c("URXDAZ","URXDMA"))
-
+unionQuery(c("DEMO_B","DEMO_D"),c("RIDAGEYR","RIAGENDR"))
 }

@@ -33,68 +33,64 @@ queryByVars = function(vars=NULL,ystart = NULL,ystop = NULL){
 }
 
 
-#' Query Data with names of the tables
+
+#' Joint Query
 #'
+#' @param tables_n_cols
 #'
-#'
-#' @param tb_names names of the tables
-#' @param cols columns, the function will query all the columns if it is set to NULL as default.
-#'
-#' @return it combines the researched results and returns the results as a data frame.
+#' @return
 #' @export
 #'
-#' @examples unionQuery(tb_names=c("BPX_D","BPX_E"),cols=c("BPXDI1","BPXDI2"))
-#' @examples unionQuery(tb_names=c("PhthalatesPhytoestrogensAndPAHsUrine","PhytoestrogensUrine"),cols=c("URXDAZ","URXDMA"))
-#'
-unionQuery <- function(tb_names, cols=NULL){
-  tb_names = unique(tb_names)
-  if(is.null(cols)){
-    cols <- "*"
-  }else{
-    cols <- paste(c("SEQN",cols),collapse=",")
-  }
+#' @examples jointQuery( list(BPQ_J=c("BPQ020", "BPQ050A"), DEMO_J=c("RIDAGEYR","RIAGENDR")))
+jointQuery <- function(tables_n_cols){
+  tb_names = names(tables_n_cols)
+
+  cols=toString(sprintf("%s", unlist(tables_n_cols)))
 
   sql<- paste0("SELECT ",cols ,
                 " FROM ",tb_names[1])
-  if(length(tb_names)>=2){
-    for(tl_n in tb_names[2:length(tb_names)]){
-      sql = paste0(sql," UNION SELECT ",cols ,
-                   " FROM ",tl_n)
-    }
 
+  if(length(tb_names)>=2){
+    for(long_tb in tb_names[2:length(tb_names)]){
+      sql <- paste0(sql," INNER JOIN ",long_tb," ON ",tb_names[1],".SEQN = ",long_tb,".SEQN")
+    }
   }
+
+
+  # print(sql)
   nhanesQuery(sql)
 
 }
 
-#' Joint Query
+
+#' Union Query
 #'
-#' @param table_names list of the table names want to joint and query
-#' @param cols columns
+#' @param table_names
+#' @param cols
 #'
-#' @return it merges the researched results and returns the results as a data frame.
+#' @return
 #' @export
 #'
-#' @examples jointQuery(c("DEMO","BMX"))
-#' @examples jointQuery(c("DEMO","BodyMeasures"))
-#' @example  cols = c("RIDAGEYR","RIAGENDR","BMXBMI","DMDEDUC2")
-#' jointQuery(c('BodyMeasures','DemographicVariablesAndSampleWeights'),cols)
-jointQuery <- function(table_names,cols=NULL){
+#' @examples unionQuery(c("DEMO_B","DEMO_D"),c("RIDAGEYR","RIAGENDR"))
+unionQuery= function(table_names,cols=NULL){
 
   if(is.null(cols)){
     cols <- "*"
   }else{
-    cols <- paste0(c(paste0(table_names[1],".SEQN"),cols),collapse=", ")
+    cols <- paste0("SEQN, ",toString(sprintf("%s", cols)))
   }
 
   sql <- paste("SELECT ",cols,
                "FROM", table_names[1])
   if(length(table_names)>=2){
-    for(long_tb in table_names[2:length(table_names)]){
-      sql <- paste0(sql," INNER JOIN ",long_tb," ON ",table_names[1],".SEQN = ",long_tb,".SEQN")
+    for(tl_n in table_names[2:length(table_names)]){
+      sql = paste0(sql," UNION SELECT ",cols ,
+                   " FROM ",tl_n)
     }
+
   }
 
+  print(sql)
   nhanesQuery(sql)
 
 }

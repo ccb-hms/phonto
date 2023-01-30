@@ -29,7 +29,20 @@ library(nhanesA)
 
 It can be search by certain variable.
 
-### 1) The function of search table names only by veriable has been replicated
+### 1) Check variables constantancy
+
 ```{r search_tables,warning=FALSE,message=FALSE}
-checkDataConst("DEMO_C","DEMO_D")
+checkDataConst("DEMO_C","DEMO_D") |> DT::datatable()
+```
+
+### 2) Union Query
+
+```{r uniq,warning=FALSE,message=FALSE}
+unionQuery(c("DEMO_B","DEMO_D"),c("RIDAGEYR","RIAGENDR")) |> DT::datatable()
+```
+
+### 3) Joint Query
+
+```{r uniq2,warning=FALSE,message=FALSE}
+jointQuery( list(BPQ_J=c("BPQ020", "BPQ050A"), DEMO_J=c("RIDAGEYR","RIAGENDR"))) |> DT::datatable()
 ```

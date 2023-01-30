@@ -17,3 +17,6 @@ it returns a matrix, and the first and second row show whether the variable exis
 \description{
 Check if the variables across over two tables and encoded as the same values.
 }
+\examples{
+checkDataConst("DEMO_C","DEMO_D")
+}
