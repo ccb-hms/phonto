@@ -15,13 +15,13 @@ nhanesTableVars(
 \arguments{
 \item{data_group}{data_group: The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION,LABORATORY, QUESTIONNAIRE). Abbreviated terms may also beused: (DEMO, DIET, EXAM, LAB, Q).}
 
+\item{nh_table}{The name of the specific table to retrieve.}
+
 \item{details}{If TRUE then a more detailed description of the tables is returned (default=FALSE).}
 
 \item{nchar}{Truncates the table description to a max length of nchar.}
 
 \item{namesonly}{If TRUE then only the table names are returned (default=FALSE).}
-
-\item{nh_tableThe}{name of the specific table to retrieve.}
 }
 \value{
 The number of characters in the Variable Description to print. Default length is 128, which is set to enhance readability cause variable descriptions can be very long.

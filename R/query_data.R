@@ -36,26 +36,57 @@ queryByVars = function(vars=NULL,ystart = NULL,ystop = NULL){
 
 #' Joint Query
 #'
-#' @param tables_n_cols
+#' @param tables_n_cols a list contains tables and colunmns
 #'
-#' @return
+#' @return data frame
 #' @export
 #'
 #' @examples jointQuery( list(BPQ_J=c("BPQ020", "BPQ050A"), DEMO_J=c("RIDAGEYR","RIAGENDR")))
+#' @examples cols = list(DEMO_I=c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2","years"),
+#'                      DEMO_J=c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2","years"),
+#'                      BPQ_I=c('BPQ050A','BPQ020'),BPQ_J=c('BPQ050A','BPQ020'),
+#'                      HDL_I=c("LBDHDD"),HDL_J=c("LBDHDD"), TRIGLY_I=c("LBXTR","LBDLDL"))
+#' jointQuery(cols)
 jointQuery <- function(tables_n_cols){
-  tb_names = names(tables_n_cols)
-
-  cols=toString(sprintf("%s", unlist(tables_n_cols)))
-
-  sql<- paste0("SELECT ",cols ,
-                " FROM ",tb_names[1])
-
-  if(length(tb_names)>=2){
-    for(long_tb in tb_names[2:length(tb_names)]){
-      sql <- paste0(sql," INNER JOIN ",long_tb," ON ",tb_names[1],".SEQN = ",long_tb,".SEQN")
+  cols_to_tables = list() # it won't be long and we do not know the lenth ahead.
+  for (cl in names(tables_n_cols)){
+    col = tables_n_cols[[cl]]
+    col = toString(sprintf("%s", unlist(col)))
+    col = paste0("SEQN, ",col)
+    if(!col %in% names(cols_to_tables)){
+      cols_to_tables[[col]] = cl
+    }else{
+      cols_to_tables[[col]]=c(cols_to_tables[[col]],cl)
     }
   }
 
+  sql = "WITH"
+  i = 1
+  for (cn in names(cols_to_tables)) {
+    sql = paste(sql,LETTERS[i],"AS","(SELECT", cn," FROM ",cols_to_tables[[cn]][1])
+    i = i+1
+    if(length(cols_to_tables[[cn]])>1){
+      for (j in 2:length(cols_to_tables[[cn]])) {
+        tb1 = cols_to_tables[[cn]][j]
+        sql = paste(sql,"UNION ALL SELECT", cn," FROM ",cols_to_tables[[cn]][j])
+      }
+    }
+    sql = paste0(sql,"),")
+  }
+
+  sql = substring(sql,1,nchar(sql)-1)
+
+  final_cols = unique(unlist(tables_n_cols))
+  final_cols = toString(sprintf("%s", unlist(final_cols)))
+  final_cols = paste0("A.SEQN, ",final_cols)
+
+  query_sql = paste("SELECT",final_cols,"FROM A")
+  for (i in 2:length(cols_to_tables)) {
+    query_sql = paste0(query_sql," JOIN ",LETTERS[i]," ON A.SEQN=",LETTERS[i],".SEQN")
+  }
+
+  sql = paste0(sql, "
+             ",query_sql)
 
   # print(sql)
   nhanesQuery(sql)
@@ -65,10 +96,10 @@ jointQuery <- function(tables_n_cols){
 
 #' Union Query
 #'
-#' @param table_names
-#' @param cols
+#' @param table_names nhanes table names
+#' @param cols columns
 #'
-#' @return
+#' @return data frame
 #' @export
 #'
 #' @examples unionQuery(c("DEMO_B","DEMO_D"),c("RIDAGEYR","RIAGENDR"))
@@ -84,13 +115,12 @@ unionQuery= function(table_names,cols=NULL){
                "FROM", table_names[1])
   if(length(table_names)>=2){
     for(tl_n in table_names[2:length(table_names)]){
-      sql = paste0(sql," UNION SELECT ",cols ,
+      sql = paste0(sql," UNION ALL SELECT ",cols ,
                    " FROM ",tl_n)
     }
 
   }
 
-  print(sql)
   nhanesQuery(sql)
 
 }
@@ -109,8 +139,8 @@ unionQuery= function(table_names,cols=NULL){
 #'
 #' @export
 #'
-#' @examples checkDataConst("DEMO_C","DEMO_D")
-checkDataConst = function(table1,table2){
+#' @examples checkDataConsistency("DEMO_C","DEMO_D")
+checkDataConsistency = function(table1,table2){
   data1 = nhanes(table1)
   data2 = nhanes(table2)
   cols=union(colnames(data1), colnames(data2))

@@ -7,7 +7,12 @@
 unionQuery(table_names, cols = NULL)
 }
 \arguments{
-\item{cols}{}
+\item{table_names}{nhanes table names}
+
+\item{cols}{columns}
+}
+\value{
+data frame
 }
 \description{
 Union Query

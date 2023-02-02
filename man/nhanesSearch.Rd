@@ -29,6 +29,8 @@ nhanesSearch(
 
 \item{ystop}{Four digit year of final survey included in search, where ystop >= ystart.}
 
+\item{includerdc}{including document}
+
 \item{nchar}{Truncates the variable description to a max length of nchar.}
 
 \item{namesonly}{If TRUE then only the table names are returned (default=FALSE).}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/nhanesA.R
 \name{nhanesTables}
 \alias{nhanesTables}
-\title{Title}
+\title{Returns a list of table names for the specified survey group.}
 \usage{
 nhanesTables(
   data_group,
@@ -14,8 +14,24 @@ nhanesTables(
 )
 }
 \arguments{
-\item{includerdc}{}
+\item{data_group}{The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE). Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).}
+
+\item{year}{The year in yyyy format where 1999 <= yyyy.}
+
+\item{nchar}{Truncates the table description to a max length of nchar.}
+
+\item{details}{If TRUE then a more detailed description of the tables is returned (default=FALSE).}
+
+\item{namesonly}{If TRUE then only the table names are returned (default=FALSE).}
+
+\item{includerdc}{If TRUE then RDC only tables are included in list (default=FALSE).}
+}
+\value{
+Returns a data frame that contains table attributes. If namesonly=TRUE, then a character vector of table names is returned.
 }
 \description{
-Title
+Returns a list of table names for the specified survey group.
+}
+\examples{
+nhanesTables('EXAM', 2007)
 }

@@ -1,13 +1,6 @@
 
-#' Query data from the Docker database
-#'
-#' It is an internal function.
-#'
-#' @param sql string of sql
-#'
-#' @return a data frame of the results
-#'
-#' @examples query("SELECT TOP(50) * FROM QuestionnaireVariables;")
+## Query data from the Docker database
+## examples: nhanesQuery("SELECT TOP(50) * FROM QuestionnaireVariables;")
 nhanesQuery <- function(sql){
 
   # suppress warining from DBI::dbConnect()

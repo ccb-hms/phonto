@@ -7,11 +7,19 @@
 jointQuery(tables_n_cols)
 }
 \arguments{
-\item{tables_n_cols}{}
+\item{tables_n_cols}{a list contains tables and colunmns}
+}
+\value{
+data frame
 }
 \description{
 Joint Query
 }
 \examples{
 jointQuery( list(BPQ_J=c("BPQ020", "BPQ050A"), DEMO_J=c("RIDAGEYR","RIAGENDR")))
+cols = list(DEMO_I=c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2","years"),
+                     DEMO_J=c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2","years"),
+                     BPQ_I=c('BPQ050A','BPQ020'),BPQ_J=c('BPQ050A','BPQ020'),
+                     HDL_I=c("LBDHDD"),HDL_J=c("LBDHDD"), TRIGLY_I=c("LBXTR","LBDLDL"))
+jointQuery(cols)
 }

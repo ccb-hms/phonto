@@ -9,6 +9,9 @@ nhanes(nh_table)
 \arguments{
 \item{nh_table}{The name of the specific table to retrieve.}
 }
+\value{
+data frame
+}
 \description{
 Use to download/load NHANES data tables that are in SAS format.
 }

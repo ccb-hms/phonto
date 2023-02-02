@@ -2,7 +2,7 @@
 ## classify each of the columns into one of continuous, multifactor (with some levels)
 ## or read from a prescribed set of variable names that the variable has some special attributes
 ## probably the processing should be to first figure out which of the variables are special, eg SEQN
-## 
+##
 
 
 #' simple version of PHEnome Scan ANalysis Tool (PHESANT)
@@ -12,7 +12,7 @@
 #' @return suggested data types
 #' @export
 #'
-#' @examples  phesant(df=nhanes)
+#' @examples phesant(df=nhanes('DEMO_C'))
 phesant <- function(df) {
   cnt_data <- nrow(df)
 
@@ -109,10 +109,11 @@ phesant <- function(df) {
 
 ##FIXME: what is this function supposed to do?
 ##as far as I can tell this should just be sapply(df, unique)
-##
+## Laha: sapply will fail when it has only one column
+
 n_unique <- function (df,cols){
   if (length(cols) == 0)
-    return
+    return (NULL)
   else{
     cols <- names(cols[cols==TRUE])
   }

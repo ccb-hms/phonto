@@ -128,19 +128,19 @@ nchar_default <- 128
 ########################################################
 
 
-#' Title
+#' Returns a list of table names for the specified survey group.
 #'
-#' @param data_group
-#' @param year
-#' @param nchar
-#' @param details
-#' @param namesonly
-#' @param includerdc
+#' @param data_group The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE). Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).
+#' @param year The year in yyyy format where 1999 <= yyyy.
+#' @param nchar Truncates the table description to a max length of nchar.
+#' @param details If TRUE then a more detailed description of the tables is returned (default=FALSE).
+#' @param namesonly 	If TRUE then only the table names are returned (default=FALSE).
+#' @param includerdc If TRUE then RDC only tables are included in list (default=FALSE).
 #'
-#' @return
+#' @return Returns a data frame that contains table attributes. If namesonly=TRUE, then a character vector of table names is returned.
 #' @export
 #'
-#' @examples
+#' @examples nhanesTables('EXAM', 2007)
 nhanesTables = function( data_group, year,
       nchar = 128,  details = FALSE,
       namesonly = FALSE, includerdc = FALSE ) {
@@ -172,7 +172,7 @@ nhanesTables = function( data_group, year,
 #' Displays a list of variables in the specified NHANES table.
 #'
 #' @param data_group data_group: The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION,LABORATORY, QUESTIONNAIRE). Abbreviated terms may also beused: (DEMO, DIET, EXAM, LAB, Q).
-#' @param nh_tableThe name of the specific table to retrieve.
+#' @param nh_table The name of the specific table to retrieve.
 #' @param details If TRUE then a more detailed description of the tables is returned (default=FALSE).
 #' @param nchar Truncates the table description to a max length of nchar.
 #' @param namesonly If TRUE then only the table names are returned (default=FALSE).
@@ -192,7 +192,7 @@ nhanesTableVars = function(data_group, nh_table, details = FALSE, nchar=128, nam
 #'
 #' @param nh_table The name of the specific table to retrieve.
 #'
-#' @return
+#' @return  data frame
 #' @export
 #'
 #' @examples nhanes('BPX_E')
@@ -393,9 +393,8 @@ variableDescr <- function(nh_table,
 #' @return The code translation table (or translated data frame when data is defined). Returns NULL upon error.
 #' @export
 #'
-#' @examples nhanesTranslate("DEMO_C",c("RIAGENDR","RIDRETH1")
-#' @examples data = nhanes("DEMO_C")
-#' nhanesTranslate("DEMO_C",c("RIAGENDR","RIDRETH1"),data)
+#' @examples nhanesTranslate("DEMO_C",c("RIAGENDR","RIDRETH1"))
+#' @examples nhanesTranslate("DEMO_C",c("RIAGENDR","RIDRETH1"),data=TRUE)
 nhanesTranslate = function(
     nh_table,
     colnames = NULL,
@@ -438,7 +437,7 @@ nhanesTranslate = function(
 #' @param ignore.case 	Ignore case if TRUE. (Default=FALSE).
 #' @param ystart Four digit year of first survey included in search, where ystart >= 1999.
 #' @param ystop Four digit year of final survey included in search, where ystop >= ystart.
-#' @param includerdc
+#' @param includerdc including document
 #' @param nchar Truncates the variable description to a max length of nchar.
 #' @param namesonly If TRUE then only the table names are returned (default=FALSE).
 #'
