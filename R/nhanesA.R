@@ -17,6 +17,11 @@ nhanes_group['LIMITED']       <- "NON-PUBLIC"
 nhanes_group['LTD']           <- "NON-PUBLIC"
 nhanes_survey_groups <- unlist(unique(nhanes_group))
 
+nhanes_min_year = "1999"
+nhanes_max_year = "2023"
+nhanes_years = c("1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010",
+    "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023")
+
 # Although continuous NHANES is grouped in 2-year intervals,
 # for convenience we want to specify using a single year
 nh_years <- list()
@@ -215,7 +220,7 @@ nhanes = function(nh_table){
 }
 
 
-#' Search for tables that contain a specified variable,replicate of nhanesA::nhanesSearchVarName()
+#' Search for tables that contain a specified variable,implementation of nhanesA::nhanesSearchVarName()
 #'
 #' @details The NHANES Comprehensive Variable List is scanned to find all data tables that contain the given variable name. Only a single variable name may be entered, and only exact matches will be found.
 #' @param varnames Names of variable to match.
@@ -228,10 +233,10 @@ nhanes = function(nh_table){
 #' @return By default, a character vector of table names that include the specified variable is returned. If namesonly=FALSE, then a data frame of table attributes is returned.
 #' @export
 #'
-#' @examples searchTablesByVar('BPXPULS')
-#' @examples searchTablesByVar(c('BPXPULS','BMXBMI'))
-#' @examples searchTablesByVar(c('BPXPULS','BMXBMI'),ystop=2004)
-searchTablesByVar <- function(varnames = NULL,
+#' @examples nhanesSearchVarName('BPXPULS')
+#' @examples nhanesSearchVarName(c('BPXPULS','BMXBMI'))
+#' @examples nhanesSearchVarName(c('BPXPULS','BMXBMI'),ystop=2004)
+nhanesSearchVarName <- function(varnames = NULL,
                               ystart = NULL,
                               ystop = NULL,
                               includerdc = FALSE,
@@ -446,9 +451,9 @@ nhanesTranslate = function(
 #' @return Returns a data frame that describes variables that matched the search terms. If namesonly=TRUE, then a character vector of table names that contain matched variables is returned.
 #' @export
 #'
-#' @examples nhanesSearch("bladder", ystart=2001, ystop=2008, nchar=50)
-#' @examples nhanesSearch("urin", exclude_terms="During", ystart=2009)
-#' @examples nhanesSearch(c("urine", "urinary"), ignore.case=TRUE, ystop=2006, namesonly=TRUE)
+#' @examples b1 = nhanesSearch("bladder", ystart=2001, ystop=2008, nchar=50)
+#' @examples b2 = nhanesSearch("urin", exclude_terms="During", ystart=2009)
+#' @examples b3 = nhanesSearch(c("urine", "urinary"), ignore.case=TRUE, ystop=2006, namesonly=TRUE)
 nhanesSearch = function( search_terms = NULL,
                          exclude_terms = NULL,
                          data_group = NULL,
@@ -513,7 +518,16 @@ nhanesSearch = function( search_terms = NULL,
   sql = gsub("%\\^", "", sql) # address start with ..
 
 
-
+  if( is.null(ystart) ) ystart=nhanes_min_year
+  if( is.null(ystop) ) ystop=nhanes_max_year
+  if( !(ystart %in% nhanes_years) ) {
+            warning(paste0("invalid start year given ",ystart," using ", nhanes_min_year))
+            ystart = nhanes_min_year
+  }
+  if( !(ystop %in% nhanes_years) ) {
+            warning(paste0("invalid stop year given ",ystop," using ", nhanes_max_year))
+            ystart = nhanes_min_year
+  }
   if(!is.null(ystart)){
     sql = paste(sql,"AND V.BeginYear >=",ystart)
   }
@@ -521,8 +535,10 @@ nhanesSearch = function( search_terms = NULL,
     sql <- paste(sql,"AND V.EndYear <=",ystop)
   }
   # print(sql)
-  nhanesQuery(sql)
-
+  data =  nhanesQuery(sql)
+  ##we don't want 1 column dataframes - turn into a vector
+  if (ncol(data) == 1) return(data[,1])
+  return(data)
 }
 
 

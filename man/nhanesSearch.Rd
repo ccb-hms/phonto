@@ -42,7 +42,7 @@ Returns a data frame that describes variables that matched the search terms. If 
 Perform a search over the comprehensive NHANES variable list.
 }
 \examples{
-nhanesSearch("bladder", ystart=2001, ystop=2008, nchar=50)
-nhanesSearch("urin", exclude_terms="During", ystart=2009)
-nhanesSearch(c("urine", "urinary"), ignore.case=TRUE, ystop=2006, namesonly=TRUE)
+b1 = nhanesSearch("bladder", ystart=2001, ystop=2008, nchar=50)
+b2 = nhanesSearch("urin", exclude_terms="During", ystart=2009)
+b3 = nhanesSearch(c("urine", "urinary"), ignore.case=TRUE, ystop=2006, namesonly=TRUE)
 }

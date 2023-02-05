@@ -40,6 +40,6 @@ Display code translation information.
 Most NHANES data tables have encoded values. E.g. 1 = 'Male', 2 = 'Female'. Thus it is often helpful to view the code translations and perhaps insert the translated values in a data frame. Only a single table may be specified, but multiple variables within that table can be selected. Code translations are retrieved for each variable.
 }
 \examples{
-nhanesTranslate("DEMO_C",c("RIAGENDR","RIDRETH1"))
-nhanesTranslate("DEMO_C",c("RIAGENDR","RIDRETH1"),data=TRUE)
+v1 = nhanesTranslate("DEMO_C",c("RIAGENDR","RIDRETH1"))
+v2 = nhanesTranslate("DEMO_C",c("RIAGENDR","RIDRETH1"),data=TRUE)
 }
