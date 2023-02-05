@@ -402,17 +402,11 @@ variableDescr <- function(nh_table,
 #'
 #' @examples v1 = nhanesTranslate("DEMO_C",c("RIAGENDR","RIDRETH1"))
 #' @examples v2 = nhanesTranslate("DEMO_C",c("RIAGENDR","RIDRETH1"),data=TRUE)
-nhanesTranslate = function(
-    nh_table,
-    colnames = NULL,
-    data = FALSE,
-    nchar = 32,
-    mincategories = 2,
-    details = FALSE,
-    dxa = FALSE
-    ){
 
-  if(length(nh_table) > 1 ) stop("you must select one column")
+nhanesTranslate = function( nh_table, colnames = NULL, data = FALSE, nchar = 32,
+      mincategories = 2, details = FALSE, dxa = FALSE){
+
+  if(length(nh_table) > 1 ) stop("you can only select one table")
   if(details){
     sql = "SELECT Variable,CodeOrValue,ValueDescription,Count,Cumulative,SkipToItem FROM VariableCodebook
             WHERE Questionnaire='"
@@ -426,14 +420,19 @@ nhanesTranslate = function(
 
   df = nhanesQuery(sql)
   ans=split(df, df$Variable)
-  if(data){
+  ##here we are going to let data either be a dataframe - in which case we translate in place
+  ##or it can be TRUE or FALSE - in which case we extract the data and then translate
+  if(is.data.frame(data)) { 
+     data=translate(ans, data) 
+     return(data)
+  }
+  if(data) {
     data = translate(ans,nhanes(nh_table))
     return(data)
-  }else{
-    return(ans)
+  }
+  return(ans)
   }
 
-}
 
 
 #' Perform a search over the comprehensive NHANES variable list.
