@@ -36,17 +36,19 @@ queryByVars = function(vars=NULL,ystart = NULL,ystop = NULL){
 
 #' Joint Query
 #'
-#' @param tables_n_cols a list contains tables and colunmns
+#' @param tables_n_cols a named list, each name corresponds to a Questionnaire and the value is a list of variable names.
 #'
-#' @return data frame
+#' @return data frame containing the join of the tables and selected variables
 #' @export
 #'
 #' @examples jointQuery( list(BPQ_J=c("BPQ020", "BPQ050A"), DEMO_J=c("RIDAGEYR","RIAGENDR")))
 #' @examples cols = list(DEMO_I=c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2","years"),
 #'                      DEMO_J=c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2","years"),
 #'                      BPQ_I=c('BPQ050A','BPQ020'),BPQ_J=c('BPQ050A','BPQ020'),
-#'                      HDL_I=c("LBDHDD"),HDL_J=c("LBDHDD"), TRIGLY_I=c("LBXTR","LBDLDL"))
-#' jointQuery(cols)
+#'                      HDL_I=c("LBDHDD"),HDL_J=c("LBDHDD"), TRIGLY_I=c("LBXTR","LBDLDL"),
+#'                      TRIGLY_J=c("LBXTR","LBDLDL"))
+#' ans = jointQuery(cols)
+#' dim(ans)
 jointQuery <- function(tables_n_cols){
   cols_to_tables = list() # it won't be long and we do not know the lenth ahead.
   for (cl in names(tables_n_cols)){

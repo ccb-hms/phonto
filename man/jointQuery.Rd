@@ -7,10 +7,10 @@
 jointQuery(tables_n_cols)
 }
 \arguments{
-\item{tables_n_cols}{a list contains tables and colunmns}
+\item{tables_n_cols}{a named list, each name corresponds to a Questionnaire and the value is a list of variable names.}
 }
 \value{
-data frame
+data frame containing the join of the tables and selected variables
 }
 \description{
 Joint Query
@@ -20,6 +20,8 @@ jointQuery( list(BPQ_J=c("BPQ020", "BPQ050A"), DEMO_J=c("RIDAGEYR","RIAGENDR")))
 cols = list(DEMO_I=c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2","years"),
                      DEMO_J=c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2","years"),
                      BPQ_I=c('BPQ050A','BPQ020'),BPQ_J=c('BPQ050A','BPQ020'),
-                     HDL_I=c("LBDHDD"),HDL_J=c("LBDHDD"), TRIGLY_I=c("LBXTR","LBDLDL"))
-jointQuery(cols)
+                     HDL_I=c("LBDHDD"),HDL_J=c("LBDHDD"), TRIGLY_I=c("LBXTR","LBDLDL"),
+                     TRIGLY_J=c("LBXTR","LBDLDL"))
+ans = jointQuery(cols)
+dim(ans)
 }

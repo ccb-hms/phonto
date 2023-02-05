@@ -18,6 +18,6 @@ The codebook is returned as a list object. Returns NULL upon error.
 Display codebook for selected variable.
 }
 \examples{
-nhanesCodebook('AUX_D', 'AUQ020D')
-nhanesCodebook('DEMO_D', 'RIAGENDR')
+t1 = nhanesCodebook('AUX_D', 'AUQ020D')
+t2 = nhanesCodebook('DEMO_D', 'RIAGENDR')
 }

@@ -264,7 +264,7 @@ searchTablesByVar <- function(varnames = NULL,
 }
 
 
-#' Search for matching table names, replicate of nhanesA::nhanesSearchTableNames()
+#' Search for matching table names, implementation of nhanesA::nhanesSearchTableNames()
 #'
 #' @param pattern Pattern of table names to match
 #' @param ystart Four digit year of first survey included in search, where ystart >= 1999.
@@ -276,8 +276,8 @@ searchTablesByVar <- function(varnames = NULL,
 #' @return Returns a character vector of table names that match the given pattern. If details=TRUE, then a data frame of table attributes is returned. NULL is returned when an HTML read error is encountered.
 #' @export
 #'
-#' @examples searchTableByName("BPX")
-searchTableByName <-  function(pattern = NULL,
+#' @examples nhanesSearchTableNames("BPX")
+nhanesSearchTableNames <-  function(pattern = NULL,
                                ystart = NULL,
                                ystop = NULL,
                                includerdc = FALSE,
@@ -296,6 +296,7 @@ searchTableByName <-  function(pattern = NULL,
   if(!is.null(ystop)){
     sql <- paste(sql,"AND EndYear <=",ystop)
   }
+  if( includerdc ) warning("The DB has no restricted data")
 
   df = nhanesQuery(sql)
 
@@ -303,9 +304,10 @@ searchTableByName <-  function(pattern = NULL,
     warning(paste("Cannot find any table name like:",pattern,"!"))
   }
 
-  df
-
-
+  if(details)
+     return(df)
+  else
+     return(df$Questionnaire)
 }
 
 
@@ -393,8 +395,8 @@ variableDescr <- function(nh_table,
 #' @return The code translation table (or translated data frame when data is defined). Returns NULL upon error.
 #' @export
 #'
-#' @examples nhanesTranslate("DEMO_C",c("RIAGENDR","RIDRETH1"))
-#' @examples nhanesTranslate("DEMO_C",c("RIAGENDR","RIDRETH1"),data=TRUE)
+#' @examples v1 = nhanesTranslate("DEMO_C",c("RIAGENDR","RIDRETH1"))
+#' @examples v2 = nhanesTranslate("DEMO_C",c("RIAGENDR","RIDRETH1"),data=TRUE)
 nhanesTranslate = function(
     nh_table,
     colnames = NULL,
@@ -532,8 +534,8 @@ nhanesSearch = function( search_terms = NULL,
 #' @return The codebook is returned as a list object. Returns NULL upon error.
 #' @export
 #'
-#' @examples nhanesCodebook('AUX_D', 'AUQ020D')
-#' @examples nhanesCodebook('DEMO_D', 'RIAGENDR')
+#' @examples t1 = nhanesCodebook('AUX_D', 'AUQ020D')
+#' @examples t2 = nhanesCodebook('DEMO_D', 'RIAGENDR')
 nhanesCodebook = function(nh_table, colname){
   sql = paste0("SELECT Variable, Description, Target, SasLabel FROM QuestionnaireVariables WHERE Questionnaire='",nh_table,"' AND Variable='",colname,"'")
   res = as.list(nhanesQuery(sql))
