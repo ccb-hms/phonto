@@ -369,7 +369,7 @@ variableDescr <- function(nh_table,
         bb = input_codes[[i]]
         if( bb[1, "ValueDescription"] == "Range of Values" ) next
         z1 = data[,i]
-        labels = bb$ValueDescription[match(unique(z1), bb$CodeOrValue)]
+        labels = bb$ValueDescription[match(sort(unique(z1)), bb$CodeOrValue)]
         labels = labels[!is.na(labels)]
         data[,i] = factor(z1, labels = labels)
      }
