@@ -225,7 +225,7 @@ nhanesColnames = function(tb_name){
 #' @examples nhanesDim("BMX_I")
 nhanesDim = function(tb_name){
 
-  c(nhanesNRow(tb_name),length(nhanesColnames(tb_name)))
+  c(nhanesNrow(tb_name),length(nhanesColnames(tb_name)))
 }
 
 
