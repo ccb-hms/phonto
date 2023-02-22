@@ -173,3 +173,59 @@ checkDataConsistency = function(table1,table2){
 }
 
 
+#' The Number of Rows of an NHANES table
+#'
+#' @param tb_name NHANES table name
+#'
+#' @return an integer of length 1
+#' @export
+#'
+#' @examples nhanesNrow("BMX_I")
+nhanesNrow = function(tb_name){
+  sql_str = paste0("SELECT COUNT(*) FROM ",tb_name)
+  nhanesQuery(sql_str)[1,1]
+}
+
+
+#' The Number of Columns of an NHANES table
+#'
+#' @param tb_name NHANES table name
+#'
+#' @return an integer of length 1
+#' @export
+#'
+#' @examples nhanesNcol("BMX_I")
+nhanesNcol = function(tb_name){
+  length(nhanesColnames(tb_name))
+}
+
+
+#' Column Names for NHANES tables
+#'
+#' @param tb_name NHANES table name
+#'
+#' @description Retrieve column names of an NHANES table.
+#'
+#' @return a character vector of non-zero length equal to the appropriate dimension.
+#' @export
+#'
+#' @examples nhanesColnames("BMX_I")
+nhanesColnames = function(tb_name){
+  sql_str = paste0("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '",tb_name,"'")
+  nhanesQuery(sql_str)$COLUMN_NAME
+}
+
+#' Dimensions of NHANES table
+#'
+#' @param tb_name NHANES table name
+#'
+#' @return  retrieves the dim attribute of NHANES table.
+#' @export
+#'
+#' @examples nhanesDim("BMX_I")
+nhanesDim = function(tb_name){
+
+  c(nhanesNRow(tb_name),length(nhanesColnames(tb_name)))
+}
+
+
