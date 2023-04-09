@@ -228,4 +228,58 @@ nhanesDim = function(tb_name){
   c(nhanesNrow(tb_name),length(nhanesColnames(tb_name)))
 }
 
+#' Return the First of an NHANES table
+#'
+#' @param nh_table NHANES table name
+#' @param n number of rows of NHANES table
+#'
+#' @return  retrieves the First of an NHANES table
+#' @export
+#'
+#' @examples nhanesHead("BMX_I")
+#' @examples nhanesHead("BMX_I",10)
+nhanesHead = function(nh_table,n=5){
+
+  sql = paste0("SELECT TOP(",n, ") * FROM ",nh_table)
+  df = nhanesQuery(sql)
+
+  cols = paste0("SELECT Variable from
+                QuestionnaireVariables where Questionnaire='",
+                nh_table,
+                "'")
+  cols = nhanesQuery(cols)
+  cols = cols$Variable
+  cols = cols[!cols %in% c("years","DownloadUrl","Questionnaire")]
+  df[,cols]
+}
+
+
+
+#' Return the Last of an NHANES table
+#'
+#' @param nh_table NHANES table name
+#' @param n number of rows of NHANES table
+#'
+#' @return  retrieves the Last of an NHANES table
+#' @export
+#'
+#' @examples nhanesTail("BMX_I")
+#' @examples nhanesTail("BMX_I",10)
+nhanesTail= function(nh_table,n=5){
+
+  sql = paste0("SELECT TOP(",n, ") * FROM ",nh_table," ORDER BY SEQN DESC")
+  df = nhanesQuery(sql)
+
+  cols = paste0("SELECT Variable from
+                QuestionnaireVariables where Questionnaire='",
+                nh_table,
+                "'")
+  cols = nhanesQuery(cols)
+  cols = cols$Variable
+  cols = cols[!cols %in% c("years","DownloadUrl","Questionnaire")]
+  df[,cols]
+  df = df[order(df$SEQN),]
+}
+
+
 
