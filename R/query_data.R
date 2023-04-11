@@ -269,7 +269,7 @@ nhanesTail= function(nh_table,n=5){
 
   sql = paste0("SELECT TOP(",n, ") * FROM ",nh_table," ORDER BY SEQN DESC")
   df = nhanesQuery(sql)
-
+  df = df[order(df$SEQN),]
   cols = paste0("SELECT Variable from
                 QuestionnaireVariables where Questionnaire='",
                 nh_table,
@@ -278,7 +278,6 @@ nhanesTail= function(nh_table,n=5){
   cols = cols$Variable
   cols = cols[!cols %in% c("years","DownloadUrl","Questionnaire")]
   df[,cols]
-  df = df[order(df$SEQN),]
 }
 
 
