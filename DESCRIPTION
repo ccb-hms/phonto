@@ -1,13 +1,13 @@
 Package: phonto
 Type: Package
-Title: What the Package oes (Title Case)
-Version: 0.0.0.0042
+Title: Using NHANES via Epiconductor
+Version: 0.0.0.0043
 Maintainer: Laha Ale <ainilaha@gmail.com>
 Authors@R: 
     person("Laha", "Ale", , "first.last@example.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-4070-5289"))
 Author: Laha Ale [aut, cre]
-Description: What the package does (one paragraph).
+Description: A package to facilitate using NHANES via Epiconductor
 License: use_mit_license()
     license
 Encoding: UTF-8

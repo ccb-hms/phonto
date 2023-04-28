@@ -1,5 +1,10 @@
 ---
 title: "Building up variables defs"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Organizing Phenotypes}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 output: html_document
 date: "2023-04-28"
 ---
