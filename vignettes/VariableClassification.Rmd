@@ -1,0 +1,56 @@
+---
+title: "Building up variables defs"
+output: html_document
+date: "2023-04-28"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Get the data....
+
+Load up phonto, get the Variables and Descriptions for everything.
+Then drop identify anything that is missing either the Label or the Description
+
+```{r cars}
+  library(phonto)
+ t1 = paste0("SELECT DISTINCT Questionnaire, Variable, Description, SaSLabel FROM  QuestionnaireVariables")
+xx = phonto:::nhanesQuery(t1)
+#make a vector to store our variable labels
+outPut = rep(NA, nrow(xx))
+apply(xx,2, function(x) sum(is.na(x)))
+#Questionnaire      Variable   Description      SaSLabel 
+#            0             0          4604          4437 
+missLab = is.na(xx$SaSLabel) |is.na(xx$Description)
+usedIndex = which(missLab)
+outPut[missLab] = "Missing"
+```
+
+## Any survey weights
+
+
+And we can see already that some of the variables that start with WT have either a missing Description field or a missing SasLabel field.
+```{r weights}
+ isWT = grep("^WT", xx$Variable)
+ outPut[isWT] = "Survey Weight"
+ table(outPut, useNA="always")
+ 
+ ##variance estimates also survey weights
+ isWT = grep("^SDMV", xx$Variable)
+ outPut[isWT] = "Survey Weight"
+ 
+ ##now for Interviewer questions
+ g1 = grep("*[Ii]nterview\\??$", xx$SaSLabel)
+ outPut[g1] = "Interview"
+ 
+ ##comments - most variables end with an LC but not all...so we also
+ ## look at the description - the SasLabel doesn't work as they abbreviate
+ ##comments in weird ways
+ g1 = grep("LC$", xx$Variable)
+ g2 = grep("*[Cc]omment [Cc]ode$", xx$Description)
+ outPut[union(g1,g2)] = "Comment"
+ 
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
