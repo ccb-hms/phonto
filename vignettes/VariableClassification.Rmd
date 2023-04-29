@@ -5,7 +5,7 @@ vignette: >
   %\VignetteIndexEntry{Organizing Phenotypes}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-output: html_document
+# output: html_document
 date: "2023-04-28"
 ---
 
