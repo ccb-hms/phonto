@@ -328,7 +328,7 @@ nhanesSearchTableNames <-  function(pattern = NULL,
 #' @return Returns a data frame that describes variable attributes for the specified table. If namesonly=TRUE, then a character vector of the variable names is returned.
 #' @export
 #'
-#' @examples variableDescr("DEMO")
+#' @examples variableDescr("DEMO_C")
 #' @details NHANES tables may contain more than 100 variables. Function nhanesTableVars provides a concise display of variables for a specified table, which helps to ascertain quickly if the table is of interest. NULL is returned when an HTML read error is encountered.
 variableDescr <- function(nh_table,
                           data_group = NULL,
@@ -422,8 +422,8 @@ nhanesTranslate = function( nh_table, colnames = NULL, data = FALSE, nchar = 32,
   ans=split(df, df$Variable)
   ##here we are going to let data either be a dataframe - in which case we translate in place
   ##or it can be TRUE or FALSE - in which case we extract the data and then translate
-  if(is.data.frame(data)) { 
-     data=translate(ans, data) 
+  if(is.data.frame(data)) {
+     data=translate(ans, data)
      return(data)
   }
   if(data) {

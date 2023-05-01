@@ -1,5 +1,5 @@
 # phonto
-PHenome - PHenome ONTOlogy for NHANES
+PHONTO - PHenome ONTOlogy for NHANES
 
 ## Installation
 
