@@ -1,5 +1,5 @@
 ---
-title: "Building up variables defs"
+title: "Building Variables defs"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Organizing Phenotypes}
@@ -14,9 +14,11 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Get the data....
+One of the important aspects of the PHESANT package is that they provided some characterization of all the phenotypes, thereby making analysis easier.
 
-Load up phonto, get the Variables and Descriptions for everything.
-Then drop identify anything that is missing either the Label or the Description
+We aim to provide a similar capability for NHANES and this document provides both a description of what we did and a template for others to enhance, or correct our classifications.
+
+We first load `phonto`, and extract all questions together with the variable name, the SasLabel etc.  In the first part of this vignette we then label the different variables that are probably not useful as phenotypes.  Examples are things like survey weights, comment fields, etc.
 
 ```{r cars}
   library(phonto)
@@ -45,7 +47,9 @@ And we can see already that some of the variables that start with WT have either
  isWT = grep("^SDMV", xx$Variable)
  outPut[isWT] = "Survey Weight"
  
- ##now for Interviewer questions
+ ##now for Interview questions - eg what language was it done in etc
+ ##unlikely to be relevant, but maybe
+ 
  g1 = grep("*[Ii]nterview\\??$", xx$SaSLabel)
  outPut[g1] = "Interview"
  
@@ -58,4 +62,24 @@ And we can see already that some of the variables that start with WT have either
  
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+##Build a searchable corpus
+
+```{r eval=FALSE}
+library("corpustools")
+nhanes_df = xx
+nhanes_df$Unique = paste0(nhanes_df$Questionnaire,"_", nhanes_df$Variable)
+nhanes_tc = create_tcorpus(nhanes_df, doc_column = 'Unique', text_columns = 'Description')
+nhanes_tc$preprocess(use_stemming = TRUE, remove_stopwords=TRUE)
+
+h1 = search_features(nhanes_tc, query = c(`"blood pressure"`))
+
+h2 = search_features(nhanes_tc, query = "hypertension")
+
+  save=FALSE
+  if( save ) {
+   save(efo_tc, file= paste0(path, "/nhanes_tc.rda"), compress="xz")
+   save(efo_df, file=paste0(path, "/nhanes_df.rda"), compress="xz")
+  }
+
+
+```

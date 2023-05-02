@@ -434,7 +434,10 @@ nhanesTranslate = function( nh_table, colnames = NULL, data = FALSE, nchar = 32,
   }
 
 
-
+## explicitly this searches the Description field (which is the text read to the participant) of
+## the QuestionaireVariables table. It should probably have some way to also consider the SASLabel
+## do we know what nhanesA does?
+##we should strip the TableName out of the return value - that is an implementation detail
 #' Perform a search over the comprehensive NHANES variable list.
 #'
 #' @param search_terms List of terms or keywords.
@@ -540,13 +543,14 @@ nhanesSearch = function( search_terms = NULL,
   return(data)
 }
 
-
-#' Display codebook for selected variable.
+#FIXME: Somehow we should have the last item in the return be called Codebook - I think
+#' Display the NHANES codebook for selected variable.
 #'
-#' @param nh_table The name of the NHANES table that contains the desired variable.
-#' @param colname the name of the table column (variable).
+#' @param nh_table The name of the NHANES Questionaire that contains the desired variable.
+#' @param colname The NHANES variable name.
 #'
-#' @return The codebook is returned as a list object. Returns NULL upon error.
+#' @return The codebook is returned as a list with components
+#'         Variable, Description, Target, SasLabel and Codebook
 #' @export
 #'
 #' @examples t1 = nhanesCodebook('AUX_D', 'AUQ020D')
@@ -554,10 +558,9 @@ nhanesSearch = function( search_terms = NULL,
 nhanesCodebook = function(nh_table, colname){
   sql = paste0("SELECT Variable, Description, Target, SasLabel FROM QuestionnaireVariables WHERE Questionnaire='",nh_table,"' AND Variable='",colname,"'")
   res = as.list(nhanesQuery(sql))
-  res[[colname]]=phonto::nhanesTranslate(nh_table, colname,details = T)
+  res[["Codebook"]]=phonto::nhanesTranslate(nh_table, colname,details = TRUE)[[1]]
   res
 }
-
 
 
 
