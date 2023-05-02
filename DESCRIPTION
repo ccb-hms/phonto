@@ -17,7 +17,6 @@ Depends:
     R (>= 4.0)
 Imports:
     DBI,
-    MsSqlTools,
     nhanesA,
     stringr
 LazyData: true
