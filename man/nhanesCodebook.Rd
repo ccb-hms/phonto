@@ -2,20 +2,21 @@
 % Please edit documentation in R/nhanesA.R
 \name{nhanesCodebook}
 \alias{nhanesCodebook}
-\title{Display codebook for selected variable.}
+\title{Display the NHANES codebook for selected variable.}
 \usage{
 nhanesCodebook(nh_table, colname)
 }
 \arguments{
-\item{nh_table}{The name of the NHANES table that contains the desired variable.}
+\item{nh_table}{The name of the NHANES Questionaire that contains the desired variable.}
 
-\item{colname}{the name of the table column (variable).}
+\item{colname}{The NHANES variable name.}
 }
 \value{
-The codebook is returned as a list object. Returns NULL upon error.
+The codebook is returned as a list with components
+Variable, Description, Target, SasLabel and Codebook
 }
 \description{
-Display codebook for selected variable.
+Display the NHANES codebook for selected variable.
 }
 \examples{
 t1 = nhanesCodebook('AUX_D', 'AUQ020D')

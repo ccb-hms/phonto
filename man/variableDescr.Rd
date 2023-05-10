@@ -33,5 +33,5 @@ a wrap of nhanesA::nhanesTableVars()
 NHANES tables may contain more than 100 variables. Function nhanesTableVars provides a concise display of variables for a specified table, which helps to ascertain quickly if the table is of interest. NULL is returned when an HTML read error is encountered.
 }
 \examples{
-variableDescr("DEMO")
+variableDescr("DEMO_C")
 }

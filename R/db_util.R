@@ -19,3 +19,10 @@ nhanesQuery <- function(sql){
   df
 }
 
+# this will be an internal function to switch functions from PHONTO to nhanesA
+witchPHONTO = function(){
+  if (Sys.getenv("EPICONDUCTOR_CONTAINER_VERSION")==""){
+    return()
+  }
+}
+

@@ -543,7 +543,7 @@ nhanesSearch = function( search_terms = NULL,
   return(data)
 }
 
-#FIXME: Somehow we should have the last item in the return be called Codebook - I think
+
 #' Display the NHANES codebook for selected variable.
 #'
 #' @param nh_table The name of the NHANES Questionaire that contains the desired variable.
