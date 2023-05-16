@@ -1,15 +1,14 @@
 Package: phonto
 Type: Package
 Title: Using NHANES via Epiconductor
-Version: 0.0.0.0044
+Version: 0.0.0.0045
 Maintainer: Laha Ale <ainilaha@gmail.com>
 Authors@R: 
     person("Laha", "Ale", , "first.last@example.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-4070-5289"))
 Author: Laha Ale [aut, cre]
 Description: A package to facilitate using NHANES via Epiconductor
-License: use_mit_license()
-    license
+License: License: CC BY 4.0 | file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
@@ -18,7 +17,8 @@ Depends:
 Imports:
     DBI,
     nhanesA,
-    stringr
+    stringr,
+    MsSqlTools
 LazyData: true
 Suggests: 
     rmarkdown,

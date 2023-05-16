@@ -165,7 +165,7 @@ nhanesTables = function( data_group, year,
   tables = paste0("SELECT * from
                 QuestionnaireDescriptions where DataGroup='",
                 data_group, "' and ", ifelse(EVEN, "EndYear", "BeginYear"), "=",year)
-  print(tables)
+  # print(tables)
   nhanesQuery(tables)
 }
 
