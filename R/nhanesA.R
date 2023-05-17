@@ -162,11 +162,26 @@ nhanesTables = function( data_group, year,
   else stop("Invalid year")
   ##construct SQL queries
 
-  tables = paste0("SELECT * from
+
+  tables = paste0("SELECT Questionnaire AS 'Data.File.Name',
+                Description as 'Data.File.Description',
+                BeginYear as 'Begin.Year',
+                DataGroup as Component, EndYear
+                FROM
                 QuestionnaireDescriptions where DataGroup='",
-                data_group, "' and ", ifelse(EVEN, "EndYear", "BeginYear"), "=",year)
-  # print(tables)
+                    data_group, "' and ", ifelse(EVEN, "EndYear", "BeginYear"), "=",year)
+
+
+  if(details==FALSE){
+    tables = paste0("SELECT Questionnaire AS 'Data.File.Name',
+                Description as 'Data.File.Description'
+                FROM
+                QuestionnaireDescriptions where DataGroup='",
+                    data_group, "' and ", ifelse(EVEN, "EndYear", "BeginYear"), "=",year)
+  }
+
   nhanesQuery(tables)
+
 }
 
 
@@ -187,7 +202,7 @@ nhanesTables = function( data_group, year,
 #'
 #' @examples nhanesTableVars('LAB', 'CBC_E')
 nhanesTableVars = function(data_group, nh_table, details = FALSE, nchar=128, namesonly = FALSE) {
-  ans = paste0("SELECT Variable,Description from
+  ans = paste0("SELECT Variable as 'Variable.Name',Description as 'Variable.Description' from
                 QuestionnaireVariables where Questionnaire='", nh_table, "'")
 
   nhanesQuery(ans)
@@ -264,7 +279,7 @@ nhanesSearchVarName <- function(varnames = NULL,
       warning(paste("Variable ",v, "is not found in the database!"))
     }
   }
-  df
+  df$Questionnaire
 
 }
 
