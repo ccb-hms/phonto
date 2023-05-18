@@ -36,7 +36,6 @@ Search for tables that contain a specified variable,implementation of nhanesA::n
 The NHANES Comprehensive Variable List is scanned to find all data tables that contain the given variable name. Only a single variable name may be entered, and only exact matches will be found.
 }
 \examples{
-nhanesSearchVarName('BPXPULS')
 nhanesSearchVarName(c('BPXPULS','BMXBMI'))
 nhanesSearchVarName(c('BPXPULS','BMXBMI'),ystop=2004)
 }

@@ -11,9 +11,8 @@
 #' @return union data frame
 #' @export
 #'
-#' @examples queryByVars(c("URXDAZ","URXDMA"))
-#' @examples vars = c("URXDAZ","URXDMA","URXEQU", "URXETD","URXETL","URXGNS")
-#' df = queryByVars(vars)
+#' @examples df = queryByVars(c("URXDAZ","URXDMA"))
+
 queryByVars = function(vars=NULL,ystart = NULL,ystop = NULL){
   if(is.null(vars) | length(vars) <1) return (NULL)
   vars <- unique(vars)
@@ -41,7 +40,7 @@ queryByVars = function(vars=NULL,ystart = NULL,ystop = NULL){
 #' @return data frame containing the join of the tables and selected variables
 #' @export
 #'
-#' @examples jointQuery( list(BPQ_J=c("BPQ020", "BPQ050A"), DEMO_J=c("RIDAGEYR","RIAGENDR")))
+#' @examples df = jointQuery( list(BPQ_J=c("BPQ020", "BPQ050A"), DEMO_J=c("RIDAGEYR","RIAGENDR")))
 #' @examples cols = list(DEMO_I=c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2"),
 #'                      DEMO_J=c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2"),
 #'                      BPQ_I=c('BPQ050A','BPQ020'),BPQ_J=c('BPQ050A','BPQ020'),
@@ -104,7 +103,7 @@ jointQuery <- function(tables_n_cols){
 #' @return data frame
 #' @export
 #'
-#' @examples unionQuery(c("DEMO_B","DEMO_D"),c("RIDAGEYR","RIAGENDR"))
+#' @examples df = unionQuery(c("DEMO_B","DEMO_D"),c("RIDAGEYR","RIAGENDR"))
 unionQuery= function(table_names,cols=NULL){
 
   if(is.null(cols)){

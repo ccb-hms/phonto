@@ -18,5 +18,5 @@ data frame
 Union Query
 }
 \examples{
-unionQuery(c("DEMO_B","DEMO_D"),c("RIDAGEYR","RIAGENDR"))
+df = unionQuery(c("DEMO_B","DEMO_D"),c("RIDAGEYR","RIAGENDR"))
 }

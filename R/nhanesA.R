@@ -248,7 +248,6 @@ nhanes = function(nh_table){
 #' @return By default, a character vector of table names that include the specified variable is returned. If namesonly=FALSE, then a data frame of table attributes is returned.
 #' @export
 #'
-#' @examples nhanesSearchVarName('BPXPULS')
 #' @examples nhanesSearchVarName(c('BPXPULS','BMXBMI'))
 #' @examples nhanesSearchVarName(c('BPXPULS','BMXBMI'),ystop=2004)
 nhanesSearchVarName <- function(varnames = NULL,
@@ -352,11 +351,11 @@ variableDescr <- function(nh_table,
                           namesonly = FALSE){
   df <- NULL
   if (!is.null(data_group)) {
-    df <- nhanesA::nhanesTableVars(data_group, nh_table, details, nchar, namesonly)
+    df <- phonto::nhanesTableVars(data_group, nh_table, details, nchar, namesonly)
   }else{
     for (g in c('DEMO', 'DIET', 'EXAM', 'LAB', 'Q')) {
       tryCatch({
-        df <- nhanesA::nhanesTableVars(g, nh_table, details, nchar, namesonly)
+        df <- phonto::nhanesTableVars(g, nh_table, details, nchar, namesonly)
       },
       error=function(cond) {
         # message(paste0("No information found in group ",g))

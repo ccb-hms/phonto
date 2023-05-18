@@ -20,7 +20,5 @@ union data frame
 It search the tables contain the given variables and query data union
 }
 \examples{
-queryByVars(c("URXDAZ","URXDMA"))
-vars = c("URXDAZ","URXDMA","URXEQU", "URXETD","URXETL","URXGNS")
-df = queryByVars(vars)
+df = queryByVars(c("URXDAZ","URXDMA"))
 }

@@ -1,7 +1,7 @@
 Package: phonto
 Type: Package
 Title: Using NHANES via Epiconductor
-Version: 0.0.0.0046
+Version: 0.0.0.0047
 Maintainer: Laha Ale <ainilaha@gmail.com>
 Authors@R: 
     person("Laha", "Ale", , "first.last@example.com", role = c("aut", "cre"),
