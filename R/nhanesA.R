@@ -577,5 +577,19 @@ nhanesCodebook = function(nh_table, colname){
 }
 
 
+#' Show the doc page
+#'
+#' @param nh_table a NHANES table name
+#'
+#' @return open the CDC doc page
+#' @export
+#'
+#' @examples nhanesCDCDataDoc("DEMO_C")
+nhanesCDCDataDoc = function(nh_table){
+  url_str = paste0("https://wwwn.cdc.gov/nchs/nhanes/",.get_year_from_nh_table(nh_table),"/",nh_table,".htm")
+  browseURL(url_str)
+
+}
+
 
 

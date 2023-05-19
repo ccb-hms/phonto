@@ -3,6 +3,7 @@
 export(checkDataConsistency)
 export(jointQuery)
 export(nhanes)
+export(nhanesCDCDataDoc)
 export(nhanesCodebook)
 export(nhanesColnames)
 export(nhanesDim)

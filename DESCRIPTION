@@ -1,12 +1,14 @@
 Package: phonto
 Type: Package
 Title: Using NHANES via Epiconductor
-Version: 0.0.0.0047
-Maintainer: Laha Ale <ainilaha@gmail.com>
+Version: 0.0.0.0048
+Maintainer: Laha Ale <laha.ale@ieee.org>, Robert Gentleman <robert_gentleman@g.harvard.edu>
 Authors@R: 
-    person("Laha", "Ale", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0002-4070-5289"))
-Author: Laha Ale [aut, cre]
+    c(
+    person("Laha", "Ale", ,"laha.ale@ieee.org", role = c("aut", "cre"),comment = c(ORCID = "0000-0002-4070-5289")),
+    person("Robert", "Gentleman", ,"robert_gentleman@g.harvard.edu", role = "aut")
+           )
+Author: Laha Ale [aut, cre], Robert Gentleman[aut]
 Description: A package to facilitate using NHANES via Epiconductor
 License: License: CC BY 4.0 | file LICENSE
 Encoding: UTF-8
@@ -16,7 +18,6 @@ Depends:
     R (>= 4.0)
 Imports:
     DBI,
-    nhanesA,
     stringr,
     MsSqlTools
 LazyData: true
