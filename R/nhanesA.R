@@ -422,10 +422,11 @@ nhanesTranslate = function( nh_table, colnames = NULL, data = FALSE, nchar = 32,
 
   if(length(nh_table) > 1 ) stop("you can only select one table")
   if(details){
-    sql = "SELECT Variable,CodeOrValue,ValueDescription,Count,Cumulative,SkipToItem FROM VariableCodebook
-            WHERE Questionnaire='"
+    sql = "SELECT Variable,CodeOrValue AS 'Code.or.Value',ValueDescription AS 'Value.Description',
+            Count,Cumulative,SkipToItem AS 'Skip.to.Item'
+            FROM VariableCodebook WHERE Questionnaire='"
   } else {
-    sql = "SELECT Variable,CodeOrValue,ValueDescription
+    sql = "SELECT Variable,CodeOrValue AS 'Code.or.Value',ValueDescription AS 'Value.Description'
              FROM VariableCodebook WHERE Questionnaire='"
   }
   sql = paste0(sql,nh_table,"'")
@@ -433,7 +434,8 @@ nhanesTranslate = function( nh_table, colnames = NULL, data = FALSE, nchar = 32,
      sql = paste0(sql,"AND Variable IN (", toString(sprintf("'%s'", colnames)),")")
 
   df = nhanesQuery(sql)
-  ans=split(df, df$Variable)
+  ans=split(df[-which(names(df)=="Variable")], df$Variable)
+  ans=lapply(ans,function(x){row.names(x)=NULL;x}) # reset row names
   ##here we are going to let data either be a dataframe - in which case we translate in place
   ##or it can be TRUE or FALSE - in which case we extract the data and then translate
   if(is.data.frame(data)) {
