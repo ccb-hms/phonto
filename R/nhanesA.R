@@ -381,9 +381,9 @@ variableDescr <- function(nh_table,
        stop("name mismatch in translate")  ##FIXME - maybe figure out which one?
      for(i in names(input_codes) ) {
         bb = input_codes[[i]]
-        if( bb[1, "ValueDescription"] == "Range of Values" ) next
+        if( bb[1, "Value.Description"] == "Range of Values" ) next
         z1 = data[,i]
-        labels = bb$ValueDescription[match(sort(unique(z1)), bb$CodeOrValue)]
+        labels = bb$Value.Description[match(sort(unique(z1)), bb$Code.or.Value)]
         labels = labels[!is.na(labels)]
         data[,i] = factor(z1, labels = labels)
      }

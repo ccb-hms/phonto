@@ -1,0 +1,30 @@
+---
+title: "testsuite"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{testsuite}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(phonto)
+library(testthat)
+```
+
+```{r,error=TRUE,attr.source='.numberLines'}
+test_that("nhanesTables returns a dataframe", {
+  ph = nhanesTables('EXAM', 2008)
+  nhsA = nhanesA::nhanesTables('EXAM', 2008)
+  expect_equal(colnames(ph), colnames(nhsA))
+  expect_equal(dim(ph), dim(nhsA))
+})
+```
+
