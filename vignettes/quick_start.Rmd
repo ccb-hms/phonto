@@ -1,6 +1,7 @@
 ---
 title: "Quick Start"
 output: rmarkdown::html_vignette
+author: Laha Ale, Robert Gentleman, Teresa Filshtein Sonmez
 vignette: >
   %\VignetteIndexEntry{quick_start}
   %\VignetteEngine{knitr::rmarkdown}
