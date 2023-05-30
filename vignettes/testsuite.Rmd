@@ -14,17 +14,66 @@ knitr::opts_chunk$set(
 )
 ```
 
+## 1. Create Test Suites
+
+We can add more test suites to test the bug-prone functions to ensure the functions work as expected.
+
+First, we need to load `testthat` package as shown in the above with use  `use_test()` to create test suites under the `tests` folder in the package. To learn more details about test suites, you can read [R Packages (2e), chapter 15](https://r-pkgs.org/testing-design.html).
 ```{r setup}
 library(phonto)
+library(devtools)
 library(testthat)
 ```
 
-```{r,error=TRUE,attr.source='.numberLines'}
+For example, the following command would create a test suite `tests/testhat/test-nhanesTables.R` with a simple template.
+```{r,eval = FALSE}
+# use_testthat() create tests/testhat...
+use_test("nhanesTables")
+```
+
+## 2. Writing Test Suites
+
+To test the functions, we often use `expec_*` functions (eg `expect_equal(), expect_gt(),expect_match()...`) and `test_that()` to verify the outputs. 
+
+For example, we can check the column names and dimensions of `phonto::nhanesTables()` outputs are the same as `nhanesA::nhanesTables().`
+
+```{r,error=TRUE}
+ph = phonto::nhanesTables('EXAM', 2008)
+nhsA = nhanesA::nhanesTables('EXAM', 2008)
 test_that("nhanesTables returns a dataframe", {
-  ph = nhanesTables('EXAM', 2008)
-  nhsA = nhanesA::nhanesTables('EXAM', 2008)
   expect_equal(colnames(ph), colnames(nhsA))
   expect_equal(dim(ph), dim(nhsA))
 })
 ```
+
+In the above test case, the dimension of the `phonto::nhanesA::nhanesTables()` miss matched `nhanesA::nhanesTables()`.
+Further, we found that `nhanesA` has an extra row because the database intentionally removed some of the tables.
+
+```{r,error=TRUE}
+setdiff(nhsA$Data.File.Name,ph$Data.File.Name)
+```
+
+It could go the other way, `phonto/DB` shows more tables than `nhanesA.` For example, `phonto` shows three more tables than `nhanesA.`  Since `nhanesA` scrape data from the CDC website,  it is possible no longer exists/downloadable on the CDC website. 
+
+```{r,error=TRUE}
+ph_lab = phonto::nhanesTables('LAB', 2008)
+nhsA_lab = nhanesA::nhanesTables('LAB', 2008)
+diff_tables = setdiff(ph_lab$Data.File.Name,nhsA_lab$Data.File.Name)
+```
+
+
+## 3. Analysis Findings and Fix Bugs (if needed)
+
+ To verify if the tables can still be downloaded from the CDC website, we can try to download them.  
+ 
+ Note: the download information may not show up if you run the code Rmarkdown or vignette page.
+ 
+```{r,error=TRUE}
+for(tb in diff_tables){
+  download.file(paste0("https://wwwn.cdc.gov/Nchs/Nhanes/2007-2008/",tb,".XPT"),paste0(tb,".XPT"))
+  file.remove(paste0(tb,".XPT")) # you can comments out this line to check the files
+}
+
+```
+As we can see from the above results, all those tables are still downloadable from the CDC website. Therefore, we may consider `nhanesA` has some bugs that missed some tables.
 
