@@ -1,12 +1,12 @@
-epv = Sys.getenv("EPICONDUCTOR_CONTAINER_VERSION")
-cldate = Sys.getenv("COLLECTION_DATE")
-if(grepl("\\d{1,4}[.]\\d{1,4}[.]\\d{1,4}",epv)){
-  message("EpiConductor Version: ", epv)
+container_version = Sys.getenv("EPICONDUCTOR_CONTAINER_VERSION")
+collection_date = as.Date(Sys.getenv("COLLECTION_DATE"))
+if(!is.null(container_version)){
+  message("EpiConductor Container Version: ", container_version)
 }else{
-  message("YOU ARE NOT IN THE CONTAINER, DO SOMETHING ELSE!")
+  message("YOU ARE NOT IN THE CONTAINER, call nhanesA functions()")
 }
-if(grepl("\\d{2}-\\d{2}-\\d{2,4}",cldate)){
-  message("Data Collection Date: ", cldate)
+if(!is.null(collection_date)){
+  message("Data Collection Date: ", collection_date)
 }else{
   message("YOU ARE NOT IN THE CONTAINER, DO SOMETHING ELSE!")
 }
