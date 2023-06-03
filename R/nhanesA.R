@@ -202,10 +202,29 @@ nhanesTables = function( data_group, year,
 #'
 #' @examples nhanesTableVars('LAB', 'CBC_E')
 nhanesTableVars = function(data_group, nh_table, details = FALSE, nchar=128, namesonly = FALSE) {
-  ans = paste0("SELECT Variable as 'Variable.Name',Description as 'Variable.Description' from
-                QuestionnaireVariables where Questionnaire='", nh_table, "'")
+  # FIXME: We need to add Use.Constraints when DB is updated
 
-  nhanesQuery(ans)
+  ans = paste0("SELECT V.Variable AS 'Variable.Name',
+                       SUBSTRING(V.Description,1,",nchar,") AS 'Variable.Description',
+                       V.Questionnaire AS 'Data.File.Name',
+                       SUBSTRING(Q.[Description],1,",nchar,") AS 'Data.File.Description',
+                       V.BeginYear AS 'Begin.Year',
+                       V.EndYear,
+                       CONCAT(SUBSTRING(DataGroup,1,1),LOWER(SUBSTRING(DataGroup,2,20))) AS Component
+                  FROM QuestionnaireDescriptions Q
+                  JOIN QuestionnaireVariables V ON V.Questionnaire = Q.Questionnaire
+                  WHERE DataGroup LIKE '",data_group,"%'
+                  AND V.Questionnaire = '",nh_table,"'")
+
+  df = nhanesQuery(ans)
+
+  if(namesonly){
+    return(df$Variable.Name)
+  }else if(!details){
+    return(df[,c('Variable.Name','Variable.Description')])
+  }else{
+    return(df)
+  }
 }
 
 #' Download/Load an NHANES table and return as a data frame.
@@ -217,9 +236,7 @@ nhanesTableVars = function(data_group, nh_table, details = FALSE, nchar=128, nam
 #'
 #' @examples nhanes('BPX_E')
 #' @description Use to download/load NHANES data tables that are in SAS format.
-##FIXME - need some error checking at some time
-##in our DB we have constructed a view for each of the NHANES tables - so this query just works
-##but we have added in a few columns - DownloadUrl and Questionnaire that need to be filtered
+
 nhanes = function(nh_table){
   sql = paste0("SELECT * FROM ",nh_table)
   df = nhanesQuery(sql)
@@ -248,7 +265,7 @@ nhanes = function(nh_table){
 #' @return By default, a character vector of table names that include the specified variable is returned. If namesonly=FALSE, then a data frame of table attributes is returned.
 #' @export
 #'
-#' @examples nhanesSearchVarName(c('BPXPULS','BMXBMI'))
+#' @examples nhanesSearchVarName('BPXPULS',nchar=38, namesonly=FALSE))
 #' @examples nhanesSearchVarName(c('BPXPULS','BMXBMI'),ystop=2004)
 nhanesSearchVarName <- function(varnames = NULL,
                               ystart = NULL,
@@ -257,28 +274,37 @@ nhanesSearchVarName <- function(varnames = NULL,
                               nchar = 128,
                               namesonly = TRUE){
 
-  sql <- paste0("SELECT DISTINCT Variable,
-                        Questionnaire,TableName,
-                        CONCAT(q.BeginYear, '-', q.EndYear) AS years
-                      FROM QuestionnaireVariables q
-                      WHERE Variable IN (", toString(sprintf("'%s'", varnames)),")")
+  sql = paste0("SELECT V.Variable AS 'Variable.Name',
+                       SUBSTRING(V.Description,1,",nchar,") AS 'Variable.Description',
+                       V.Questionnaire AS 'Data.File.Name',
+                       SUBSTRING(Q.[Description],1,",nchar,") AS 'Data.File.Description',
+                       V.BeginYear AS 'Begin.Year',
+                       V.EndYear,
+                       CONCAT(SUBSTRING(DataGroup,1,1),LOWER(SUBSTRING(DataGroup,2,20))) AS Component
+                  FROM QuestionnaireDescriptions Q
+                  JOIN QuestionnaireVariables V ON V.Questionnaire = Q.Questionnaire
+                  WHERE V.Variable IN (", toString(sprintf("'%s'", varnames)),")")
 
 
 
   if(!is.null(ystart)){
-    sql <- paste(sql,"AND BeginYear >=",ystart)
+    sql <- paste(sql,"AND V.BeginYear >=",ystart)
   }
   if(!is.null(ystop)){
-    sql <- paste(sql,"AND EndYear <=",ystop)
+    sql <- paste(sql,"AND V.EndYear <=",ystop)
   }
 
   df = nhanesQuery(sql)
-  for(v in varnames){
-    if(!(v %in% df$Variable)){
+  if(is.null(df)){
       warning(paste("Variable ",v, "is not found in the database!"))
     }
+
+
+  if(namesonly){
+    df = df$Data.File.Name
   }
-  df$Questionnaire
+
+  df
 
 }
 

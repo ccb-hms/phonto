@@ -83,7 +83,7 @@ jointQuery <- function(tables_n_cols){
 
   query_sql = paste("SELECT",final_cols,"FROM A")
   for (i in 2:length(cols_to_tables)) {
-    query_sql = paste0(query_sql," JOIN ",LETTERS[i]," ON A.SEQN=",LETTERS[i],".SEQN")
+    query_sql = paste0(query_sql," FULL OUTER JOIN  ",LETTERS[i]," ON A.SEQN=",LETTERS[i],".SEQN")
   }
 
   sql = paste0(sql, "
