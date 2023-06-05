@@ -103,7 +103,7 @@ For example, we can search the blood pressure related tables by the following co
 res = nhanesSearchTableNames("BPX", details=TRUE)
 datatable(res)
 ```
-##FIXME: we need to rationalize this to not use long descriptive names in public
+
 In the research data frame, Questionnaire present CDC tables.
 
 
@@ -119,6 +119,8 @@ datatable(res)
   
   ##FIXME: somehow we need to figure out a search strategy that puts some of the output into an HTML page, or a searchable datatable
   ##FIXME (TJFS): I am not sure what you mean by this
+  ## the problem with the return values is that they are often long and fairly complex, that is not easy to go through at the R level - if we push this into a datatable and open it in the browser then they could search through that.
+  ## I was also thinking of taking the table descriptions and building a corpus with them - so that they could more easily be searched through - regexps in a database don't work very well
   
  One of the main challenges in using the NHANES data set is finding the tables that contain the data you want to analyze. The `nhanesSearch` function allows the investigator to input search terms, match against the comprehensive variable descriptions, and retrieve the list of matching variables. In this section we outline some of the basic methods you can use to do the searching. The returned value can be put into a searchable data table that you can use to further filter, sort and search for specific variables. 
  
