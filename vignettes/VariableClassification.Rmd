@@ -83,3 +83,10 @@ h2 = search_features(nhanes_tc, query = "hypertension")
 
 
 ```
+ And more from DEMO_I - not clear but they don't seem to be useful phenotypes
+
+ SDDSRVYR - Data release cycle...
+ RIDSTATR - Interview/Examination status
+ SIAPROXY - Proxy used in SP Interview?
+ SIAINTRP - Interpreter used in SP Interview?
+
