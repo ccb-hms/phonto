@@ -31,4 +31,5 @@ Displays a list of variables in the specified NHANES table.
 }
 \examples{
 nhanesTableVars('LAB', 'CBC_E')
+nhanesTableVars('CBC_E')
 }

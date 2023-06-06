@@ -201,10 +201,17 @@ nhanesTables = function( data_group, year,
 #' @export
 #'
 #' @examples nhanesTableVars('LAB', 'CBC_E')
+#'@examples nhanesTableVars('CBC_E')
 nhanesTableVars = function(data_group, nh_table, details = FALSE, nchar=128, namesonly = FALSE) {
-  # FIXME: We need to add Use.Constraints when DB is updated
 
-  ans = paste0("SELECT V.Variable AS 'Variable.Name',
+  # FIXME: We need to add Use.Constraints when DB is updated
+  param = match.call()
+  if(is.null(param$nh_table)){
+    nh_table = param$data_group
+    data_group = NULL
+  }
+
+  sql = paste0("SELECT V.Variable AS 'Variable.Name',
                        SUBSTRING(V.Description,1,",nchar,") AS 'Variable.Description',
                        V.Questionnaire AS 'Data.File.Name',
                        SUBSTRING(Q.[Description],1,",nchar,") AS 'Data.File.Description',
@@ -213,11 +220,13 @@ nhanesTableVars = function(data_group, nh_table, details = FALSE, nchar=128, nam
                        CONCAT(SUBSTRING(DataGroup,1,1),LOWER(SUBSTRING(DataGroup,2,20))) AS Component
                   FROM QuestionnaireDescriptions Q
                   JOIN QuestionnaireVariables V ON V.Questionnaire = Q.Questionnaire
-                  WHERE DataGroup LIKE '",data_group,"%'
-                  AND V.Questionnaire = '",nh_table,"'")
+                  WHERE V.Questionnaire = '",nh_table,"'")
+  if(!is.null(data_group)){
+    sql = paste0(sql," AND DataGroup LIKE '",data_group,"%'")
+  }
 
-  df = nhanesQuery(ans)
 
+  df = nhanesQuery(sql)
   if(namesonly){
     return(df$Variable.Name)
   }else if(!details){
@@ -355,49 +364,17 @@ nhanesSearchTableNames <-  function(pattern = NULL,
      return(df$Questionnaire)
 }
 
-
-#' Displays a list of variables in the specified NHANES table
-#' @description a wrap of nhanesA::nhanesTableVars()
-#'
-#' @param nh_table  The name of the specific table to retrieve.
-#' @param data_group The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE). Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q). It will check all the groups if it is NULL.
-#' @param details If TRUE then all columns in the variable description are returned (default=FALSE).
-#' @param nchar The number of characters in the Variable Description to print. Default length is 128, which is set to enhance readability cause variable descriptions can be very long.
-#' @param namesonly If TRUE then only the variable names are returned (default=FALSE).
-#'
-#' @return Returns a data frame that describes variable attributes for the specified table. If namesonly=TRUE, then a character vector of the variable names is returned.
-#' @export
-#'
-#' @examples variableDescr("DEMO_C")
-#' @details NHANES tables may contain more than 100 variables. Function nhanesTableVars provides a concise display of variables for a specified table, which helps to ascertain quickly if the table is of interest. NULL is returned when an HTML read error is encountered.
-variableDescr <- function(nh_table,
-                          data_group = NULL,
-                          details = FALSE,
-                          nchar = 128,
-                          namesonly = FALSE){
-  df <- NULL
-  if (!is.null(data_group)) {
-    df <- phonto::nhanesTableVars(data_group, nh_table, details, nchar, namesonly)
-  }else{
-    for (g in c('DEMO', 'DIET', 'EXAM', 'LAB', 'Q')) {
-      tryCatch({
-        df <- phonto::nhanesTableVars(g, nh_table, details, nchar, namesonly)
-      },
-      error=function(cond) {
-        # message(paste0("No information found in group ",g))
-      }
-      )
-    }
-
-  }
-  if(!is.null(df)){
-    colnames(df) <- c("Variable","Description")
-  }else{
-    print(paste("No information be found for table,",nh_table))
-  }
-
-  df
+center <- function(x, type = c("mean", "median", "trimmed")) {
+  type <- match.arg(type)
+  switch(type,
+         mean = mean(x),
+         median = median(x),
+         trimmed = mean(x, trim = .1))
 }
+x <- rcauchy(10)
+center(x, "t")       # Works
+center(x, "med")     # Works
+try(center(x, "m"))  # Error
 
   ##rewritten to work columnwise
   ##for now silently skip over any continuous variable
