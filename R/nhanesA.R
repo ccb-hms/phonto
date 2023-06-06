@@ -364,17 +364,7 @@ nhanesSearchTableNames <-  function(pattern = NULL,
      return(df$Questionnaire)
 }
 
-center <- function(x, type = c("mean", "median", "trimmed")) {
-  type <- match.arg(type)
-  switch(type,
-         mean = mean(x),
-         median = median(x),
-         trimmed = mean(x, trim = .1))
-}
-x <- rcauchy(10)
-center(x, "t")       # Works
-center(x, "med")     # Works
-try(center(x, "m"))  # Error
+
 
   ##rewritten to work columnwise
   ##for now silently skip over any continuous variable
