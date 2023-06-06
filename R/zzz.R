@@ -1,5 +1,5 @@
 container_version = Sys.getenv("EPICONDUCTOR_CONTAINER_VERSION")
-collection_date = as.Date(Sys.getenv("COLLECTION_DATE"))
+collection_date = as.Date(Sys.getenv("COLLECTION_DATE"), format="%m-%d-%y")
 if(!is.null(container_version)){
   message("EpiConductor Container Version: ", container_version)
 }else{
