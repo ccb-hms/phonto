@@ -509,41 +509,39 @@ nhanesSearch = function( search_terms = NULL,
                          namesonly = FALSE){
 
 
-  sql = "SELECT  * FROM QuestionnaireVariables V WHERE (Description LIKE '%"
+  sql = paste0("SELECT V.Variable AS 'Variable.Name',
+                       SUBSTRING(V.Description,1,",nchar,") AS 'Variable.Description',
+                       V.Questionnaire AS 'Data.File.Name',
+                       SUBSTRING(Q.[Description],1,",nchar,") AS 'Data.File.Description',
+                       V.BeginYear AS 'Begin.Year',
+                       V.EndYear,
+                       CONCAT(SUBSTRING(DataGroup,1,1),LOWER(SUBSTRING(DataGroup,2,20))) AS Component
+                  FROM QuestionnaireDescriptions Q
+                  JOIN QuestionnaireVariables V ON V.Questionnaire = Q.Questionnaire
+                  WHERE (V.Description COLLATE SQL_Latin1_General_CP1_CS_AS LIKE '%")
 
-  if(namesonly){
-    sql="SELECT Variable FROM QuestionnaireVariables V WHERE (Description LIKE '%"
-  }
+  # COLLATE SQL_Latin1_General_CP1_CS_AS  : is to make case sensitive patter match
 
-
-  if(!is.null(data_group)){
-    sql="SELECT  V.* FROM QuestionnaireVariables V INNER JOIN  QuestionnaireDescriptions AS Q ON Q.Questionnaire=V.Questionnaire WHERE (V.Description LIKE '%"
-  }
-
+  sql = paste0(sql,search_terms[1],"%'")
   # match multiple patterns
   if (length(search_terms)>=2){
-    sql = paste0(sql,search_terms[1],"%'")
     for (term in search_terms[2:length(search_terms)]){
-      sql = paste0(sql," OR V.Description LIKE '%",term,"%'")
+      sql = paste0(sql," OR V.Description COLLATE SQL_Latin1_General_CP1_CS_AS LIKE '%",term,"%'")
     }
-  }else{
-    sql = paste0(sql,search_terms,"%'")
   }
   sql = paste0(sql,")")
 
 
 
   if(!is.null(exclude_terms)){
-      if(length(exclude_terms>1)){
-        for (term in exclude_terms){
-          sql = paste0(sql," AND V.Description NOT LIKE '%",term,"%'")
-        }
-      }else{
-        sql = paste0(sql," AND V.Description NOT LIKE '%",exclude_terms,"%'")
-      }
-
+    for (term in exclude_terms){
+          sql = paste0(sql," AND V.Description COLLATE SQL_Latin1_General_CP1_CS_AS NOT LIKE '%",term,"%'")
+       }
   }
 
+  if(ignore.case){
+    sql = gsub("COLLATE SQL_Latin1_General_CP1_CS_AS", "", sql)
+  }
 
 
   if(!is.null(data_group)){
@@ -559,30 +557,24 @@ nhanesSearch = function( search_terms = NULL,
   }
 
 
+
   sql = gsub("%\\^", "", sql) # address start with ..
 
 
-  if( is.null(ystart) ) ystart=nhanes_min_year
-  if( is.null(ystop) ) ystop=nhanes_max_year
-  if( !(ystart %in% nhanes_years) ) {
-            warning(paste0("invalid start year given ",ystart," using ", nhanes_min_year))
-            ystart = nhanes_min_year
-  }
-  if( !(ystop %in% nhanes_years) ) {
-            warning(paste0("invalid stop year given ",ystop," using ", nhanes_max_year))
-            ystart = nhanes_min_year
-  }
   if(!is.null(ystart)){
     sql = paste(sql,"AND V.BeginYear >=",ystart)
   }
   if(!is.null(ystop)){
     sql <- paste(sql,"AND V.EndYear <=",ystop)
   }
-  # print(sql)
-  data =  nhanesQuery(sql)
-  ##we don't want 1 column dataframes - turn into a vector
-  if (ncol(data) == 1) return(data[,1])
-  return(data)
+
+
+  df = nhanesQuery(sql)
+  if(namesonly){
+    df = df$Data.File.Name
+  }
+
+  df
 }
 
 
