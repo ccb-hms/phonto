@@ -122,7 +122,21 @@ unionQuery= function(table_names,cols=NULL){
 
   }
 
-  nhanesQuery(sql)
+
+
+
+  df = nhanesQuery(sql)
+
+  # add years colunm to the dataframe
+  df["years"] = 0
+  ydx = 1
+  for (tn in table_names) {
+    nrw = nhanesNrow(tn)
+    df[ydx:(ydx+nrw-1),"years"] = rep(unlist(.get_year_from_nh_table(tn)),nrw)
+    ydx = ydx + nrw
+  }
+
+  df
 
 }
 

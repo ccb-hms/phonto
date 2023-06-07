@@ -487,7 +487,7 @@ nhanesSearch = function( search_terms = NULL,
                   JOIN QuestionnaireVariables V ON V.Questionnaire = Q.Questionnaire
                   WHERE (V.Description COLLATE SQL_Latin1_General_CP1_CS_AS LIKE '%")
 
-  # COLLATE SQL_Latin1_General_CP1_CS_AS  : is to make case sensitive patter match
+  # COLLATE SQL_Latin1_General_CP1_CS_AS  : is to make case sensitive pattern match
 
   sql = paste0(sql,search_terms[1],"%'")
   # match multiple patterns
