@@ -557,9 +557,23 @@ nhanesSearch = function( search_terms = NULL,
 #' @examples t1 = nhanesCodebook('AUX_D', 'AUQ020D')
 #' @examples t2 = nhanesCodebook('DEMO_D', 'RIAGENDR')
 nhanesCodebook = function(nh_table, colname){
-  sql = paste0("SELECT Variable, Description, Target, SasLabel FROM QuestionnaireVariables WHERE Questionnaire='",nh_table,"' AND Variable='",colname,"'")
+  # FIXME: we need handle multiple targets once DB is updated!
+  if(length(colname) > 1){
+    stop("colname not accepts a list, please provide one colunm name only!")
+  }
+  sql = paste0("SELECT Variable AS 'Variable Name:',
+                       SasLabel AS 'SAS Label:',
+                       Description AS 'English Text:',
+                       Target AS 'Target:'
+                       FROM QuestionnaireVariables WHERE Questionnaire='",nh_table,"' AND Variable='",colname,"'")
   res = as.list(nhanesQuery(sql))
-  res[["Codebook"]]=phonto::nhanesTranslate(nh_table, colname,details = TRUE)[[1]]
+  if(length(res[[1]])==0){
+    stop(paste0("The variable \"",colname,"\" is not found in the data file/table \"",nh_table,"\".
+                Please check the table and variable name!"))
+  }
+
+  res[colname]=phonto::nhanesTranslate(nh_table, colname,details = TRUE)
+
   res
 }
 
