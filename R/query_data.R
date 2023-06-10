@@ -49,7 +49,9 @@ queryByVars = function(vars=NULL,ystart = NULL,ystop = NULL){
 #' ans = jointQuery(cols)
 #' dim(ans)
 jointQuery <- function(tables_n_cols){
-  cols_to_tables = list() # it won't be long and we do not know the lenth ahead.
+  cols_to_tables = list() # it won't be long and we do not know the length ahead.
+
+  # group the data tables according to the colunms
   for (cl in names(tables_n_cols)){
     col = tables_n_cols[[cl]]
     col = toString(sprintf("%s", unlist(col)))
@@ -61,7 +63,33 @@ jointQuery <- function(tables_n_cols){
     }
   }
 
-  sql = "WITH"
+
+
+
+  # create SEQN with years
+  # want to create a sub sqls like:
+  # SELECT SEQN,  BeginYear, EndYear
+  # FROM (
+  #   SELECT SEQN
+  #   FROM DEMO_C
+  # ) DEMO_C
+  # JOIN QuestionnaireDescriptions QD ON QD.Questionnaire = 'DEMO_C'
+  seqn_year = rep("", length(tables_n_cols))
+  for (i in 1:length(tables_n_cols)){
+    tb = names(tables_n_cols)[i]
+    temp_sql = paste0("SELECT SEQN, BeginYear, EndYear
+    FROM (
+        SELECT SEQN FROM ", tb,
+        ") ", tb,
+        " JOIN QuestionnaireDescriptions QD ON QD.Questionnaire = '",tb,"'")
+    seqn_year[i] = temp_sql
+  }
+
+  sql = "WITH unifiedTB AS ("
+  sql = paste0(sql, paste0(paste0(seqn_year, collapse = " UNION ALL "),"),"))
+
+
+  # create union sql
   i = 1
   for (cn in names(cols_to_tables)) {
     sql = paste(sql,LETTERS[i],"AS","(SELECT", cn," FROM ",cols_to_tables[[cn]][1])
@@ -77,15 +105,18 @@ jointQuery <- function(tables_n_cols){
 
   sql = substring(sql,1,nchar(sql)-1)
 
+  # tidy columns set
   final_cols = unique(unlist(tables_n_cols))
   final_cols = toString(sprintf("%s", unlist(final_cols)))
-  final_cols = paste0("A.SEQN, ",final_cols)
+  final_cols = paste0(" DISTINCT unifiedTB.SEQN, ",final_cols,",BeginYear, EndYear")
 
-  query_sql = paste("SELECT",final_cols,"FROM A")
-  for (i in 2:length(cols_to_tables)) {
-    query_sql = paste0(query_sql," FULL OUTER JOIN  ",LETTERS[i]," ON A.SEQN=",LETTERS[i],".SEQN")
+  #joint query sql
+  query_sql = paste("SELECT",final_cols,"FROM unifiedTB")
+  for (i in 1:length(cols_to_tables)) {
+    query_sql = paste0(query_sql," LEFT JOIN ",LETTERS[i]," ON unifiedTB.SEQN=",LETTERS[i],".SEQN")
   }
 
+  # put the sql together
   sql = paste0(sql, "
              ",query_sql)
 
