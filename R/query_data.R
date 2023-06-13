@@ -1,4 +1,14 @@
 
+# choose the to query translated or Raw table
+.tableNameConvert = function(tb_name,translated=TRUE){
+
+  if(translated){
+    tb_name = paste0("Translated.",tb_name)
+  }else{
+    tb_name = paste0("Raw.",tb_name)
+  }
+  tb_name
+}
 
 
 #' Query data by variable
@@ -7,27 +17,18 @@
 #' @param vars variables or phenotypes want to search
 #' @param ystart Four digit year of first survey included in search, where ystart >= 1999.
 #' @param ystop Four digit year of final survey included in search, where ystop >= ystart.
+#' @param translated whether the variables are translated
 #'
 #' @return union data frame
 #' @export
 #'
 #' @examples df = queryByVars(c("URXDAZ","URXDMA"))
 
-queryByVars = function(vars=NULL,ystart = NULL,ystop = NULL){
+queryByVars = function(vars=NULL,ystart = NULL,ystop = NULL,translated=TRUE){
   if(is.null(vars) | length(vars) <1) return (NULL)
-  vars <- unique(vars)
-  sql = paste0("SELECT DISTINCT TableName
-                     FROM QuestionnaireVariables
-                     WHERE Variable='",vars[1],
-                     "'")
-  if(length(vars)>=2){
-    for(v in vars[2:length(vars)]){
-      sql = paste0(sql," OR Variable='",v,"'")
-    }
-  }
-  tables <- nhanesQuery(sql)$TableName
+  tables = nhanesSearchVarName(vars,ystart,ystop)
   # need a try catch here
-  unionQuery(tables,vars)
+  unionQuery(tables,vars,translated)
 
 }
 
@@ -36,6 +37,7 @@ queryByVars = function(vars=NULL,ystart = NULL,ystop = NULL){
 #' Joint Query
 #'
 #' @param tables_n_cols a named list, each name corresponds to a Questionnaire and the value is a list of variable names.
+#' @param translated whether the variables are translated
 #'
 #' @return data frame containing the join of the tables and selected variables
 #' @export
@@ -48,7 +50,17 @@ queryByVars = function(vars=NULL,ystart = NULL,ystop = NULL){
 #'                      TRIGLY_J=c("LBXTR","LBDLDL"))
 #' ans = jointQuery(cols)
 #' dim(ans)
-jointQuery <- function(tables_n_cols){
+jointQuery = function(tables_n_cols,translated=TRUE){
+
+  if(is.null(tables_n_cols) | length(tables_n_cols) <1) return (NULL)
+  for (tb in names(tables_n_cols)){
+    if(!tb %in% validTables){
+      stop(paste0("Invalid table name: ",tb,""))
+    }
+  }
+
+  names(tables_n_cols) = .tableNameConvert(names(tables_n_cols))
+
   cols_to_tables = list() # it won't be long and we do not know the length ahead.
 
   # group the data tables according to the colunms
@@ -73,17 +85,20 @@ jointQuery <- function(tables_n_cols){
   #   SELECT SEQN
   #   FROM DEMO_C
   # ) DEMO_C
-  # JOIN QuestionnaireDescriptions QD ON QD.Questionnaire = 'DEMO_C'
+  # JOIN Metadata.QuestionnaireDescriptions QD ON QD.TableName = 'DEMO_C'
   seqn_year = rep("", length(tables_n_cols))
   for (i in 1:length(tables_n_cols)){
-    tb = names(tables_n_cols)[i]
-    temp_sql = paste0("SELECT SEQN, BeginYear, EndYear
+    tb_name = names(tables_n_cols)[i]
+    tb = unlist(strsplit(tb_name, "\\."))[2] # removed prefix, Translated. or Raw.
+    temp_sql = paste0("SELECT SEQN, Year
     FROM (
-        SELECT SEQN FROM ", tb,
+        SELECT SEQN FROM ", tb_name,
         ") ", tb,
-        " JOIN QuestionnaireDescriptions QD ON QD.Questionnaire = '",tb,"'")
+        " JOIN Metadata.QuestionnaireDescriptions QD ON QD.TableName='",tb ,"'")
     seqn_year[i] = temp_sql
   }
+
+
 
   sql = "WITH unifiedTB AS ("
   sql = paste0(sql, paste0(paste0(seqn_year, collapse = " UNION ALL "),"),"))
@@ -108,7 +123,7 @@ jointQuery <- function(tables_n_cols){
   # tidy columns set
   final_cols = unique(unlist(tables_n_cols))
   final_cols = toString(sprintf("%s", unlist(final_cols)))
-  final_cols = paste0(" DISTINCT unifiedTB.SEQN, ",final_cols,",BeginYear, EndYear")
+  final_cols = paste0(" DISTINCT unifiedTB.SEQN, ",final_cols,",Year")
 
   #joint query sql
   query_sql = paste("SELECT",final_cols,"FROM unifiedTB")
@@ -120,7 +135,6 @@ jointQuery <- function(tables_n_cols){
   sql = paste0(sql, "
              ",query_sql)
 
-  # print(sql)
   nhanesQuery(sql)
 
 }
@@ -130,12 +144,19 @@ jointQuery <- function(tables_n_cols){
 #'
 #' @param table_names nhanes table names
 #' @param cols columns
+#' @param translated whether the variables are translated
 #'
 #' @return data frame
 #' @export
 #'
 #' @examples df = unionQuery(c("DEMO_B","DEMO_D"),c("RIDAGEYR","RIAGENDR"))
-unionQuery= function(table_names,cols=NULL){
+unionQuery= function(table_names,cols=NULL,translated=TRUE){
+
+  if(is.null(table_names) | length(table_names) <1) return (NULL)
+  for (tb in table_names){
+    checkTableNames(tb)
+  }
+  table_names = .tableNameConvert(table_names,translated)
 
   if(is.null(cols)){
     cols <- "*"
@@ -154,15 +175,13 @@ unionQuery= function(table_names,cols=NULL){
   }
 
 
-
-
   df = nhanesQuery(sql)
 
   # add years colunm to the dataframe
   df["years"] = 0
   ydx = 1
   for (tn in table_names) {
-    nrw = nhanesNrow(tn)
+    nrw = nhanesNrow(unlist(strsplit(tn,"\\."))[2])
     df[ydx:(ydx+nrw-1),"years"] = rep(unlist(.get_year_from_nh_table(tn)),nrw)
     ydx = ydx + nrw
   }
@@ -220,12 +239,15 @@ checkDataConsistency = function(table1,table2){
 #' The Number of Rows of an NHANES table
 #'
 #' @param tb_name NHANES table name
+#' @param Translated whether the table name is translated
 #'
 #' @return an integer of length 1
 #' @export
 #'
 #' @examples nhanesNrow("BMX_I")
-nhanesNrow = function(tb_name){
+nhanesNrow = function(tb_name,translated=TRUE){
+  checkTableNames(tb_name)
+  tb_name = .tableNameConvert(tb_name,translated)
   sql_str = paste0("SELECT COUNT(*) FROM ",tb_name)
   nhanesQuery(sql_str)[1,1]
 }
@@ -234,12 +256,13 @@ nhanesNrow = function(tb_name){
 #' The Number of Columns of an NHANES table
 #'
 #' @param tb_name NHANES table name
+#' @param translated whether the table name is translated
 #'
 #' @return an integer of length 1
 #' @export
 #'
 #' @examples nhanesNcol("BMX_I")
-nhanesNcol = function(tb_name){
+nhanesNcol = function(tb_name,translated=TRUE){
   length(nhanesColnames(tb_name))
 }
 
@@ -247,6 +270,7 @@ nhanesNcol = function(tb_name){
 #' Column Names for NHANES tables
 #'
 #' @param tb_name NHANES table name
+#' @param translated whether the table name is translated
 #'
 #' @description Retrieve column names of an NHANES table.
 #'
@@ -254,47 +278,43 @@ nhanesNcol = function(tb_name){
 #' @export
 #'
 #' @examples nhanesColnames("BMX_I")
-nhanesColnames = function(tb_name){
+nhanesColnames = function(tb_name,translated=TRUE){
+  checkTableNames(tb_name)
   sql_str = paste0("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '",tb_name,"'")
   nhanesQuery(sql_str)$COLUMN_NAME
 }
 
 #' Dimensions of NHANES table
 #'
-#' @param tb_name NHANES table name
+#' @param nh_table NHANES table name
+#' @param translated whether the table name is translated
 #'
 #' @return  retrieves the dim attribute of NHANES table.
 #' @export
 #'
 #' @examples nhanesDim("BMX_I")
-nhanesDim = function(tb_name){
-
-  c(nhanesNrow(tb_name),length(nhanesColnames(tb_name)))
+nhanesDim = function(nh_table,translated=TRUE){
+  checkTableNames(nh_table)
+  c(nhanesNrow(nh_table),length(nhanesColnames(nh_table)))
 }
 
 #' Return the First of an NHANES table
 #'
 #' @param nh_table NHANES table name
 #' @param n number of rows of NHANES table
+#' @param translated whether the table name is translated
 #'
 #' @return  retrieves the First of an NHANES table
 #' @export
 #'
 #' @examples nhanesHead("BMX_I")
 #' @examples nhanesHead("BMX_I",10)
-nhanesHead = function(nh_table,n=5){
+nhanesHead = function(nh_table,n=5,translated=TRUE){
+  checkTableNames(nh_table)
+  nh_table = .tableNameConvert(nh_table,translated)
 
   sql = paste0("SELECT TOP(",n, ") * FROM ",nh_table)
-  df = nhanesQuery(sql)
-
-  cols = paste0("SELECT Variable from
-                QuestionnaireVariables where Questionnaire='",
-                nh_table,
-                "'")
-  cols = nhanesQuery(cols)
-  cols = cols$Variable
-  cols = cols[!cols %in% c("years","DownloadUrl","Questionnaire")]
-  df[,cols]
+  nhanesQuery(sql)
 }
 
 
@@ -303,25 +323,22 @@ nhanesHead = function(nh_table,n=5){
 #'
 #' @param nh_table NHANES table name
 #' @param n number of rows of NHANES table
+#' @param translated whether the table name is translated
 #'
 #' @return  retrieves the Last of an NHANES table
 #' @export
 #'
 #' @examples nhanesTail("BMX_I")
 #' @examples nhanesTail("BMX_I",10)
-nhanesTail= function(nh_table,n=5){
+nhanesTail= function(nh_table,n=5,translated=TRUE){
+  checkTableNames(nh_table)
+  nh_table = .tableNameConvert(nh_table,translated)
 
   sql = paste0("SELECT TOP(",n, ") * FROM ",nh_table," ORDER BY SEQN DESC")
   df = nhanesQuery(sql)
   df = df[order(df$SEQN),]
-  cols = paste0("SELECT Variable from
-                QuestionnaireVariables where Questionnaire='",
-                nh_table,
-                "'")
-  cols = nhanesQuery(cols)
-  cols = cols$Variable
-  cols = cols[!cols %in% c("years","DownloadUrl","Questionnaire")]
-  df[,cols]
+  df
+
 }
 
 
