@@ -4,10 +4,12 @@
 \alias{jointQuery}
 \title{Joint Query}
 \usage{
-jointQuery(tables_n_cols)
+jointQuery(tables_n_cols, translated = TRUE)
 }
 \arguments{
 \item{tables_n_cols}{a named list, each name corresponds to a Questionnaire and the value is a list of variable names.}
+
+\item{translated}{whether the variables are translated}
 }
 \value{
 data frame containing the join of the tables and selected variables

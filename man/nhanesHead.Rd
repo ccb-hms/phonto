@@ -4,12 +4,14 @@
 \alias{nhanesHead}
 \title{Return the First of an NHANES table}
 \usage{
-nhanesHead(nh_table, n = 5)
+nhanesHead(nh_table, n = 5, translated = TRUE)
 }
 \arguments{
 \item{nh_table}{NHANES table name}
 
 \item{n}{number of rows of NHANES table}
+
+\item{translated}{whether the table name is translated}
 }
 \value{
 retrieves the First of an NHANES table

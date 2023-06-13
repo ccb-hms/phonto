@@ -4,12 +4,14 @@
 \alias{unionQuery}
 \title{Union Query}
 \usage{
-unionQuery(table_names, cols = NULL)
+unionQuery(table_names, cols = NULL, translated = TRUE)
 }
 \arguments{
 \item{table_names}{nhanes table names}
 
 \item{cols}{columns}
+
+\item{translated}{whether the variables are translated}
 }
 \value{
 data frame

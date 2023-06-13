@@ -4,10 +4,12 @@
 \alias{nhanesNrow}
 \title{The Number of Rows of an NHANES table}
 \usage{
-nhanesNrow(tb_name)
+nhanesNrow(tb_name, translated = TRUE)
 }
 \arguments{
 \item{tb_name}{NHANES table name}
+
+\item{Translated}{whether the table name is translated}
 }
 \value{
 an integer of length 1

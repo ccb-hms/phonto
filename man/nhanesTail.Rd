@@ -4,12 +4,14 @@
 \alias{nhanesTail}
 \title{Return the Last of an NHANES table}
 \usage{
-nhanesTail(nh_table, n = 5)
+nhanesTail(nh_table, n = 5, translated = TRUE)
 }
 \arguments{
 \item{nh_table}{NHANES table name}
 
 \item{n}{number of rows of NHANES table}
+
+\item{translated}{whether the table name is translated}
 }
 \value{
 retrieves the Last of an NHANES table

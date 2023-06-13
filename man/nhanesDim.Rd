@@ -4,10 +4,12 @@
 \alias{nhanesDim}
 \title{Dimensions of NHANES table}
 \usage{
-nhanesDim(tb_name)
+nhanesDim(nh_table, translated = TRUE)
 }
 \arguments{
-\item{tb_name}{NHANES table name}
+\item{nh_table}{NHANES table name}
+
+\item{translated}{whether the table name is translated}
 }
 \value{
 retrieves the dim attribute of NHANES table.

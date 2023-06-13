@@ -4,10 +4,12 @@
 \alias{nhanesNcol}
 \title{The Number of Columns of an NHANES table}
 \usage{
-nhanesNcol(tb_name)
+nhanesNcol(tb_name, translated = TRUE)
 }
 \arguments{
 \item{tb_name}{NHANES table name}
+
+\item{translated}{whether the table name is translated}
 }
 \value{
 an integer of length 1

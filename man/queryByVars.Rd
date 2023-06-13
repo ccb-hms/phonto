@@ -4,7 +4,7 @@
 \alias{queryByVars}
 \title{Query data by variable}
 \usage{
-queryByVars(vars = NULL, ystart = NULL, ystop = NULL)
+queryByVars(vars = NULL, ystart = NULL, ystop = NULL, translated = TRUE)
 }
 \arguments{
 \item{vars}{variables or phenotypes want to search}
@@ -12,6 +12,8 @@ queryByVars(vars = NULL, ystart = NULL, ystop = NULL)
 \item{ystart}{Four digit year of first survey included in search, where ystart >= 1999.}
 
 \item{ystop}{Four digit year of final survey included in search, where ystop >= ystart.}
+
+\item{translated}{whether the variables are translated}
 }
 \value{
 union data frame
