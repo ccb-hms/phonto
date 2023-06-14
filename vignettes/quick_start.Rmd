@@ -3,7 +3,7 @@ title: "Quick Start"
 output: rmarkdown::html_vignette
 author: Laha Ale, Robert Gentleman, Teresa Filshtein Sonmez
 vignette: >
-  %\VignetteIndexEntry{quick_start}
+  %\VignetteIndexEntry{Quick Start}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -252,10 +252,10 @@ And the real factor levels for year 2003-2004 can be found in [the codebook]() a
 ![education](images/edu.png){width=85%}
 
 
+The data from NHANES comes as tables with integer codes for each of the levels of a factor variable.  A separate file, one for each cycle and questionnaire, has the map from the codes to the text description of what the levels mean. Because the chances of errors if users have untranslated variables (e.g. treating them as integers for example) we automatically translate all of these tables.  There is a way to access the raw data that is explained in a different vignette.
 
-The real factor levels can be set with `nhanesTranslate()` function. This function uses
-the data in the NHANES Codebook for a given variable and uses that to translate categorical variables from their integer codes into the appropriate levels.
-##FIXME: need to figure out if these are always coming back as character vectors - which seems best, and those can then be transformed into factors (ordered if desired).  Compare our implementation to that of nhanesA
+The code below is how you would do the translation using the `nhanesA` package.  But in the NHANES docker container this is not needed.
+
 
 ```{r,DT.warn.size=FALSE, eval=FALSE}
 ##now we can translate the variables that need to be translated
@@ -263,10 +263,6 @@ t1 = nhanesTranslate("DEMO_J",c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2","yea
 datatable(t1[1:100,c('SEQN','RIDAGEYR','RIAGENDR', 'RIDRETH1')] )
 ```
 
-##FIXME: Laha - somewhere you should have an explicit definition of what is in the code - what makes something continuous - what makes it discrete, what makes it ordered? In the first pass, all the categorical values are discrete integers - that does not make them ordered - you have to look at the actual levels - and we need to explain how our users will do that.
-
-
-##FIXME - the more I think about it, we should only report a factor, if the column has been transformed into an R factor, and then you can get from that whether it is ordered or unordered.  When you get a column with integer values only (and less than whatever the PHESANT cut-off is, then call them "categorical" - let's reserve the label "factor" for R factors.
 
 Currently, we are doing as the following flow chat, but both the ordered and unordered are considered as multilevel.
 ![PHESANT flow chat](images/phesant_like.png){width=80%}
