@@ -257,7 +257,7 @@ The real factor levels can be set with `nhanesTranslate()` function. This functi
 the data in the NHANES Codebook for a given variable and uses that to translate categorical variables from their integer codes into the appropriate levels.
 ##FIXME: need to figure out if these are always coming back as character vectors - which seems best, and those can then be transformed into factors (ordered if desired).  Compare our implementation to that of nhanesA
 
-```{r,DT.warn.size=FALSE}
+```{r,DT.warn.size=FALSE, eval=FALSE}
 ##now we can translate the variables that need to be translated
 t1 = nhanesTranslate("DEMO_J",c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2","years"),data=data)
 datatable(t1[1:100,c('SEQN','RIDAGEYR','RIAGENDR', 'RIDRETH1')] )
