@@ -419,10 +419,10 @@ nhanesTranslate = function( nh_table, colnames = NULL, data = FALSE, nchar = 32,
   if(details){
     sql = "SELECT Variable,CodeOrValue AS 'Code.or.Value',ValueDescription AS 'Value.Description',
             Count,Cumulative,SkipToItem AS 'Skip.to.Item'
-            FROM Metadata.VariableCodebook WHERE Questionnaire='"
+            FROM Metadata.VariableCodebook WHERE TableName='"
   } else {
     sql = "SELECT Variable,CodeOrValue AS 'Code.or.Value',ValueDescription AS 'Value.Description'
-             FROM Metadata.VariableCodebook WHERE Questionnaire='"
+             FROM Metadata.VariableCodebook WHERE TableName='"
   }
   sql = paste0(sql,nh_table,"'")
   if(!is.null(colnames))
