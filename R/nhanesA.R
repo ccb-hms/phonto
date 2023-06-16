@@ -523,7 +523,7 @@ nhanesSearch = function( search_terms = NULL,
     sql <- paste(sql,"AND Q.Year >=",ystart)
   }
   if(!is.null(ystop)){
-    sql <- paste(sql,"AND Q.Year <",ystop)
+    sql <- paste(sql,"AND Q.Year <=",ystop)
   }
   df = nhanesQuery(sql)
   if(namesonly){

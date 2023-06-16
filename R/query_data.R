@@ -123,7 +123,7 @@ jointQuery = function(tables_n_cols,translated=TRUE){
   # tidy columns set
   final_cols = unique(unlist(tables_n_cols))
   final_cols = toString(sprintf("%s", unlist(final_cols)))
-  final_cols = paste0(" DISTINCT unifiedTB.SEQN, ",final_cols,",Year")
+  final_cols = paste0(" DISTINCT unifiedTB.SEQN, ",final_cols,",Year AS 'Begin.Year', (Year+1) AS EndYear")
 
   #joint query sql
   query_sql = paste("SELECT",final_cols,"FROM unifiedTB")
