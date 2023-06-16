@@ -149,11 +149,11 @@ dim(urinsm)
 #
 # Restrict search to 'EXAM' and 'LAB' data groups. Explicitly list matching and exclude terms, leave ignore.case set to default value of FALSE. Search surveys from 2009 to present.
 urinrest = nhanesSearch(c("urin", "Urin"), exclude_terms=c("During", "eaten during", "do during"), data_group=c('EXAM', 'LAB'), ystart=2009)
-dim(urinrest)
+head(urinrest) # namesonly=TRUE by default, and it only returns an vector
 #
 # Search on "tooth" or "teeth", all years
 teeth = nhanesSearch(c("tooth", "teeth"), ignore.case=TRUE)
-dim(teeth)
+head(teeth)
 #
 # Search for variables where the variable description begins with "Tooth"
 sttooth = nhanesSearch("^Tooth")
