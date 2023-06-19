@@ -6,6 +6,8 @@ That container can be obtained by running the code below.  Once installed and st
 a web browser to analyze NHANES data using any tools they would like. The data live in a SQL database and can
 be accessed by a variety of tools.  We provide an interface via RStudio and this package works together with the 
 nhanesA package to support a wide variety of analyses.
+  phonto provides a few vignettes and users can familiarize themselves with the Quick Start vignette in order
+to find out how to interact with the DB.
 
 ### Start Docker
 
