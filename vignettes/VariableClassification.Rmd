@@ -27,8 +27,9 @@ xx = phonto:::nhanesQuery(t1)
 #make a vector to store our variable labels
 outPut = rep(NA, nrow(xx))
 apply(xx,2, function(x) sum(is.na(x)))
-#Questionnaire      Variable   Description      SaSLabel 
-#            0             0          4604          4437 
+## we can see that only Description and SaSLabel are missing
+##  TableName    Variable Description    SaSLabel
+##          0           0         505         338
 missLab = is.na(xx$SaSLabel) |is.na(xx$Description)
 usedIndex = which(missLab)
 outPut[missLab] = "Missing"
@@ -64,6 +65,10 @@ And we can see already that some of the variables that start with WT have either
 
 ##Build a searchable corpus
 
+The code below can be used to build a searchable corpus using the `corpustools` package.  Once constructed the corpus is put into the `inst/extdata` subdirectory and it can be used.  The corpus should be updated for every new release as mappings to the ontologies, the ontologies and the DB may all have changed.
+
+This is not run as part of the vignette testing but rather provides the details on how to do this for a release.
+
 ```{r eval=FALSE}
 library("corpustools")
 nhanes_df = xx
@@ -74,11 +79,12 @@ nhanes_tc$preprocess(use_stemming = TRUE, remove_stopwords=TRUE)
 h1 = search_features(nhanes_tc, query = c(`"blood pressure"`))
 
 h2 = search_features(nhanes_tc, query = "hypertension")
-
+h3 = search_features(nhanes_tc, query="LDL")
   save=FALSE
   if( save ) {
-   save(efo_tc, file= paste0(path, "/nhanes_tc.rda"), compress="xz")
-   save(efo_df, file=paste0(path, "/nhanes_df.rda"), compress="xz")
+   path="/HostData/Laha/phonto/inst/extdata"
+   save(nhanes_tc, file= paste0(path, "/nhanes_tc.rda"), compress="xz")
+   save(nhanes_df, file=paste0(path, "/nhanes_df.rda"), compress="xz")
   }
 
 

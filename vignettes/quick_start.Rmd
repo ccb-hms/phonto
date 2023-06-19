@@ -97,17 +97,15 @@ Comprehensive lists of NHANES variables are maintained for each data group. For 
   
 #### 2.1 Searching for tables
   
-
-This function lets users search for tables in the database using the table name.  
-For example, we can search the blood pressure related tables using the following code. We search for the string "BPX" as the parameters based on the CDC table name conventions. This also demonstrates the naming convention that is often (although not always) used by the CDC.  There is generally a base name (some short set of uppercase characters) and then a suffix, for all but the first cycle, that increases lexicographically one letter per cycle.  If you click on the next button in the table below you will see that there is one table named "BPXO_J" which is a bit different from the others. According to the documentation during the 2017-2018 cycle *a BP methodology study was conducted to compare BP measurements obtained by a physician using a mercury sphygmomanometer to those obtained by a health technician using an oscillometric device.*
+The function `nhanesSearchTableNames` lets users search for tables in the database using the table name. For example, we can search the blood pressure related tables using the following code. We search for the string "BPX" as the parameters based on the CDC table name conventions. This also demonstrates the naming convention that is often (although not always) used by the CDC.  There is generally a base name (some short set of uppercase characters) and then a suffix, for all but the first cycle, that increases lexicographically one letter per cycle.  If you click on the next button in the table below you will see that there is one table named "BPXO_J" which is a bit different from the others. According to the documentation during the 2017-2018 cycle *a BP methodology study was conducted to compare BP measurements obtained by a physician using a mercury sphygmomanometer to those obtained by a health technician using an oscillometric device.*
 
 ```{r}
 res = nhanesSearchTableNames("BPX", details=TRUE)
 datatable(res)
 ```
 
+We provide access to functions within the database for matching strings. In the example below the string "BPX[_]" string is passed to the database engine directly.  This string matches only tables containing the string "BPX_"; therefore, the table named "BPXO_J" will not match. We note that the table named "BPX" also has no underscore and it also will not match. Recall that in the first survey cycle the table names have no underscore or suffix.
 
-In the code chunk below we exploit the fact that the data are stored in a SQLServer database. We can provide access to some of the special functions within that database for matching strings. In the example below the string "BPX[_]" string is passed to the database engine directly.  This string matches only tables containing the string "BPX_"; therefore, the table named "BPXO_J" will not match the search string. We note that the table named "BPX" also has no underscore and it also will not match. Readers familiar with regular expressions may want to explore on-line documentation for SQL Server that helps them identify ways of creating more specialized search expressions.
 ```{r}
 res = nhanesSearchTableNames("BPX[_]", details=TRUE)
 datatable(res)
@@ -176,16 +174,16 @@ datatable(sttooth)
 Now suppose we wanted to find variables names that contain information about (low density lipoproteins).  To do that one can first use the `nhanesSearch` function to retrieve a master list of any and all questions matching this search term in it's *Description*. One can then use the output of this search to identify variable names of interest. The variable name can then be searched for using the `nhanesSearchVarName` function.  In the code below we find a variable names corresponding to LDLs and then find all the tables that contain a variable with that name.
 
 ```{r}
-s1 = nhanesSearch("LDL", nchar=256)
-##from this one can obtain Variable names
-s1[1,c(2:3)]
-##FIXME: how did you get to LBDLDL from the above? this doc should explain
-##everything....
+s1 = nhanesSearch("LDL", nchar=256, data_group="LAB")
+DT::datatable(s1)
+
+```
+
+Scrolling through the datatable we find that there are a number of variables that correspond to an actual LDL measurement, several are named `LBDLDL` and so we can now search for that variable.
+```{r}
 LDLTabs = nhanesSearchVarName('LBDLDL')
 LDLTabs
 ```
-
-
 
 ### 3 nhanesCodebook
 
