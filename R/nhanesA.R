@@ -181,8 +181,12 @@ nhanesTables = function( data_group, year,
                     data_group, "' and Year=",ifelse(EVEN, year-1, year))
   }
 
-  nhanesQuery(tables)
-
+  df = nhanesQuery(tables)
+  if(namesonly){
+    return(unique(df$Data.File.Name))
+  } else {
+    return(df)
+  }
 }
 
 
@@ -214,7 +218,7 @@ nhanesTableVars = function(data_group, nh_table, details = FALSE, nchar=128, nam
 
   checkTableNames(nh_table)
 
-  sql = paste0("SELECT V.Variable AS 'Variable.Name',
+  sql = paste0("SELECT DISTINCT V.Variable AS 'Variable.Name',
                        SUBSTRING(V.Description,1,",nchar,") AS 'Variable.Description',
                        V.TableName AS 'Data.File.Name',
                        SUBSTRING(Q.[Description],1,",nchar,") AS 'Data.File.Description',
@@ -228,10 +232,9 @@ nhanesTableVars = function(data_group, nh_table, details = FALSE, nchar=128, nam
     sql = paste0(sql," AND DataGroup LIKE '",data_group,"%'")
   }
 
-
   df = nhanesQuery(sql)
   if(namesonly){
-    return(df$Variable.Name)
+    return(unique(df$Variable.Name))
   }else if(!details){
     return(df[,c('Variable.Name','Variable.Description')])
   }else{
@@ -308,7 +311,7 @@ nhanesSearchVarName <- function(varnames = NULL,
 
 
   if(namesonly){
-    df = df$Data.File.Name
+    df = unique(df$Data.File.Name)
   }
 
   df
@@ -359,7 +362,7 @@ nhanesSearchTableNames <-  function(pattern = NULL,
   if(details)
      return(df)
   else
-     return(df$TableName)
+     return(unique(df$TableName))
 }
 
 
@@ -527,7 +530,7 @@ nhanesSearch = function( search_terms = NULL,
   }
   df = nhanesQuery(sql)
   if(namesonly){
-    df = df$Data.File.Name
+    df = unique(df$Data.File.Name)
   }
 
   df
