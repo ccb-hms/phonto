@@ -507,8 +507,8 @@ nhanesSearch = function( search_terms = NULL,
 
 
   if(!is.null(data_group)){
-    if(length(data_group>1)){
-      sql = paste0(sql,"AND (DataGroup LIKE '%",data_group[1],"%'")
+    if(length(data_group)>1){
+      sql = paste0(sql," AND (DataGroup LIKE '%",data_group[1],"%'")
       for (term in data_group[2:length(data_group)]){
         sql = paste0(sql," OR DataGroup LIKE '%",term,"%'")
       }
