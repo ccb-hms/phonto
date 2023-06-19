@@ -1,7 +1,11 @@
 # phonto
 PHONTO - PHenome ONTOlogy for NHANES
 
-
+This package is designed to work with the Docker container available from https://github.com/ccb-hms/NHANES
+That container can be obtained by running the code below.  Once installed and started users can log in via
+a web browser to analyze NHANES data using any tools they would like. The data live in a SQL database and can
+be accessed by a variety of tools.  We provide an interface via RStudio and this package works together with the 
+nhanesA package to support a wide variety of analyses.
 
 ### Start Docker
 
