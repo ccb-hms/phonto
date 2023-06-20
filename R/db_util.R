@@ -27,8 +27,10 @@ checkTableNames = function(table_name){
    if(is.null(table_name)){
     stop("Table name cannot be null!")
   }
-  if(!all(table_name %in% validTables)){
-    stop(paste0("Invalid table name: ",table_name,""))
+  validIndx = (table_name %in% validTables)
+  if(sum(!validIndx)>0){
+    stop("Table ",paste(table_name[!validIndx],collapse = ", "),
+    " does/do not exist in database, please check the table names.")
   }
 }
 
@@ -44,7 +46,7 @@ convertTranslatedTable = function(table_name,translated){
     table_name[translatedIndx] = paste0("Translated.",table_name[translatedIndx])
     if(sum(!translatedIndx)>0){
       
-      warning("Table ",paste(table_name[!translatedIndx],collapse = ","),
+      warning("Table ",paste(table_name[!translatedIndx],collapse = ", "),
       " does/do not exist in Translated schema, using Raw schema instead.")
       table_name[!translatedIndx] = paste0("Raw.",table_name[!translatedIndx])
     }

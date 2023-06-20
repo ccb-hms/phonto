@@ -42,12 +42,8 @@ queryByVars = function(vars=NULL,ystart = NULL,ystop = NULL,translated=TRUE){
 jointQuery = function(tables_n_cols,translated=TRUE){
 
   if(is.null(tables_n_cols) | length(tables_n_cols) <1) return (NULL)
-  for (tb in names(tables_n_cols)){
-    if(!tb %in% validTables){
-      stop(paste0("Invalid table name: ",tb,""))
-    }
-  }
 
+  checkTableNames(names(tables_n_cols))
   names(tables_n_cols) = convertTranslatedTable(names(tables_n_cols),translated)
 
   cols_to_tables = list() # it won't be long and we do not know the length ahead.
@@ -142,9 +138,9 @@ jointQuery = function(tables_n_cols,translated=TRUE){
 unionQuery= function(table_names,cols=NULL,translated=TRUE){
 
   if(is.null(table_names) | length(table_names) <1) return (NULL)
-  for (tb in table_names){
-    checkTableNames(tb)
-  }
+
+  checkTableNames(table_names)
+  
   table_names = convertTranslatedTable(table_names,translated)
 
   if(is.null(cols)){
