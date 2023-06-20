@@ -1,15 +1,4 @@
 
-# choose the to query translated or Raw table
-.tableNameConvert = function(tb_name,translated=TRUE){
-
-  if(translated){
-    tb_name = paste0("Translated.",tb_name)
-  }else{
-    tb_name = paste0("Raw.",tb_name)
-  }
-  tb_name
-}
-
 
 #' Query data by variable
 #'
@@ -59,7 +48,7 @@ jointQuery = function(tables_n_cols,translated=TRUE){
     }
   }
 
-  names(tables_n_cols) = .tableNameConvert(names(tables_n_cols))
+  names(tables_n_cols) = convertTranslatedTable(names(tables_n_cols),translated)
 
   cols_to_tables = list() # it won't be long and we do not know the length ahead.
 
@@ -156,7 +145,7 @@ unionQuery= function(table_names,cols=NULL,translated=TRUE){
   for (tb in table_names){
     checkTableNames(tb)
   }
-  table_names = .tableNameConvert(table_names,translated)
+  table_names = convertTranslatedTable(table_names,translated)
 
   if(is.null(cols)){
     cols <- "*"
@@ -239,16 +228,14 @@ checkDataConsistency = function(table1,table2){
 #' The Number of Rows of an NHANES table
 #'
 #' @param tb_name NHANES table name
-#' @param Translated whether the table name is translated
 #'
 #' @return an integer of length 1
 #' @export
 #'
 #' @examples nhanesNrow("BMX_I")
-nhanesNrow = function(tb_name,translated=TRUE){
+nhanesNrow = function(tb_name){
   checkTableNames(tb_name)
-  tb_name = .tableNameConvert(tb_name,translated)
-  sql_str = paste0("SELECT COUNT(*) FROM ",tb_name)
+  sql_str = paste0("SELECT COUNT(*) FROM Raw.",tb_name)
   nhanesQuery(sql_str)[1,1]
 }
 
@@ -270,7 +257,6 @@ nhanesNcol = function(tb_name,translated=TRUE){
 #' Column Names for NHANES tables
 #'
 #' @param tb_name NHANES table name
-#' @param translated whether the table name is translated
 #'
 #' @description Retrieve column names of an NHANES table.
 #'
@@ -278,7 +264,7 @@ nhanesNcol = function(tb_name,translated=TRUE){
 #' @export
 #'
 #' @examples nhanesColnames("BMX_I")
-nhanesColnames = function(tb_name,translated=TRUE){
+nhanesColnames = function(tb_name){
   checkTableNames(tb_name)
   sql_str = paste0("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '",tb_name,"'")
   nhanesQuery(sql_str)$COLUMN_NAME
@@ -311,8 +297,7 @@ nhanesDim = function(nh_table,translated=TRUE){
 #' @examples nhanesHead("BMX_I",10)
 nhanesHead = function(nh_table,n=5,translated=TRUE){
   checkTableNames(nh_table)
-  nh_table = .tableNameConvert(nh_table,translated)
-
+  nh_table = convertTranslatedTable(nh_table,translated)
   sql = paste0("SELECT TOP(",n, ") * FROM ",nh_table)
   nhanesQuery(sql)
 }
@@ -332,7 +317,7 @@ nhanesHead = function(nh_table,n=5,translated=TRUE){
 #' @examples nhanesTail("BMX_I",10)
 nhanesTail= function(nh_table,n=5,translated=TRUE){
   checkTableNames(nh_table)
-  nh_table = .tableNameConvert(nh_table,translated)
+  nh_table = convertTranslatedTable(nh_table,translated)
 
   sql = paste0("SELECT TOP(",n, ") * FROM ",nh_table," ORDER BY SEQN DESC")
   df = nhanesQuery(sql)
