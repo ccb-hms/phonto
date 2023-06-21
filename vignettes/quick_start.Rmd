@@ -136,7 +136,7 @@ bl = nhanesSearch("bladder", ystart=2001, ystop=2008, nchar=50)
 dim(bl)
 #
 # Search on "urin" (will match urine, urinary, etc), from 1999-2010, return table names only
-urin1 = nhanesSearch("urin", ignore.case=TRUE, ystop=2010)
+urin = nhanesSearch("urin", ignore.case=TRUE, ystop=2010)
 length(urin)
 urin[1:10]
 #
