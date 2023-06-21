@@ -4,12 +4,10 @@
 \alias{nhanesColnames}
 \title{Column Names for NHANES tables}
 \usage{
-nhanesColnames(tb_name, translated = TRUE)
+nhanesColnames(tb_name)
 }
 \arguments{
 \item{tb_name}{NHANES table name}
-
-\item{translated}{whether the table name is translated}
 }
 \value{
 a character vector of non-zero length equal to the appropriate dimension.

@@ -255,7 +255,7 @@ nhanesTableVars = function(data_group, nh_table, details = FALSE, nchar=128, nam
 nhanes = function(nh_table,translated=TRUE){
   checkTableNames(nh_table)
 
-  nh_table = ifelse(translated,paste0("Translated.",nh_table),paste0("Raw.",nh_table))
+  nh_table = convertTranslatedTable(nh_table,translated)
   sql = paste0("SELECT * FROM ",nh_table)
   nhanesQuery(sql)
 }
