@@ -124,7 +124,7 @@ datatable(res)
 
  One of the main challenges in using the NHANES data set is finding the tables that contain the data you want to analyze.  In this section we outline some of the basic methods you can use to do the searching. The returned value can be put into a searchable data table that you can use to further filter, sort and search for specific variables.
  
- The `nhanesSearch` function searches for text strings in the variable names and then returns the name of the table that contains
+The primary purpose of the `nhanesSearch` function is to facilitate the search for specific text strings within the variable description field. By utilizing this function, users can obtain a convenient data frame that includes the names of variables whose descriptions meet the specified criteria. Furthermore, the function offers additional filtering options, such as specifying a start and stop year, enabling users to further refine their search results.
 
 
 ```{r}
@@ -136,13 +136,13 @@ bl = nhanesSearch("bladder", ystart=2001, ystop=2008, nchar=50)
 dim(bl)
 #
 # Search on "urin" (will match urine, urinary, etc), from 1999-2010, return table names only
-urin = nhanesSearch("urin", ignore.case=TRUE, ystop=2010, namesonly=TRUE)
+urin1 = nhanesSearch("urin", ignore.case=TRUE, ystop=2010)
 length(urin)
 urin[1:10]
 #
 ```
 
-The `nhanesSearch` function also has a way to exclude certain matches. In the search above any variable name that has the word "during" in it will also match and we probably don't want those. So in the output below we exclude those terms.
+The `nhanesSearch` function also provides an option to exclude specific matches. In the previous search, any variable name containing the word "during" would have been considered a match. However, by excluding these terms in the output, the function ensures results that more accurately reflect your desired specifications.
 ```{r}
 urinEx = nhanesSearch("urin", exclude_terms="during", ignore.case=TRUE, ystop=2010, namesonly=TRUE)
 length(urinEx)
