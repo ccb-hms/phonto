@@ -242,6 +242,10 @@ We can run a PHESANT-like process to convert each column into data types. It als
 phs_dat = phesant(data)
 data = phs_dat$data
 DT::datatable(phs_dat$phs_res)
+```
+
+We can also find out which variables are categorical.
+```{r CategoricalVars, echo=TRUE}
 categoricalVars = rownames(phs_dat$phs_res)[grep("^Multilevel", phs_dat$phs_res$types)]
 categoricalVars
 ```

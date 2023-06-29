@@ -42,7 +42,6 @@ And we can see already that some of the variables that start with WT have either
 ```{r weights}
  isWT = grep("^WT", xx$Variable)
  outPut[isWT] = "Survey Weight"
- table(outPut, useNA="always")
  
  ##variance estimates also survey weights
  isWT = grep("^SDMV", xx$Variable)
@@ -63,7 +62,31 @@ And we can see already that some of the variables that start with WT have either
  
 ```
 
-##Build a searchable corpus
+Another set of variables that are not likely to be phenotypes are the interview IDs.
+
+```{r interviewerID}
+g1 = grep("DR[12D]EXMER", xx$Variable)
+outPut[g1] = "Interviewer ID code"
+
+g2 = grep("[Rr]ecall [Ss]tatus", xx$SaSLabel)
+outPut[g2] = "Recall Status"
+
+g3 = grep("*LANG*", xx$Variable)
+##table(outPut[g3], useNA = "always")
+
+outPut[g3] = "Language Used"
+
+## captured with Interview
+## g4 = grep("*INTRP*", xx$Variable)
+## table(outPut[g4], useNA = "always")
+```
+
+
+```{r classes, echo=TRUE}
+ table(outPut, useNA="always")
+```
+
+## Build a searchable corpus
 
 The code below can be used to build a searchable corpus using the `corpustools` package.  Once constructed the corpus is put into the `inst/extdata` subdirectory and it can be used.  The corpus should be updated for every new release as mappings to the ontologies, the ontologies and the DB may all have changed.
 
