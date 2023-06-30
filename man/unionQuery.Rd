@@ -10,8 +10,6 @@ unionQuery(tables_n_cols, translated = TRUE)
 \item{tables_n_cols}{a named list, each name corresponds to a Questionnaire and the value is a list of variable names.}
 
 \item{translated}{A boolean parameter, default is TRUE. This indicates whether the variables are translated or not.}
-
-\item{table_names}{nhanes table names}
 }
 \value{
 data frame

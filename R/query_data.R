@@ -1,26 +1,5 @@
 
 
-#' Query data by variable
-#'
-#' It search the tables contain the given variables and query data union
-#' @param vars variables or phenotypes want to search
-#' @param ystart Four digit year of first survey included in search, where ystart >= 1999.
-#' @param ystop Four digit year of final survey included in search, where ystop >= ystart.
-#' @param translated whether the variables are translated
-#'
-#' @return union data frame
-#' @export
-#'
-#' @examples df = queryByVars(c("URXDAZ","URXDMA"))
-
-queryByVars = function(vars=NULL,ystart = NULL,ystop = NULL,translated=TRUE){
-  if(is.null(vars) | length(vars) <1) return (NULL)
-  tables = nhanesSearchVarName(vars,ystart,ystop)
-  # need a try catch here
-  unionQuery(tables,vars,translated)
-
-}
-
 # inner function to convert colunms for the tables
 .convertColunms = function(tables_n_cols,translated){
 
@@ -144,7 +123,6 @@ cols_to_tables = .convertColunms(tables_n_cols,translated)
 #' The unionQuery function is used for merging or unifying tables from the same survey over different years and returning the resultant data frame. 
 #' The main goal of this function is to union given variables and tables from the same survey across different years.
 #' 
-#' @param table_names nhanes table names
 #' @param tables_n_cols a named list, each name corresponds to a Questionnaire and the value is a list of variable names.
 #' @param translated A boolean parameter, default is TRUE. This indicates whether the variables are translated or not.
 #'
