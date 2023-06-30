@@ -207,9 +207,10 @@ The `unionQuery()` function is designed to aggregate data across the years for a
 For an example of how to utilize this function, we use the blood pressure tables BPX, BPX_B,...BPX_J from years 1999-2000 to 2017-2018. User can aggregate some or all of the data contained in relevant tables.  Note: we are showing this example for illustrative purposes and have not carefully checking the code book. We encourage you to take the time to always ensure that code book entries are compatible.
 
 ```{r search_union,warning=FALSE,message=FALSE}
-tablenames = nhanesSearchTableNames('BPX[_]')
+nhanesSearchTableNames('BPX[_]')
 
-blood_df <- unionQuery(tablenames,cols =c("BPXDI1","BPXDI2","BPXSY1","BPXSY2"))
+blood_df <- unionQuery(list(BPX_C=c("BPXDI1","BPXDI2","BPXSY1","BPXSY2"),
+                            BPX_D=c("BPXDI1","BPXDI2","BPXSY1","BPXSY2")))
 DT::datatable(blood_df[1:400,])
 ```
 
