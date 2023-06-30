@@ -149,12 +149,11 @@ nchar_default <- 128
 nhanesTables = function( data_group, year,
       nchar = 128,  details = FALSE,
       namesonly = FALSE, includerdc = FALSE ) {
-
+   .checkDataGroup(data_group)
   # ##check if they are using the short name
   if( data_group %in% names(nhanes_group) )
       data_group = nhanes_group[data_group]
-  if ( !(data_group %in% nhanes_group) )
-    stop("Invalid survey group")
+
 
 
   if (is.numeric(year))
@@ -189,7 +188,12 @@ nhanesTables = function( data_group, year,
   }
 }
 
-
+.checkDataGroup = function(data_group){
+  if (!(data_group %in% c('DEMOGRAPHICS', 'DIETARY', 'EXAMINATION','LABORATORY', 'QUESTIONNAIRE') 
+  || data_group %in% c('DEMO', 'DIET', 'EXAM', 'LAB', 'Q')))
+  stop("Invalid survey group!")
+ 
+}
 
 ##note for our system we only need nh_table - the other details are not relevant
 ##so no need to process or pay attention to them
@@ -215,7 +219,10 @@ nhanesTableVars = function(data_group, nh_table, details = FALSE, nchar=128, nam
     nh_table = param$data_group
     data_group = NULL
   }
-
+  if(!is.null(data_group)){
+    .checkDataGroup(data_group)
+  }
+  
   checkTableNames(nh_table)
 
   sql = paste0("SELECT DISTINCT V.Variable AS 'Variable.Name',
