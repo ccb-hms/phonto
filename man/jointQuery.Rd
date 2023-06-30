@@ -12,10 +12,11 @@ jointQuery(tables_n_cols, translated = TRUE)
 \item{translated}{whether the variables are translated}
 }
 \value{
-data frame containing the join of the tables and selected variables
+This function returns a data frame containing the joined data from the specified tables and selected variables.
 }
 \description{
-Joint Query
+The jointQuery function is designed for merging and joining tables from different surveys over various years and returning the resultant data frame.
+The primary objective of this function is to union given variables and tables from the same survey across different years, join different surveys, and return a unified data frame.
 }
 \examples{
 df = jointQuery( list(BPQ_J=c("BPQ020", "BPQ050A"), DEMO_J=c("RIDAGEYR","RIAGENDR")))

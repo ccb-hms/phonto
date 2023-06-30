@@ -4,21 +4,22 @@
 \alias{unionQuery}
 \title{Union Query}
 \usage{
-unionQuery(table_names, cols = NULL, translated = TRUE)
+unionQuery(tables_n_cols, translated = TRUE)
 }
 \arguments{
+\item{tables_n_cols}{a named list, each name corresponds to a Questionnaire and the value is a list of variable names.}
+
+\item{translated}{A boolean parameter, default is TRUE. This indicates whether the variables are translated or not.}
+
 \item{table_names}{nhanes table names}
-
-\item{cols}{columns}
-
-\item{translated}{whether the variables are translated}
 }
 \value{
 data frame
 }
 \description{
-Union Query
+The unionQuery function is used for merging or unifying tables from the same survey over different years and returning the resultant data frame.
+The main goal of this function is to union given variables and tables from the same survey across different years.
 }
 \examples{
-df = unionQuery(c("DEMO_B","DEMO_D"),c("RIDAGEYR","RIAGENDR"))
+df = unionQuery( list(DEMO_I=c("RIDAGEYR","RIAGENDR"), DEMO_J=c("RIDAGEYR","RIAGENDR")))
 }

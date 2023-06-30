@@ -21,30 +21,8 @@ queryByVars = function(vars=NULL,ystart = NULL,ystop = NULL,translated=TRUE){
 
 }
 
-
-
-#' Joint Query
-#'
-#' @param tables_n_cols a named list, each name corresponds to a Questionnaire and the value is a list of variable names.
-#' @param translated whether the variables are translated
-#'
-#' @return data frame containing the join of the tables and selected variables
-#' @export
-#'
-#' @examples df = jointQuery( list(BPQ_J=c("BPQ020", "BPQ050A"), DEMO_J=c("RIDAGEYR","RIAGENDR")))
-#' @examples cols = list(DEMO_I=c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2"),
-#'                      DEMO_J=c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2"),
-#'                      BPQ_I=c('BPQ050A','BPQ020'),BPQ_J=c('BPQ050A','BPQ020'),
-#'                      HDL_I=c("LBDHDD"),HDL_J=c("LBDHDD"), TRIGLY_I=c("LBXTR","LBDLDL"),
-#'                      TRIGLY_J=c("LBXTR","LBDLDL"))
-#' ans = jointQuery(cols)
-#' dim(ans)
-jointQuery = function(tables_n_cols,translated=TRUE){
-
-  if(is.null(tables_n_cols) | length(tables_n_cols) <1) return (NULL)
-
-  checkTableNames(names(tables_n_cols))
-  names(tables_n_cols) = convertTranslatedTable(names(tables_n_cols),translated)
+# inner function to convert colunms for the tables
+.convertColunms = function(tables_n_cols,translated){
 
   cols_to_tables = list() # it won't be long and we do not know the length ahead.
 
@@ -59,9 +37,38 @@ jointQuery = function(tables_n_cols,translated=TRUE){
       cols_to_tables[[col]]=c(cols_to_tables[[col]],cl)
     }
   }
+  cols_to_tables
+}
 
+#' Joint Query
+#'
+#' The jointQuery function is designed for merging and joining tables from different surveys over various years and returning the resultant data frame. 
+#' The primary objective of this function is to union given variables and tables from the same survey across different years, join different surveys, and return a unified data frame. 
+#' 
+#' 
+#' 
+#' @param tables_n_cols a named list, each name corresponds to a Questionnaire and the value is a list of variable names.
+#' @param translated whether the variables are translated
+#'
+#' @return This function returns a data frame containing the joined data from the specified tables and selected variables.
+#' @export
+#'
+#' @examples df = jointQuery( list(BPQ_J=c("BPQ020", "BPQ050A"), DEMO_J=c("RIDAGEYR","RIAGENDR")))
+#' @examples cols = list(DEMO_I=c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2"),
+#'                      DEMO_J=c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2"),
+#'                      BPQ_I=c('BPQ050A','BPQ020'),BPQ_J=c('BPQ050A','BPQ020'),
+#'                      HDL_I=c("LBDHDD"),HDL_J=c("LBDHDD"), TRIGLY_I=c("LBXTR","LBDLDL"),
+#'                      TRIGLY_J=c("LBXTR","LBDLDL"))
+#' ans = jointQuery(cols)
+#' dim(ans)
 
-
+jointQuery = function(tables_n_cols,translated=TRUE){
+ 
+if(is.null(tables_n_cols) | length(tables_n_cols) <1) return (NULL)
+checkTableNames(names(tables_n_cols))
+names(tables_n_cols) = convertTranslatedTable(names(tables_n_cols),translated)
+cols_to_tables = .convertColunms(tables_n_cols,translated)
+ 
 
   # create SEQN with years
   # want to create a sub sqls like:
@@ -119,59 +126,85 @@ jointQuery = function(tables_n_cols,translated=TRUE){
   # put the sql together
   sql = paste0(sql, "
              ",query_sql)
-
-  nhanesQuery(sql)
+  
+  tryCatch(
+    nhanesQuery(sql),
+    error = function(e) {
+      message("ERROR! Please make sure you have the same variables across the years for the same survey.")
+      return(NULL)
+    }
+   
+  )
 
 }
 
 
 #' Union Query
 #'
+#' The unionQuery function is used for merging or unifying tables from the same survey over different years and returning the resultant data frame. 
+#' The main goal of this function is to union given variables and tables from the same survey across different years.
+#' 
 #' @param table_names nhanes table names
-#' @param cols columns
-#' @param translated whether the variables are translated
+#' @param tables_n_cols a named list, each name corresponds to a Questionnaire and the value is a list of variable names.
+#' @param translated A boolean parameter, default is TRUE. This indicates whether the variables are translated or not.
 #'
 #' @return data frame
 #' @export
 #'
-#' @examples df = unionQuery(c("DEMO_B","DEMO_D"),c("RIDAGEYR","RIAGENDR"))
-unionQuery= function(table_names,cols=NULL,translated=TRUE){
+#' @examples df = unionQuery( list(DEMO_I=c("RIDAGEYR","RIAGENDR"), DEMO_J=c("RIDAGEYR","RIAGENDR")))
+unionQuery= function(tables_n_cols,translated=TRUE){
 
-  if(is.null(table_names) | length(table_names) <1) return (NULL)
+if(is.null(tables_n_cols) | length(tables_n_cols) <1) return (NULL)
+checkTableNames(names(tables_n_cols))
+names(tables_n_cols) = convertTranslatedTable(names(tables_n_cols),translated)
+cols_to_tables = .convertColunms(tables_n_cols,translated)
 
-  checkTableNames(table_names)
-  
-  table_names = convertTranslatedTable(table_names,translated)
+ if(length(cols_to_tables)>1){
+   stop("Please make sure the tables and chave the same columns")
+ }
 
-  if(is.null(cols)){
-    cols <- "*"
-  }else{
-    cols <- paste0("SEQN, ",toString(sprintf("%s", cols)))
+  seqn_year = rep("", length(tables_n_cols))
+  for (i in 1:length(tables_n_cols)){
+    tb_name = names(tables_n_cols)[i]
+    tb = unlist(strsplit(tb_name, "\\."))[2] # removed prefix, Translated. or Raw.
+    temp_sql = paste0("SELECT SEQN, Year
+    FROM (
+        SELECT SEQN FROM ", tb_name,
+        ") ", tb,
+        " JOIN Metadata.QuestionnaireDescriptions QD ON QD.TableName='",tb ,"'")
+    seqn_year[i] = temp_sql
   }
 
-  sql <- paste("SELECT ",cols,
+
+
+  sql = "WITH unifiedTB AS ("
+  sql = paste0(sql, paste0(paste0(seqn_year, collapse = " UNION ALL "),"),"))
+
+
+
+
+ # create union sql
+
+  # tidy columns set
+cols = unique(unlist(tables_n_cols))
+cols = toString(sprintf("%s", unlist(cols)))
+table_names = names(tables_n_cols)
+ union_sql <- paste("SELECT SEQN,",cols,
                "FROM", table_names[1])
   if(length(table_names)>=2){
     for(tl_n in table_names[2:length(table_names)]){
-      sql = paste0(sql," UNION ALL SELECT ",cols ,
+      union_sql = paste0(union_sql," UNION ALL SELECT SEQN,",cols ,
                    " FROM ",tl_n)
     }
 
   }
 
-
-  df = nhanesQuery(sql)
-
-  # add years colunm to the dataframe
-  df["years"] = 0
-  ydx = 1
-  for (tn in table_names) {
-    nrw = nhanesNrow(unlist(strsplit(tn,"\\."))[2])
-    df[ydx:(ydx+nrw-1),"years"] = rep(unlist(.get_year_from_nh_table(tn)),nrw)
-    ydx = ydx + nrw
-  }
-
-  df
+   # put the sql together
+  sql = paste0(sql, "UTables AS (",union_sql,") ")
+  final_cols = paste0(" DISTINCT unifiedTB.SEQN, ",cols,",Year AS 'Begin.Year', (Year+1) AS EndYear")
+  
+  sql = paste0(sql, "SELECT ",final_cols," FROM unifiedTB LEFT JOIN UTables ON unifiedTB.SEQN=UTables.SEQN")
+  nhanesQuery(sql)
 
 }
 
