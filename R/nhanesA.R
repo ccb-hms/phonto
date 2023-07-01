@@ -189,8 +189,7 @@ nhanesTables = function( data_group, year,
 }
 
 .checkDataGroup = function(data_group){
-  if (!(data_group %in% c('DEMOGRAPHICS', 'DIETARY', 'EXAMINATION','LABORATORY', 'QUESTIONNAIRE') 
-  || data_group %in% c('DEMO', 'DIET', 'EXAM', 'LAB', 'Q')))
+  if (!(data_group %in% names(nhanes_group)))
   stop("Invalid survey group!")
  
 }
