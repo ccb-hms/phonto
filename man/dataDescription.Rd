@@ -2,16 +2,30 @@
 % Please edit documentation in R/query_data.R
 \name{dataDescription}
 \alias{dataDescription}
-\title{Get the metadata associated with a set of tables and variables}
+\title{dataDescription}
 \usage{
 dataDescription(tables_n_cols)
 }
 \arguments{
-\item{tables_n_cols}{a named list, each name corresponds to a Questionnaire and the value is a list of variable names.}
+\item{tables_n_cols}{A named list where each element represents a specific NHANES questionnaire along with a set of variables. The element names signify the questionnaire titles, and their corresponding values consist of vectors that contain the desired variables from each respective questionnaire.}
 }
 \value{
-A dataframe where the columns are various metadata values and the rows correspond to the input variable names.
+This function returns a data frame containing metadata on the specified variables. Only unique variable names and variable descriptions are returned, i.e., if the list contains the same questionnaire/variables across different survey years, and if all metadata is consistent, then only one row for this variable will be return
 }
 \description{
-Get the metadata associated with a set of tables and variables
+The dataDescription function retrieves comprehensive metadata for NHANES variables from the NHANES Codebook.
+The metadata includes English language descriptions (English Text), targeting information (Target), as well as SAS Labels,
+to provide a high level overview of each variable.
+}
+\examples{
+dataDescription(list(BPQ_J=c("BPQ020", "BPQ050A"), DEMO_J=c("RIDAGEYR","RIAGENDR")))
+cols = list(DEMO_I=c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2"),
+                     DEMO_J=c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2"),
+                     BPQ_I=c('BPQ050A','BPQ020'),BPQ_J=c('BPQ050A','BPQ020'),
+                     HDL_I=c("LBDHDD"),HDL_J=c("LBDHDD"), TRIGLY_I=c("LBXTR","LBDLDL"),
+                     TRIGLY_J=c("LBXTR","LBDLDL"))
+ans = jointQuery(cols)
+ans_description = dataDescription(cols)
+
+
 }

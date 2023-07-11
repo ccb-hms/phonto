@@ -21,11 +21,11 @@
 
 #' Joint Query
 #'
-#' The jointQuery function is designed for merging and joining tables from different surveys over various years and returning the resultant data frame. 
-#' The primary objective of this function is to union given variables and tables from the same survey across different years, join different surveys, and return a unified data frame. 
-#' 
-#' 
-#' 
+#' The jointQuery function is designed for merging and joining tables from different surveys over various years and returning the resultant data frame.
+#' The primary objective of this function is to union given variables and tables from the same survey across different years, join different surveys, and return a unified data frame.
+#'
+#'
+#'
 #' @param tables_n_cols a named list, each name corresponds to a Questionnaire and the value is a list of variable names.
 #' @param translated whether the variables are translated
 #'
@@ -42,12 +42,12 @@
 #' dim(ans)
 
 jointQuery = function(tables_n_cols,translated=TRUE){
- 
+
 if(is.null(tables_n_cols) | length(tables_n_cols) <1) return (NULL)
 checkTableNames(names(tables_n_cols))
 names(tables_n_cols) = convertTranslatedTable(names(tables_n_cols),translated)
 cols_to_tables = .convertColunms(tables_n_cols,translated)
- 
+
 
   # create SEQN with years
   # want to create a sub sqls like:
@@ -105,14 +105,14 @@ cols_to_tables = .convertColunms(tables_n_cols,translated)
   # put the sql together
   sql = paste0(sql, "
              ",query_sql)
-  
+
   tryCatch(
     nhanesQuery(sql),
     error = function(e) {
       message("ERROR! Please make sure you have the same variables across the years for the same survey.")
       return(NULL)
     }
-   
+
   )
 
 }
@@ -120,9 +120,9 @@ cols_to_tables = .convertColunms(tables_n_cols,translated)
 
 #' Union Query
 #'
-#' The unionQuery function is used for merging or unifying tables from the same survey over different years and returning the resultant data frame. 
+#' The unionQuery function is used for merging or unifying tables from the same survey over different years and returning the resultant data frame.
 #' The main goal of this function is to union given variables and tables from the same survey across different years.
-#' 
+#'
 #' @param tables_n_cols a named list, each name corresponds to a Questionnaire and the value is a list of variable names.
 #' @param translated A boolean parameter, default is TRUE. This indicates whether the variables are translated or not.
 #'
@@ -180,7 +180,7 @@ table_names = names(tables_n_cols)
    # put the sql together
   sql = paste0(sql, "UTables AS (",union_sql,") ")
   final_cols = paste0(" DISTINCT unifiedTB.SEQN, ",cols,",Year AS 'Begin.Year', (Year+1) AS EndYear")
-  
+
   sql = paste0(sql, "SELECT ",final_cols," FROM unifiedTB LEFT JOIN UTables ON unifiedTB.SEQN=UTables.SEQN")
   nhanesQuery(sql)
 
@@ -333,5 +333,44 @@ nhanesTail= function(nh_table,n=5,translated=TRUE){
 
 }
 
-
+#' dataDescription
+#'
+#' The dataDescription function retrieves comprehensive metadata for NHANES variables from the NHANES Codebook.
+#' The metadata includes English language descriptions (English Text), targeting information (Target), as well as SAS Labels,
+#' to provide a high level overview of each variable.
+#'
+#'
+#'
+#' @param tables_n_cols A named list where each element represents a specific NHANES questionnaire along with a set of variables. The element names signify the questionnaire titles, and their corresponding values consist of vectors that contain the desired variables from each respective questionnaire.
+#'
+#'
+#' @return This function returns a data frame containing metadata on the specified variables. Only unique variable names and variable descriptions are returned, i.e., if the list contains the same questionnaire/variables across different survey years, and if all metadata is consistent, then only one row for this variable will be return
+#' @export
+#'
+#' @examples dataDescription(list(BPQ_J=c("BPQ020", "BPQ050A"), DEMO_J=c("RIDAGEYR","RIAGENDR")))
+#' @examples cols = list(DEMO_I=c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2"),
+#'                      DEMO_J=c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2"),
+#'                      BPQ_I=c('BPQ050A','BPQ020'),BPQ_J=c('BPQ050A','BPQ020'),
+#'                      HDL_I=c("LBDHDD"),HDL_J=c("LBDHDD"), TRIGLY_I=c("LBXTR","LBDLDL"),
+#'                      TRIGLY_J=c("LBXTR","LBDLDL"))
+#' ans = jointQuery(cols)
+#' ans_description = dataDescription(cols)
+#'
+#'
+dataDescription = function(tables_n_cols){
+cols <- tables_n_cols[!duplicated(tables_n_cols)]
+ls_tmp = lapply(names(cols), function(l){
+  tmp_list = lapply(cols[[l]],function(cn){nhanesCodebook(nh_table = l, colname = cn)})
+  df <- do.call(rbind, lapply(tmp_list, function(inner_list) {
+    data.frame(
+      #Questionnaire = l,
+      VariableName = inner_list$`Variable Name:`,
+      SASLabel = inner_list$`SAS Label:`,
+      EnglishText = inner_list$`English Text:`,
+      Target = inner_list$`Target:`
+    )
+  }))
+})
+do.call(rbind, ls_tmp)
+}
 
