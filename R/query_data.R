@@ -58,7 +58,7 @@ nhanesQuery = function(sql){
 jointQuery = function(tables_n_cols,translated=TRUE){
 
 if(is.null(tables_n_cols) | length(tables_n_cols) <1) return (NULL)
-#.nhanesA:::.checkTableNames(names(tables_n_cols))
+nhanesA:::.checkTableNames(names(tables_n_cols))
 names(tables_n_cols) = nhanesA:::.convertTranslatedTable(names(tables_n_cols),translated)
 cols_to_tables = .convertColunms(tables_n_cols,translated)
 
