@@ -12,7 +12,7 @@
 #' @return suggested data types
 #' @export
 #'
-#' @examples phesant(df=nhanes('DEMO_C'))
+#' @examples phesant(df=nhanesA::nhanes('DEMO_C'))
 phesant <- function(df) {
   cnt_data <- nrow(df)
 
@@ -65,7 +65,7 @@ phesant <- function(df) {
   # bin_cols <- c(bin_cols, names(distinct_cnt[distinct_cnt <= 2]))
 
   # NEEDS FURTHER VERY TO BE ORDERED
-  factors_cols <- names(distinct_cnt[distinct_cnt > 2])
+  factors_cols <- names(distinct_cnt[distinct_cnt > 1])
   multilevel  <- c(multilevel,factors_cols)
 
 

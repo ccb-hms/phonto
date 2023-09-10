@@ -21,9 +21,9 @@ We aim to provide a similar capability for NHANES and this document provides bot
 We first load `phonto`, and extract all questions together with the variable name, the SasLabel etc.  In the first part of this vignette we then label the different variables that are probably not useful as phenotypes.  Examples are things like survey weights, comment fields, etc.
 
 ```{r cars}
-  library(phonto)
+library(phonto)
  t1 = paste0("SELECT DISTINCT TableName, Variable, Description, SaSLabel FROM  Metadata.QuestionnaireVariables")
-xx = phonto:::nhanesQuery(t1)
+xx = nhanesQuery(t1)
 #make a vector to store our variable labels
 outPut = rep(NA, nrow(xx))
 apply(xx,2, function(x) sum(is.na(x)))

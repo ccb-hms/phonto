@@ -16,5 +16,5 @@ suggested data types
 simple version of PHEnome Scan ANalysis Tool (PHESANT)
 }
 \examples{
-phesant(df=nhanes('DEMO_C'))
+phesant(df=nhanesA::nhanes('DEMO_C'))
 }

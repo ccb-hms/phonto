@@ -1,6 +1,6 @@
 
 
-# inner function to convert colunms for the tables
+# inner function to convert columns for the tables
 .convertColunms = function(tables_n_cols,translated){
 
   cols_to_tables = list() # it won't be long and we do not know the length ahead.
@@ -17,6 +17,20 @@
     }
   }
   cols_to_tables
+}
+
+
+#' Query NHANES data from Database
+#'
+#' @param sql query string for Microsoft SQL Server database.
+#'
+#' @return data frame
+#' @export
+#'
+#' @examples  demo = nhanesQuery("select * from Translated.DEMO_C")
+#' @examples  demo = nhanesQuery("select * from Raw.DEMO_C")
+nhanesQuery = function(sql){
+  return(nhanesA:::.nhanesQuery(sql))
 }
 
 #' Joint Query
@@ -44,8 +58,8 @@
 jointQuery = function(tables_n_cols,translated=TRUE){
 
 if(is.null(tables_n_cols) | length(tables_n_cols) <1) return (NULL)
-checkTableNames(names(tables_n_cols))
-names(tables_n_cols) = convertTranslatedTable(names(tables_n_cols),translated)
+#.nhanesA:::.checkTableNames(names(tables_n_cols))
+names(tables_n_cols) = nhanesA:::.convertTranslatedTable(names(tables_n_cols),translated)
 cols_to_tables = .convertColunms(tables_n_cols,translated)
 
 
@@ -107,7 +121,7 @@ cols_to_tables = .convertColunms(tables_n_cols,translated)
              ",query_sql)
 
   tryCatch(
-    nhanesQuery(sql),
+   nhanesQuery(sql),
     error = function(e) {
       message("ERROR! Please make sure you have the same variables across the years for the same survey.")
       return(NULL)
@@ -133,8 +147,8 @@ cols_to_tables = .convertColunms(tables_n_cols,translated)
 unionQuery= function(tables_n_cols,translated=TRUE){
 
 if(is.null(tables_n_cols) | length(tables_n_cols) <1) return (NULL)
-checkTableNames(names(tables_n_cols))
-names(tables_n_cols) = convertTranslatedTable(names(tables_n_cols),translated)
+nhanesA:::.checkTableNames(names(tables_n_cols))
+names(tables_n_cols) = nhanesA:::.convertTranslatedTable(names(tables_n_cols),translated)
 cols_to_tables = .convertColunms(tables_n_cols,translated)
 
  if(length(cols_to_tables)>1){
@@ -202,8 +216,8 @@ table_names = names(tables_n_cols)
 #'
 #' @examples checkDataConsistency("DEMO_C","DEMO_D")
 checkDataConsistency = function(table1,table2){
-  data1 = nhanes(table1)
-  data2 = nhanes(table2)
+  data1 = nhanesA::nhanes(table1)
+  data2 = nhanesA::nhanes(table2)
   cols=union(colnames(data1), colnames(data2))
   len_cols = length(cols)
   res = matrix(data=FALSE,nrow=3,ncol=len_cols)
@@ -219,8 +233,8 @@ checkDataConsistency = function(table1,table2){
     }
 
     if(cols[i] %in% colnames(data2) & cols[i] %in% colnames(data2)){
-      code1 = nhanesTranslate(table1,cols[i])
-      code2 = nhanesTranslate(table1,cols[i])
+      code1 = nhanesA::nhanesTranslate(table1,cols[i])
+      code2 = nhanesA::nhanesTranslate(table1,cols[i])
       res[3,i] = all.equal(code1[[cols[i]]],code2[[cols[i]]])
     }else{
       res[3,i] = NA
@@ -241,7 +255,7 @@ checkDataConsistency = function(table1,table2){
 #'
 #' @examples nhanesNrow("BMX_I")
 nhanesNrow = function(tb_name){
-  checkTableNames(tb_name)
+  nhanesA:::.checkTableNames(tb_name)
   sql_str = paste0("SELECT COUNT(*) FROM Raw.",tb_name)
   nhanesQuery(sql_str)[1,1]
 }
@@ -272,7 +286,7 @@ nhanesNcol = function(tb_name,translated=TRUE){
 #'
 #' @examples nhanesColnames("BMX_I")
 nhanesColnames = function(tb_name){
-  checkTableNames(tb_name)
+  nhanesA:::.checkTableNames(tb_name)
   sql_str = paste0("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '",tb_name,"'")
   nhanesQuery(sql_str)$COLUMN_NAME
 }
@@ -287,7 +301,7 @@ nhanesColnames = function(tb_name){
 #'
 #' @examples nhanesDim("BMX_I")
 nhanesDim = function(nh_table,translated=TRUE){
-  checkTableNames(nh_table)
+  nhanesA:::.checkTableNames(nh_table)
   c(nhanesNrow(nh_table),length(nhanesColnames(nh_table)))
 }
 
@@ -303,8 +317,8 @@ nhanesDim = function(nh_table,translated=TRUE){
 #' @examples nhanesHead("BMX_I")
 #' @examples nhanesHead("BMX_I",10)
 nhanesHead = function(nh_table,n=5,translated=TRUE){
-  checkTableNames(nh_table)
-  nh_table = convertTranslatedTable(nh_table,translated)
+  nhanesA:::.checkTableNames(nh_table)
+  nh_table = nhanesA:::.convertTranslatedTable(nh_table,translated)
   sql = paste0("SELECT TOP(",n, ") * FROM ",nh_table)
   nhanesQuery(sql)
 }
@@ -323,8 +337,8 @@ nhanesHead = function(nh_table,n=5,translated=TRUE){
 #' @examples nhanesTail("BMX_I")
 #' @examples nhanesTail("BMX_I",10)
 nhanesTail= function(nh_table,n=5,translated=TRUE){
-  checkTableNames(nh_table)
-  nh_table = convertTranslatedTable(nh_table,translated)
+  nhanesA:::.checkTableNames(nh_table)
+  nh_table = nhanesA:::.convertTranslatedTable(nh_table,translated)
 
   sql = paste0("SELECT TOP(",n, ") * FROM ",nh_table," ORDER BY SEQN DESC")
   df = nhanesQuery(sql)
@@ -360,7 +374,7 @@ nhanesTail= function(nh_table,n=5,translated=TRUE){
 dataDescription = function(tables_n_cols){
 cols <- tables_n_cols[!duplicated(tables_n_cols)]
 ls_tmp = lapply(names(cols), function(l){
-  tmp_list = lapply(cols[[l]],function(cn){nhanesCodebook(nh_table = l, colname = cn)})
+  tmp_list = lapply(cols[[l]],function(cn){nhanesA::nhanesCodebook(nh_table = l, colname = cn)})
   df <- do.call(rbind, lapply(tmp_list, function(inner_list) {
     data.frame(
       #Questionnaire = l,

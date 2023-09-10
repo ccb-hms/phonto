@@ -62,8 +62,9 @@ We can efficiently access NHANES data using `phonto` and `nhanesA` together. By 
 
 First we load up the packages we will use for this vignette.
 ```{r setup}
-library("phonto")
-library("DT")
+library(nhanesA)
+library(phonto)
+library(DT)
 ```
 
 Let's take a body measure table as an example, (<tt>BMX_I</tt>).
