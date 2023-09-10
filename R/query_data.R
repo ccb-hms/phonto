@@ -21,7 +21,8 @@
 
 
 #' Query NHANES data from Database
-#'
+#' FIXME: More information goes here.
+#' 
 #' @param sql query string for Microsoft SQL Server database.
 #'
 #' @return data frame
