@@ -2,10 +2,10 @@ Package: phonto
 Type: Package
 Title: Using NHANES via Epiconductor
 Version: 0.0.1
-Maintainer: Laha Ale <laha.ale@ieee.org>, Robert Gentleman <robert_gentleman@g.harvard.edu>
+Maintainer: Laha Ale <ainilaha@gmail.com>, Robert Gentleman <robert_gentleman@g.harvard.edu>
 Authors@R: 
     c(
-    person("Laha", "Ale", ,"laha.ale@ieee.org", role = c("aut", "cre"),comment = c(ORCID = "0000-0002-4070-5289")),
+    person("Laha", "Ale", ,"ainilaha@gmail.com", role = c("aut", "cre"),comment = c(ORCID = "0000-0002-4070-5289")),
     person("Robert", "Gentleman", ,"robert_gentleman@g.harvard.edu", role = "aut")
            )
 Author: Laha Ale [aut, cre], Robert Gentleman[aut]
