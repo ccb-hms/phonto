@@ -25,6 +25,7 @@ LazyData: true
 Suggests: 
     rmarkdown,
     knitr,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    survey
 VignetteBuilder: knitr
 Config/testthat/edition: 3
