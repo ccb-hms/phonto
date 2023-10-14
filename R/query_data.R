@@ -22,7 +22,7 @@
 
 #' Query NHANES data from Database
 #' FIXME: More information goes here.
-#' 
+#'
 #' @param sql query string for Microsoft SQL Server database.
 #'
 #' @return data frame
@@ -76,7 +76,7 @@ cols_to_tables = .convertColunms(tables_n_cols,translated)
   for (i in 1:length(tables_n_cols)){
     tb_name = names(tables_n_cols)[i]
     tb = unlist(strsplit(tb_name, "\\."))[2] # removed prefix, Translated. or Raw.
-    temp_sql = paste0("SELECT SEQN, Year
+    temp_sql = paste0("SELECT SEQN, BeginYear, EndYear
     FROM (
         SELECT SEQN FROM ", tb_name,
         ") ", tb,
@@ -109,7 +109,7 @@ cols_to_tables = .convertColunms(tables_n_cols,translated)
   # tidy columns set
   final_cols = unique(unlist(tables_n_cols))
   final_cols = toString(sprintf("%s", unlist(final_cols)))
-  final_cols = paste0(" DISTINCT unifiedTB.SEQN, ",final_cols,",Year AS 'Begin.Year', (Year+1) AS EndYear")
+  final_cols = paste0(" DISTINCT unifiedTB.SEQN, ",final_cols,",BeginYear AS 'Begin.Year', EndYear")
 
   #joint query sql
   query_sql = paste("SELECT",final_cols,"FROM unifiedTB")
@@ -121,14 +121,8 @@ cols_to_tables = .convertColunms(tables_n_cols,translated)
   sql = paste0(sql, "
              ",query_sql)
 
-  tryCatch(
-   nhanesQuery(sql),
-    error = function(e) {
-      message("ERROR! Please make sure you have the same variables across the years for the same survey.")
-      return(NULL)
-    }
+  nhanesQuery(sql)
 
-  )
 
 }
 
@@ -160,7 +154,7 @@ cols_to_tables = .convertColunms(tables_n_cols,translated)
   for (i in 1:length(tables_n_cols)){
     tb_name = names(tables_n_cols)[i]
     tb = unlist(strsplit(tb_name, "\\."))[2] # removed prefix, Translated. or Raw.
-    temp_sql = paste0("SELECT SEQN, Year
+    temp_sql = paste0("SELECT SEQN, BeginYear, EndYear
     FROM (
         SELECT SEQN FROM ", tb_name,
         ") ", tb,
@@ -194,7 +188,7 @@ table_names = names(tables_n_cols)
 
    # put the sql together
   sql = paste0(sql, "UTables AS (",union_sql,") ")
-  final_cols = paste0(" DISTINCT unifiedTB.SEQN, ",cols,",Year AS 'Begin.Year', (Year+1) AS EndYear")
+  final_cols = paste0(" DISTINCT unifiedTB.SEQN, ",cols,",BeginYear AS 'Begin.Year', EndYear")
 
   sql = paste0(sql, "SELECT ",final_cols," FROM unifiedTB LEFT JOIN UTables ON unifiedTB.SEQN=UTables.SEQN")
   nhanesQuery(sql)
