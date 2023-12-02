@@ -11,8 +11,6 @@ title: 'Phonto: Homepage'
 
 - A simple search interface for NHANES tables and variables
 
-- Caching files to reduce download overhead
-
 - Sample analyses
 
 # Summary tables [TODO]

@@ -183,7 +183,7 @@ CDC releases new files or updates old ones. The
 [__BiocFileCache__](https://bioconductor.org/packages/release/bioc/html/BiocFileCache.html)
 package can cache downloaded files locally in a persistent manner,
 updating them automatically when the source file has been updated. The
-experimental (cachehttp)[https://github.com/ccb-hms/cachehttp] package
+experimental [__cachehttp__](https://github.com/ccb-hms/cachehttp) package
 uses the __BiocFileCache__ package in conjunction with the
 [httpuv](https://github.com/rstudio/httpuv/#readme) package to run a
 local server that downloads files from the CDC website the first time
@@ -239,7 +239,7 @@ Downloading: http://127.0.0.1:8080/cdc/Nchs/Nhanes/1999-2000/DEMO.XPT
 
 ```
    user  system elapsed 
-  2.267   0.122   9.981 
+  2.237   0.112   9.991 
 ```
 
 ```r
@@ -252,8 +252,6 @@ Downloading: http://127.0.0.1:8080/cdc/Nchs/Nhanes/1999-2000/DEMO.XPT
 
 ```
    user  system elapsed 
-  2.014   0.100   2.359 
+  2.327   0.109   2.954 
 ```
-
-
 

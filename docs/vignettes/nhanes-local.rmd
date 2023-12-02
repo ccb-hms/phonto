@@ -151,7 +151,7 @@ CDC releases new files or updates old ones. The
 [__BiocFileCache__](https://bioconductor.org/packages/release/bioc/html/BiocFileCache.html)
 package can cache downloaded files locally in a persistent manner,
 updating them automatically when the source file has been updated. The
-experimental (cachehttp)[https://github.com/ccb-hms/cachehttp] package
+experimental [__cachehttp__](https://github.com/ccb-hms/cachehttp) package
 uses the __BiocFileCache__ package in conjunction with the
 [httpuv](https://github.com/rstudio/httpuv/#readme) package to run a
 local server that downloads files from the CDC website the first time
@@ -184,7 +184,7 @@ specified port, and does not require the __nhanesA__ package to work.
 
 While the server is running, we can set (in a different R session)
 
-```{r, cache = FALSE}
+```{r}
 Sys.setenv(NHANES_TABLE_BASE = "http://127.0.0.1:8080/cdc")
 ```
 
@@ -194,11 +194,9 @@ each file is downloaded from the CDC website the first time it is
 requested, subsequent downloads should be faster, as indicated by the
 elapsed times in the following code.
 
-```{r, cache = FALSE}
+```{r}
 nhanesOptions(use.db = FALSE, log.access = TRUE)
 system.time(foo <- nhanes("DEMO"))
 system.time(foo <- nhanes("DEMO"))
 ```
-
-
 
