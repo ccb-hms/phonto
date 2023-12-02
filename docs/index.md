@@ -1,6 +1,6 @@
 ---
 layout: default
-title: 'phonto: Documentation and other resources'
+title: 'Phonto: Homepage'
 ---
 
 # Documentation [TODO]

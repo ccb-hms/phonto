@@ -1,0 +1,7 @@
+## Jekyll build settings
+markdown: kramdown
+highlighter: none
+kramdown:
+  syntax_highlighter_opts:
+    disable: true
+  math_engine: mathjax

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="{{ page.author }}" />
+  <title>{{ page.title }}</title>
+
+  <link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+	integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+	crossorigin="anonymous">
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Libre Franklin" >
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto Slab" >
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto Sans" >
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto Serif" >
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira Code" >
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/themes/prism-coy.min.css" integrity="sha512-LOT5F67SMZVdXMrvQe4S1ZHu5l6xk3CST2qqno9kY329OsJBBpybnq+fM9qG4ZSaNzPOjoGzHAeBamSSJyyuZg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" integrity="sha512-cbQXwDFK7lj2Fqfkuxbo5iD1dSbLlJGXGpfTDqbggqjHJeyzx88I3rfwjS38WJag/ihH7lzuGlGHpDBymLirZQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/plugins/line-highlight/prism-line-highlight.min.css" integrity="sha512-nXlJLUeqPMp1Q3+Bd8Qds8tXeRVQscMscwysJm821C++9w6WtsFbJjPenZ8cQVMXyqSAismveQJc0C1splFDCA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/plugins/autolinker/prism-autolinker.min.css" integrity="sha512-4ZmAB2UXPu3Rgy5ZClpqnJ/zXXZBdulFXY1eWMLgIjp2HWgkHGIpr1b7kmCK+rdD5NYfivTp47UR+bQ4oTBllQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="/assets/custom.css"> <!-- custom CSS -->
+  <!-- TODO: https://www.aleksandrhovhannisyan.com/blog/how-to-add-a-copy-to-clipboard-button-to-your-jekyll-blog/ -->
+
+  <link rel='stylesheet' href='https://computationalbiomed.hms.harvard.edu/wp-content/themes/ccb2021/build/style-index.css?ver=6.4.1' type='text/css' media='all' />
+  <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.3.0/css/all.css?ver=5.3.0' type='text/css' media='all' />
+</head>
+
+<body>
+  <header>
+
+    <!-- https://getbootstrap.com/docs/4.0/components/navbar/ -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+	<span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse align-right" id="navbarNav">
+	<ul class="navbar-nav mr-auto">
+	  <li class="nav-item active">
+            <a class="nav-link" href="/" title="phonto home"><i class="fas fa-home"></i><span class="sr-only">phonto homepage</span></a>
+	  </li>	  
+
+	  <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Vignettes
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="/vignettes/nhanes-introduction.html">Introduction to Continuous NHANES</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="#">Vignette 2</a>
+            </div>
+	  </li>
+
+	</ul>
+      </div>
+
+      <a class="navbar-brand" href="https://computationalbiomed.hms.harvard.edu">
+	<img src="https://computationalbiomed.hms.harvard.edu/wp-content/themes/ccb2021/images/headers/HMS_center_compu_biomed.svg" height="62" width="400" alt="Center for Computational Biomedicine logo" />
+      </a>
+
+    </nav>
+  </header>
+
+  <main id="page-content">
+    <section>
+      <div class="container">
+	<header>
+	  <h1 class="title">{{ page.title }}</h1>
+	  <p class="author">{{ page.author }}</p>
+	</header>
+	<hr class="hr-primary"/>
+
+	{{ content }}
+
+      </div>
+    </section>
+  </main>
+
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+	  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+	  crossorigin="anonymous">
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+	  integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+	  crossorigin="anonymous">
+  </script>
+
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+	  integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+	  crossorigin="anonymous">
+  </script>
+
+  <!-- prism and necessary plugins -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/prism.min.js" integrity="sha512-/Swpp6aCQ0smuZ+zpklJqMClcUlvxhpLf9aAcM7JjJrj2waCU4dikm3biOtMVAflOOeniW9qzaNXNrbOAOWFCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/components/prism-clike.min.js" integrity="sha512-/Rynaa6ehLZJO9fdk+EUsgiOdJqFSFUB4Qgy+gP4vU4U1DrmPJWypfXe1CgyaV7rRdZjGxdpLe9djxhx1ZHvqQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Needs to be modified to tag bindings -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/components/prism-r.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+</body>
+</html>

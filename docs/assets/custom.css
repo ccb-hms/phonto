@@ -1,0 +1,50 @@
+@media screen {
+    body
+    {
+	font-family: 'Libre Franklin';
+    }
+}
+
+@media print {
+    body
+    {
+	font-family: 'Roboto Slab';
+    }
+}
+
+.container {
+    max-width: 900px;
+    font-size: 14pt;
+}
+
+h1.title { text-align: left; }
+p.author { text-align: left; }
+
+img
+{
+    display: block;
+    !margin-left: auto;
+    !margin-right: auto;
+    width: 100%;
+}
+
+pre.highlight
+{
+    padding: 0.5em;
+    font-weight: normal;
+    font-size: 90%;
+}
+
+h3 { font-style: italic; }
+
+/* customize prism/coy style color  */
+
+pre[class*=language-r]>code {
+    /* border-left: 10px solid #ad182d; too dark  */
+    border-left: 10px solid rgb(210, 78, 107);
+    /* border-left: 10px solid rgb(231, 141, 165); */
+    box-shadow: -1px 0 0 0 #ad182d, 0 0 0 1px #dfdfdf;
+    font-family: 'Fira Code', Courier; font-size: 18px;
+}
+
+

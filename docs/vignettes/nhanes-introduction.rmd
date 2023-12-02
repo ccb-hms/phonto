@@ -1,0 +1,240 @@
+---
+layout: default
+title: "Introduction to Continuous NHANES"
+author: "Deepayan Sarkar"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+library(knitr)
+opts_chunk$set(collapse = FALSE, autodep = TRUE, 
+               comment = "", warning = TRUE, message = TRUE, prompt = FALSE,
+               fig.path = "figures/nhanes-intro-",
+               out.width = "100%",
+               fig.width = 12, fig.height = 8,
+               dev = "svglite", dev.args = list(pointsize = 12),
+               cache = TRUE,
+               cache.path = "./knitr-cache/nhanes-intro/")
+options(warnPartialMatchDollar = FALSE, width = 90)
+library(lattice)
+library(kableExtra)
+```
+
+The [National Health and Nutrition Examination
+Survey](https://www.cdc.gov/nchs/nhanes/about_nhanes.htm) (NHANES) is
+a program of the National Center for Health Statistics (NCHS), which
+is part of the US Centers for Disease Control and Prevention (CDC). It
+measures the health and nutritional status of adults and children in
+the United States in a series of surveys that combine interviews and
+physical examinations.
+
+Although the program began in the early 1960s, its structure was
+changed in the 1990s.  Since 1999, the program has been conducted on
+an ongoing basis, where a nationally representative sample 
+of about 5,000 persons (across 15 counties) is examined each year,
+with public-use data released in two-year cycles. This phase of the
+program is referred to as [continuous
+NHANES](https://wwwn.cdc.gov/nchs/nhanes/continuousnhanes/).
+
+The NHANES interview includes demographic, socioeconomic, dietary, and
+health-related questions. The examination component consists of
+medical, dental, and physiological measurements, as well as laboratory
+tests administered by highly trained medical personnel. Although the
+details of the responses recorded vary from cycle to cycle, there is a
+substantial amount of consistency, making it possible to compare data
+across cycles.  Sampling weights are provided along with demographic
+details for each participant; see the NHANES [analytic
+guidelines](https://wwwn.cdc.gov/nchs/nhanes/analyticguidelines.aspx)
+for details.
+
+
+# Public-use data: web resources
+
+NHANES makes a large volume of data available for download. However,
+rather than a single download, these data are made available as a
+number of separate SAS transport files, referred to as "data files",
+for each cycle. Each such data file contains records for several
+related variables. A comprehensive list of data files available for
+download is available
+[here](https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx), along with
+subsets broken up into the following "components": 
+[Demographics](https://wwwn.cdc.gov/nchs/nhanes/search/datapage.aspx?Component=Demographics),
+[Dietary](https://wwwn.cdc.gov/nchs/nhanes/search/datapage.aspx?Component=Dietary),
+[Examination](https://wwwn.cdc.gov/nchs/nhanes/search/datapage.aspx?Component=Examination),
+[Laboratory](https://wwwn.cdc.gov/nchs/nhanes/search/datapage.aspx?Component=Laboratory), and
+[Questionnaire](https://wwwn.cdc.gov/nchs/nhanes/search/datapage.aspx?Component=Questionnaire).
+
+For each data file listed in these tables, a link to a Doc File (which
+is an HTML webpage describing the data file) and a link to a SAS
+transport file is provided. An additional list of limited access data
+files are documented
+[here](https://wwwn.cdc.gov/nchs/nhanes/search/datapage.aspx?Component=LimitedAccess),
+but the corresponding data file download links are not available.
+
+A table of _variables_ is separately available for each component, and
+gives more detailed information about both the variables and the data
+files they are recorded in, although these tables do not provide
+download links directly: 
+[Demographics](https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Demographics),
+[Dietary](https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Dietary),
+[Examination](https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Examination),
+[Laboratory](https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Laboratory),
+[Questionnaire](https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Questionnaire).
+
+In addition, a [search interface](https://wwwn.cdc.gov/nchs/nhanes/search/) is also available.
+
+For reasons [not
+specified](https://wwwn.cdc.gov/nchs/nhanes/sasviewer.aspx), NHANES
+releases data files as SAS transport files, and provides links to
+proprietary Windows-only software that can supposedly be used to
+convert these files to CSV files.
+
+
+# Public-use data: R resources
+
+The goal of this project is to provide and document an alternative
+access path to NHANES data and documentation _via_ the R ecosystem. It
+builds on the [__nhanesA__](https://cran.r-project.org/package=nhanesA) R
+package, along with utilities such as SQL databases and docker, to
+enable more efficient analyses of NHANES data.
+
+## The __nhanesA__ package
+
+The [__nhanesA__](https://github.com/cjendres1/nhanes) package provides
+a user-friendly interface to download and process data and
+documentation files from the NHANES website. To use the utilities in
+this package, we first need to know a few more details about how
+NHANES data and documentation are structured.
+
+Each available data file, which we henceforth call an NHANES _table_,
+can be identified uniquely by a name. Generally speaking, each
+public-use table has a corresponding data file (a SAS transport file,
+with extension `xpt`) and a corresponding documentation file (a
+webpage, with extension `htm`). The URLs from which these files can be
+downloaded can usually be predicted from the table name, and the
+_cycle_ it belongs to. Cycles are typically of 2-year duration,
+starting from `1999-2000`.
+
+Although there are exceptions, a table that is available for one cycle
+will typically be available for other cycles as well, with a suffix
+appended to the name of the table indicating the cycle. To make these
+details concrete, let us use the `nhanesManifest()` function in the
+__nhanesA__ package to download the [list of available
+tables](https://wwwn.cdc.gov/nchs/nhanes/search/datapage.aspx) and
+look at the names and URLs for the `DEMO` data files, which contain
+demographic information and sampling weights for each study
+participant.
+
+
+```{r}
+library(nhanesA)
+manifest <- nhanesManifest("public")
+manifest <- manifest[order(manifest$Table), ]
+subset(manifest, startsWith(Table, "DEMO"))
+```
+
+The __nhanesA__ package allows both data and documentation files to be
+accessed, either by specifying their URL explicitly, or simply using
+the table name, in which case the relevant URL is constructed from
+it. For example,
+
+```{r}
+demo_b <- nhanesFromURL("/Nchs/Nhanes/2001-2002/DEMO_B.XPT", translated = FALSE)
+demo_c <- nhanes("DEMO_C", translated = FALSE)
+```
+
+```{r}
+str(demo_b[1:10])
+str(demo_c[1:10])
+```
+
+The data in these files appear as numeric codes, and must be
+interpreted using codebooks available in the documentation files,
+which can be parsed as follows.
+
+```{r}
+demo_b_codebook <-
+    nhanesCodebookFromURL("/Nchs/Nhanes/2001-2002/DEMO_B.htm")
+demo_b_codebook$RIDSTATR 
+demo_b_codebook$RIAGENDR
+```
+
+By default, the data access step converts the raw data into more
+meaningful values using the corresponding codebook.
+
+```{r}
+demo_c <- nhanes("DEMO_C", translated = TRUE)
+str(demo_c[1:10])
+```
+
+Further analysis can be performed on these resulting datasets which
+are regular R data frames.
+
+Other tools that make it easier to work with these datasets by
+creating a local database, or creating a search interface, are
+described elsewhere. We conclude this document with a brief look at
+how frequently NHANES data files are published and / or updated, based
+on the information contained in the table manifest.
+
+
+## Frequency of NHANES data releases
+
+Recall from above that the NHANES table manifest includes a
+`Date.Published` column.  This allows us to tabulate NHANES data
+release dates. We expect that bulk releases of tables happen all
+together, generally in two year intervals, while some tables may be
+released or updated on a as-needed basis.
+
+The release information (available by month of release) can be
+summarized by tabulating the `Date.Published` field:
+```{r}
+xtabs(~ Date.Published, manifest) |> sort() |> tail(20)
+```
+
+Parsing these dates systematically, we get
+
+```{r}
+pubdate <- manifest$Date.Published
+updates <- startsWith(pubdate, "Updated")
+datesplit <- strsplit(pubdate, split = "[[:space:]]")
+datesplit[updates] <- lapply(datesplit[updates], "[", -1)
+pub_summary <-
+    data.frame(updated = updates,
+               year = sapply(datesplit, "[[", 2) |> as.numeric(),
+               month = sapply(datesplit, "[[", 1) |> factor(levels = month.name))
+```
+
+Although there are a few too many months, we can plot the number of
+releases + updates by month as follows.
+
+```{r, bymonth, fig.cap = ""}
+pubfreq <- xtabs(~ interaction(month, year, sep = "-") + updated, pub_summary)
+npub <- rowSums(pubfreq)
+npub.date <- as.Date(paste0("01", "-", names(npub)), format = "%d-%B-%Y")
+xyplot(npub ~ npub.date, type = "h", grid = TRUE,
+       xlab = "Month", ylab = "Number of tables published / updated") +
+    latticeExtra::layer(panel.text(x[y > 30], y[y > 30],
+                                   format(x[y > 30], "%Y-%m"),
+                                   pos = 3, cex = 0.75))
+```
+
+
+We can also plot the release / update frequency by year as follows.
+
+```{r, byyear, fig.cap = ""}
+xtabs(~ year + updated, pub_summary) |>
+    barchart(horizontal = FALSE, ylab = "Number of tables",
+             auto.key = list(text = c("Original", "Update"), columns = 2),
+             scales = list(x = list(rot = 45)))
+```
+
+A full table of number of releases by month is given by the following,
+showing that there is at least one update almost every month.
+
+```{r}
+pubfreq0 <- pubfreq[rowSums(pubfreq) > 0, , drop = FALSE]
+pubfreq0
+```
+
+
