@@ -5,7 +5,7 @@ title: 'Phonto: Homepage'
 
 # Documentation [TODO]
 
-- [Introduction to Continuous NHANES](/vignettes/nhanes-introduction.html)
+- [Introduction to Continuous NHANES](vignettes/nhanes-introduction.html)
 
 - Using the NHANES docker image
 
