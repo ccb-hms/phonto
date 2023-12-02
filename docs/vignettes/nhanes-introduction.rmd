@@ -93,11 +93,12 @@ convert these files to CSV files.
 
 # Public-use data: R resources
 
-The goal of this project is to provide and document an alternative
-access path to NHANES data and documentation _via_ the R ecosystem. It
-builds on the [__nhanesA__](https://cran.r-project.org/package=nhanesA) R
-package, along with utilities such as SQL databases and docker, to
-enable more efficient analyses of NHANES data.
+One of the goals of the Epiconductor project is to provide and
+document an alternative access path to NHANES data and documentation
+_via_ the R ecosystem. It builds on the
+[__nhanesA__](https://cran.r-project.org/package=nhanesA) R package,
+along with utilities such as SQL databases and docker, to enable
+efficient and reproducible analyses of NHANES data.
 
 ## The __nhanesA__ package
 

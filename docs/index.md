@@ -7,7 +7,7 @@ title: 'Phonto: Homepage'
 
 - [Introduction to Continuous NHANES](vignettes/nhanes-introduction.html)
 
-- Using the NHANES docker image
+- [Accessing NHANES data locally](vignettes/nhanes-local.html)
 
 - A simple search interface for NHANES tables and variables
 
