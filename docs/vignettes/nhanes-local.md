@@ -50,15 +50,17 @@ instance of R running outside docker.
 The last three environment variables define the details of how to
 connect to the database. For details, see the
 [DBI](https://github.com/r-dbi/DBI) and
-[odbc](https://github.com/r-dbi/odbc) packages.
+[odbc](https://github.com/r-dbi/odbc) packages (the latter is the
+backend that allows R to communicate with a Microsoft SQL server).
 
 
 ## Usage 
 
-Although there are minor differences, the __nhanesA__ package should
-ideally behave similarly whether or not a database is being used. When
-a database is successfully found on startup, the package sets an
-option called `use.db` to `TRUE`.
+Once a database is successfully configured (which is most easily done
+by using the docker version), the __nhanesA__ package should ideally
+behave similarly whether or not a database is being used. When a
+database is successfully found on startup, the package sets an option
+called `use.db` to `TRUE`.
 
 
 ```r
@@ -104,7 +106,8 @@ bpq_b_db <- nhanes("BPQ_B")
 The two versions have minor differences: The order of rows and columns
 may be different, and categorical variables may be represented either
 as factors of character strings. However, as long as the data has not
-been updated on the NHANES website, the contents should be identical.
+been updated on the NHANES website since it was downloaded for
+inclusion in the database, the contents should be identical.
 
 
 ```r
@@ -142,5 +145,115 @@ str(bpq_b_db[1:10])
  $ BPQ040E: chr  NA NA NA NA ...
  $ BPQ040F: chr  NA NA NA NA ...
 ```
+
+
+# Using a local mirror
+
+A conceptually simple alternative that also avoids repetitive
+downloads from the CDC website is to maintain a local mirror from
+which the data and documentation files can be retrieved as needed.
+
+As noted [here](nhanes-introduction.html), data and documentation URLs
+for a particular table are determined by the table's name and the
+cycle it represents. For example, the URLs for table `DEMO_C`, which
+is from cycle 3, i.e., `2003-2004`, would be
+
+- Data: <https://wwwn.cdc.gov/nchs/nhanes/2003-2004/DEMO_C.XPT>
+
+- Documentation: <https://wwwn.cdc.gov/nchs/nhanes/2003-2004/DEMO_C.htm>
+
+It is possible to change the "base" of the server from where
+__nhanesA__ tries to download these files by setting an environment
+variable called `NHANES_TABLE_BASE`, which defaults to the value
+`"https://wwwn.cdc.gov"`.
+
+The steps needed to create such a mirror is beyond the scope of this
+document, but tools such as `wget`, or even the R function
+`download.file()` in conjunction with the list of relevant URLs
+obtained using `nhanesManifest()`, may be used to download all files
+locally. Note that just downloading the files is not sufficient, and
+they must also be made available through a HTTP server running
+locally.
+
+
+## Dynamic caching using __httpuv__ and __BiocFileCache__
+
+Both the database and local mirroring options can get outdated when
+CDC releases new files or updates old ones. The
+[__BiocFileCache__](https://bioconductor.org/packages/release/bioc/html/BiocFileCache.html)
+package can cache downloaded files locally in a persistent manner,
+updating them automatically when the source file has been updated. The
+experimental (cachehttp)[https://github.com/ccb-hms/cachehttp] package
+uses the __BiocFileCache__ package in conjunction with the
+[httpuv](https://github.com/rstudio/httpuv/#readme) package to run a
+local server that downloads files from the CDC website the first time
+they are requested, but uses the cache for subsequent requests.
+
+To use this package, first install it using
+
+```r
+BiocManager::install("BiocFileCache")
+remotes::install_github("ccb-hms/cachehttp")
+```
+
+Then, run the following in a separate R session.
+
+```r
+require(cachehttp)
+add_cache("cdc", "https://wwwn.cdc.gov",
+          fun = function(x) {
+              x <- tolower(x)
+              endsWith(x, ".htm") || endsWith(x, ".xpt")
+          })
+s <- start_cache(host = "0.0.0.0", port = 8080,
+                 static_path = BiocFileCache::bfccache(BiocFileCache::BiocFileCache()))
+## stopServer(s) # to stop the httpuv server
+```
+
+This session must be kept active for the server to work. It can even
+run on a different machine, as long as it is accessible via the
+specified port, and does not require the __nhanesA__ package to work.
+
+While the server is running, we can set (in a different R session)
+
+
+```r
+Sys.setenv(NHANES_TABLE_BASE = "http://127.0.0.1:8080/cdc")
+```
+
+(changing host IP and port as necessary) to use this server instead of
+the primary CDC website to serve `XPT` and `htm` files. Although the
+each file is downloaded from the CDC website the first time it is
+requested, subsequent downloads should be faster, as indicated by the
+elapsed times in the following code.
+
+
+```r
+nhanesOptions(use.db = FALSE, log.access = TRUE)
+system.time(foo <- nhanes("DEMO"))
+```
+
+```
+Downloading: http://127.0.0.1:8080/cdc/Nchs/Nhanes/1999-2000/DEMO.XPT
+```
+
+```
+   user  system elapsed 
+  2.267   0.122   9.981 
+```
+
+```r
+system.time(foo <- nhanes("DEMO"))
+```
+
+```
+Downloading: http://127.0.0.1:8080/cdc/Nchs/Nhanes/1999-2000/DEMO.XPT
+```
+
+```
+   user  system elapsed 
+  2.014   0.100   2.359 
+```
+
 
 
