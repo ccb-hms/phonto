@@ -17,6 +17,18 @@ title: 'Phonto: Homepage'
 
 - Searchable list of [data files / tables](tables/table-summary.html)
 
+- Searchable list of variables by data group:
+
+	- [Demographics](tables/variable-summary-demographics.html)
+
+	- [Questionnaire](tables/variable-summary-questionnaire.html)
+
+	- [Examination](tables/variable-summary-examination.html)
+
+	- [Laboratory](tables/variable-summary-laboratory.html)
+
+	- [Dietary](tables/variable-summary-dietary.html)
+
 
 
 
