@@ -3,19 +3,20 @@ layout: default
 title: 'Phonto: Homepage'
 ---
 
-# Documentation [TODO]
+# Documentation
 
 - [Introduction to Continuous NHANES](vignettes/nhanes-introduction.html)
 
 - [Accessing NHANES data locally](vignettes/nhanes-local.html)
 
-- A simple search interface for NHANES tables and variables
+- Search interface for NHANES tables and variables [TODO]
 
-- Sample analyses
+- Sample analyses [TODO]
 
-# Summary tables [TODO]
+# Summary tables
 
-- Searchable tables
+- Searchable list of [data files / tables](tables/table-summary.html)
+
 
 
 
