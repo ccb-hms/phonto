@@ -1,5 +1,5 @@
 
-all: nhanes-introduction.md nhanes-local.md
+all: nhanes-introduction.md nhanes-local.md search-tables.md
 
 %.md: %.rmd
 	# Rscript -e "rmarkdown::render('$<')"

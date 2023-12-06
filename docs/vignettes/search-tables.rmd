@@ -1,0 +1,189 @@
+---
+layout: default
+title: "Searching NHANES Variables and Tables"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+library(knitr)
+opts_chunk$set(collapse = FALSE, autodep = TRUE, 
+               comment = "", warning = TRUE, message = TRUE, prompt = FALSE,
+               fig.path = "figures/search-tables-",
+               out.width = "100%",
+               fig.width = 12, fig.height = 8,
+               dev = "svglite", dev.args = list(pointsize = 12),
+               cache = TRUE,
+               cache.path = "./knitr-cache/search-tables/")
+options(warnPartialMatchDollar = FALSE, width = 90)
+library(lattice)
+library(kableExtra)
+```
+
+A broad overview of data collected as part of continuous NHANES is
+described in the [survey content
+brochure](https://wwwn.cdc.gov/nchs/data/nhanes/survey_contents.pdf),
+and the NHANES website has a [variable search
+interface](https://wwwn.cdc.gov/nchs/nhanes/search/default.aspx) as
+well. This document describes how local interactive searches can be
+performed using downloaded and processed variable metadata
+information.
+
+
+# Manifest of available variables
+
+The NHANES data consist of multiple tables over multiple cycles, each
+with a set of recorded variables. The variable names themselves are
+cryptic, and not useful as search terms. Fortunately, the NHANES
+website provides comprehensive details about these variables in the
+form of tables, grouped by components such as
+[Demographics](https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Demographics),
+[Laboratory](https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Laboratory),
+etc.
+
+The __nhanesA__ package can download these tables and make the information
+contained in them available as a data frame using the
+`nhanesManifest()` function.
+
+```{r}
+library(nhanesA)
+varmf <- nhanesManifest("variables")
+```
+
+This downloads and combines several large web pages, so it may take a
+little time to run. Add `verbose = TRUE` to see some indication of
+what is happening.
+
+While useful, this table has limited information. The most useful
+component, the variable description, sometimes (but not always)
+records instructions and can be quite long. 
+
+
+```{r}
+sum(nchar(varmf$VarDesc) == 0)
+```
+
+After reordering the remaining rows by the length of the descriptions,
+the first few rows are given by
+
+```{r}
+varmf <- subset(varmf, nzchar(varmf$VarDesc))
+varmf <- varmf[ order(nchar(varmf$VarDesc)), ]
+options(width = 200)
+head(varmf)
+```
+
+The last few rows have considerably longer descriptions.
+
+```{r}
+unique(tail(varmf, 30)$VarDesc)
+```
+
+More useful and concise descriptions are available in the per-table
+documentation, which can be accessed using the `nhanesCodebook()`
+function and summarized using the `nhanesTableSummary()` function. For
+example, a summary of the `DEMO_C` table if given by the following.
+
+```{r}
+nhanesTableSummary("DEMO_C", use = "both")
+```
+
+This collects information from the codebook and supplements it with
+information from the actual data, such as the number of non-missing
+observations. Combining such information across all available tables
+is generally time-consuming, but is considerably easier when the data
+are available in the form of a database. 
+
+# Summarizing variables using the SQL database
+
+<!-- 
+
+These are useful: should we have a R function to get these in phonto?
+
+phonto::nhanesQuery("select * from Metadata.QuestionnaireDescriptions") |> str()
+phonto::nhanesQuery("select * from Metadata.QuestionnaireVariables") |> str()
+phonto::nhanesQuery("select * from Metadata.VariableCodebook") |> str()
+
+-->
+
+Basic information about all tables can be obtained using
+`nhanesManifest("public")`, but also from the database using a SQL
+query as follows.
+
+```{r}
+tableDesc <- nhanesQuery("select * from Metadata.QuestionnaireDescriptions")
+subset(tableDesc, BeginYear == 1999, select = -c(DocFile, DataFile)) |> head(10)
+```
+
+Having a searchable list of these table descriptions can by itself be
+useful. Such a table is available
+[here](../tables/table-summary.html), and is created using [this R
+script](../scripts/generate-table-summary.R). Instead of having one
+row per table, this list combines multiple cycles for the same _base_
+table name and description, and includes the dimensions of each
+dataset.
+
+We can now apply the `nhanesTableSummary()` function on each of these
+tables. The essential code for this, accounting for the possibility of
+errors, is
+
+```{r, eval=FALSE}
+table_summary <- function(x) {
+    try(nhanesTableSummary(x, use = "both"), silent = TRUE)
+}
+table_details <- sapply(sort(tablemf$TableName), table_summary, simplify = FALSE)
+nhanesVarSummary <-
+    table_details[!sapply(table_details, inherits, "try-error")] |>
+        do.call(what = rbind)
+```
+
+```{r, echo=FALSE}
+load("../variable_summary.rda")
+```
+
+This results in a fairly large data frame.
+
+```{r}
+str(nhanesVarSummary)
+```
+
+However, as variables are repeated for each cycle, the number of
+_unique_ variables is considerable smaller, especially if we split
+them according to the component or data group.
+
+```{r}
+rownames(tableDesc) <- tableDesc$TableName
+nhanesVarSummary$DataGroup <- tableDesc[nhanesVarSummary$table, "DataGroup"]
+unique(nhanesVarSummary[c("varname", "DataGroup")]) |>
+    xtabs(~ DataGroup, data = _)
+```
+
+Having variable-level information in a data frame like this allows us
+to perform interactive searches in R quite easily. For example, we
+could search for variables related to blood pressure or hypertension recorded in the 
+third cycle as follows.
+
+```{r}
+nhanesVarSummary <- within(nhanesVarSummary, label <- tolower(label))
+subset(nhanesVarSummary, endsWith(table, "_C") &
+                         (grepl("hypertension", label) |
+                          grepl("blood pressure", label)))
+```
+
+As with the table descriptions, information about these variables can
+also be summarized and presented as searchable HTML tables. Sample
+code for doing this is available
+[here](../scripts/generate-variable-summary.R), producing the
+following tables, grouped by data group to keep the table sizes
+moderate.
+
+- [Demographics](../tables/variable-summary-demographics.html)
+
+- [Questionnaire](../tables/variable-summary-questionnaire.html)
+
+- [Examination](../tables/variable-summary-examination.html)
+
+- [Laboratory](../tables/variable-summary-laboratory.html)
+
+- [Dietary](../tables/variable-summary-dietary.html)
+

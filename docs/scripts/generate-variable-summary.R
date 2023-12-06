@@ -69,7 +69,6 @@ length(unique(nhanesVarSummary$varname))
 nhanesVarSummary$label <- tolower(nhanesVarSummary$label)
 nrow(unique(nhanesVarSummary[c("varname", "label")]))
 
-
 ## Some tables have non-unique SEQN, suggesting longitudinal
 ## measurements.  These may be interesting, but will often have lots
 ## of variables representing functional data, so we will skip them for

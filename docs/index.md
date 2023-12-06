@@ -7,17 +7,17 @@ title: 'Phonto: Homepage'
 
 - [Introduction to Continuous NHANES](vignettes/nhanes-introduction.html)
 
-- [Accessing NHANES data locally](vignettes/nhanes-local.html)
+- [Accessing NHANES Data Locally](vignettes/nhanes-local.html)
 
-- Search interface for NHANES tables and variables [TODO]
+- [Search Interface for NHANES Tables and Variables](vignettes/search-tables.html)
 
 - Sample analyses [TODO]
 
 # Summary tables
 
-- Searchable list of [data files / tables](tables/table-summary.html)
+- Searchable List of [Data Files / Tables](tables/table-summary.html)
 
-- Searchable list of variables by data group:
+- Searchable List of Variables by Data Group:
 
 	- [Demographics](tables/variable-summary-demographics.html)
 
