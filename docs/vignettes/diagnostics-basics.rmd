@@ -1,0 +1,204 @@
+---
+layout: default
+title: "Diagnostics: Part 1"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+library(knitr)
+opts_chunk$set(collapse = FALSE, autodep = TRUE, 
+               comment = "", warning = TRUE, message = TRUE, prompt = FALSE,
+               fig.path = "figures/diagnostics-basic-",
+               out.width = "100%",
+               fig.width = 12, fig.height = 8,
+               dev = "svglite", dev.args = list(pointsize = 12),
+               cache = TRUE,
+               cache.path = "./knitr-cache/diagnostics-basic/")
+options(warnPartialMatchDollar = FALSE, width = 200)
+```
+
+
+
+NHANES is a large project, and while the data distribution strategy
+employed by CDC works quite well overall, inconsistencies do creep
+in. This document describes a series of diagnostic checks, enabled by
+the local SQL database, to identify possible issues.
+
+
+## Cross check tables with NHANES master list
+
+The NHANES website contains a [master
+list](https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx) of
+available. This can be downloaded and parsed via the
+`nhanesManifest()` function in the __nhanesA__ package.  Here we use
+an alternative Python approach that does essentially the same thing.
+
+First, we download and save this table as a CSV file using Python...
+
+```{python, results='hide', cache = FALSE}
+from bs4 import BeautifulSoup
+import requests
+
+## extraction functions for td elements
+def etext(obj): return obj.get_text().strip()
+def eurl(obj): return obj.find('a').get_attribute_list('href')[0]
+
+url = 'https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx'
+
+source_html = requests.get(url).content.decode('utf-8')
+soup = BeautifulSoup(source_html, 'html.parser')
+
+_table = soup.find('table', {'id' : 'GridView1'}) 
+
+f = open('table_manifest.csv', 'w')
+f.write("Table,Years,PubDate,DocURL,DataURL\n")
+
+for row in _table.tbody.find_all('tr'):
+    [year, docfile, datafile, pubdate] = row.find_all('td')
+    if etext(pubdate) != 'Withdrawn':
+        f.write("%s,%s,%s,https://wwwn.cdc.gov%s,https://wwwn.cdc.gov%s\n" % 
+                    (etext(docfile).split()[0], 
+                     etext(year), 
+                     etext(pubdate),
+                     eurl(docfile),
+                     eurl(datafile)))
+f.close()
+```
+
+...and then read this file in using R.
+
+```{r}
+manifest <- read.csv("table_manifest.csv")
+str(manifest)
+## Some weird URLs to fix up
+subset(manifest, grepl("cdc.gov../", DocURL, fixed = TRUE) |
+                 grepl("cdc.gov../", DataURL, fixed = TRUE))
+manifest <- within(manifest, {
+  DocURL <- gsub("cdc.gov../", "cdc.gov/Nchs/Nhanes/", DocURL, fixed = TRUE)
+  DataURL <- gsub("cdc.gov../", "cdc.gov/Nchs/Nhanes/", DataURL, fixed = TRUE)
+})
+```
+
+We start by looking at the file extensions of the URLs.
+
+```{r}
+with(manifest, table(tools::file_ext(DocURL)))   # doc file extensions
+with(manifest, table(tools::file_ext(DataURL)))  # data file extensions
+```
+
+and whether there are any duplicated table names.
+
+```{r}
+with(manifest, Table[duplicated(Table)])         # uniqueness of table names
+```
+
+The `aspx` files and duplicated table name comes from additional
+details specific to missingness in DXA and OMB tables (see links
+below). Note that __nhanesA__ handles "DXA" specially, e.g., via
+`nhanesA::nhanesDXA()`, but not OMB, and the database version has
+neither.
+
+
+```{r}
+subset(manifest, Table == "All")
+```
+
+We will simply skip these two entries.
+
+```{r}
+manifest <- subset(manifest, Table != "All")
+```
+
+The ZIP extensions are from
+
+```{r}
+subset(manifest, tolower(tools::file_ext(DataURL)) == "zip")
+```
+
+These are very large files, with multiple entries per subject storing 
+minute-by-minute results recorded in a physical activity monitoring device. 
+These data are not included in the database (and probably should not be), but 
+we will retain these rows to remind us that the tables exist.
+
+
+
+Next, we check if any of these tables are missing from the table
+metadata in the database.
+
+
+```{r}
+library(nhanesA)
+library(phonto)
+dbTableDesc <- nhanesQuery("select * from Metadata.QuestionnaireDescriptions")
+setdiff(manifest$Table, dbTableDesc$TableName) # missing from DB
+setdiff(dbTableDesc$TableName, manifest$Table) # and the other way
+```
+
+If we exclude the pre-pandemic tables, we are left with 
+
+```{r}
+options(width = 80)
+mtabs <- setdiff(manifest$Table, dbTableDesc$TableName) |>
+             grep(pattern = "^P_", invert = TRUE, value = TRUE)
+mtabs
+```
+
+Ideally, this should match the list of excluded tables given by.
+
+```{r}
+nhanesQuery("select * from Metadata.ExcludedTables")
+```
+
+The following links can be used to explore the documentation of these
+missing tables in the NHANES website.
+
+```{r results='asis'}
+paste0("- <", subset(manifest, Table %in% mtabs)$DocURL, ">") |>
+    cat(sep = "\n")
+```
+
+
+
+
+## Missing documentation
+
+We check here for tables in the current metadata that do not have a
+URL.
+
+```{r}
+subset(dbTableDesc, !startsWith(DocFile, "https"),
+       select = c(TableName, DocFile, DataFile))
+```
+
+The corresponding documentation links from the online manifest are
+given below.
+
+```{r results='asis'}
+mdoc <- subset(dbTableDesc, !startsWith(DocFile, "https"))$TableName
+paste0("- <", subset(manifest, Table %in% mdoc)$DocURL, ">") |>
+    cat(sep = "\n")
+```
+
+We end with a couple of sanity checks for the URLs that are _not_ missing.
+
+```{r}
+manifest_doc_url <- with(manifest, structure(DocURL, names = Table))
+manifest_data_url <- with(manifest, structure(DataURL, names = Table))
+metadata_doc_url <- with(subset(dbTableDesc, DocFile != ""),
+                         structure(DocFile, names = TableName))
+metadata_data_url <- with(subset(dbTableDesc, DataFile != ""),
+                          structure(DataFile, names = TableName))
+```
+
+If not missing, doc / data URLs in the metadata should match those in the manifest.
+
+```{r}
+all(metadata_doc_url == manifest_doc_url[names(metadata_doc_url)])
+all(metadata_data_url == manifest_data_url[names(metadata_data_url)])
+```
+
+
+
+
+

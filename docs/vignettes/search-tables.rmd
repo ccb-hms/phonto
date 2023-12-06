@@ -146,7 +146,7 @@ str(nhanesVarSummary)
 ```
 
 However, as variables are repeated for each cycle, the number of
-_unique_ variables is considerable smaller, especially if we split
+_unique_ variables is considerably smaller, especially if we split
 them according to the component or data group.
 
 ```{r}

@@ -29,6 +29,8 @@ title: 'Phonto: Homepage'
 
 	- [Dietary](tables/variable-summary-dietary.html)
 
+# Diagnostics
 
+- [Basic Diagnostics](vignettes/diagnostics-basic.html)
 
 
