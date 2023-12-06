@@ -15,9 +15,7 @@ opts_chunk$set(collapse = FALSE, autodep = TRUE,
                dev = "svglite", dev.args = list(pointsize = 12),
                cache = TRUE,
                cache.path = "./knitr-cache/search-tables/")
-options(warnPartialMatchDollar = FALSE, width = 90)
-library(lattice)
-library(kableExtra)
+options(warnPartialMatchDollar = FALSE, width = 200)
 ```
 
 A broad overview of data collected as part of continuous NHANES is
@@ -47,6 +45,7 @@ contained in them available as a data frame using the
 
 ```{r}
 library(nhanesA)
+library(phonto)
 varmf <- nhanesManifest("variables")
 ```
 
@@ -69,7 +68,6 @@ the first few rows are given by
 ```{r}
 varmf <- subset(varmf, nzchar(varmf$VarDesc))
 varmf <- varmf[ order(nchar(varmf$VarDesc)), ]
-options(width = 200)
 head(varmf)
 ```
 

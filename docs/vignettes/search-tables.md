@@ -35,6 +35,7 @@ contained in them available as a data frame using the
 
 ```r
 library(nhanesA)
+library(phonto)
 varmf <- nhanesManifest("variables")
 ```
 
@@ -63,7 +64,6 @@ the first few rows are given by
 ```r
 varmf <- subset(varmf, nzchar(varmf$VarDesc))
 varmf <- varmf[ order(nchar(varmf$VarDesc)), ]
-options(width = 200)
 head(varmf)
 ```
 
@@ -181,18 +181,21 @@ query as follows.
 
 ```r
 tableDesc <- nhanesQuery("select * from Metadata.QuestionnaireDescriptions")
-```
-
-```
-Error in nhanesQuery("select * from Metadata.QuestionnaireDescriptions"): could not find function "nhanesQuery"
-```
-
-```r
 subset(tableDesc, BeginYear == 1999, select = -c(DocFile, DataFile)) |> head(10)
 ```
 
 ```
-Error in eval(expr, envir, enclos): object 'tableDesc' not found
+                                                  Description TableName BeginYear EndYear     DataGroup UseConstraints      DatePublished
+1                                               Acculturation       ACQ      1999    2000 Questionnaire           None          June 2002
+11                                   Analgesic Pain Relievers   RXQ_ANA      1999    2000 Questionnaire           None          June 2002
+12         Anti-Mullerian Hormone (AMH) & Inhibin-B (Surplus)   SSAMH_A      1999    2000    Laboratory           None Updated April 2022
+26                                                    Balance       BAQ      1999    2000 Questionnaire           None          June 2002
+44                                     Cardiovascular Fitness       CVX      1999    2000   Examination           None          June 2004
+49                          Cholesterol - LDL & Triglycerides   LAB13AM      1999    2000    Laboratory           None Updated March 2007
+69                                      Current Health Status       HSQ      1999    2000 Questionnaire           None          June 2002
+74               Cytomegalovirus Antibodies - Serum (Surplus)   SSCMV_A      1999    2000    Laboratory           None Updated April 2022
+78                                                Dermatology       DEQ      1999    2000 Questionnaire           None          June 2002
+104 Dietary Supplement Use 30-Day - File 1, Supplement Counts  DSQFILE1      1999    2000       Dietary           None  Updated July 2009
 ```
 
 Having a searchable list of these table descriptions can by itself be
@@ -252,27 +255,15 @@ them according to the component or data group.
 
 ```r
 rownames(tableDesc) <- tableDesc$TableName
-```
-
-```
-Error in eval(expr, envir, enclos): object 'tableDesc' not found
-```
-
-```r
 nhanesVarSummary$DataGroup <- tableDesc[nhanesVarSummary$table, "DataGroup"]
-```
-
-```
-Error in eval(expr, envir, enclos): object 'tableDesc' not found
-```
-
-```r
 unique(nhanesVarSummary[c("varname", "DataGroup")]) |>
     xtabs(~ DataGroup, data = _)
 ```
 
 ```
-Error in `[.data.frame`(nhanesVarSummary, c("varname", "DataGroup")): undefined columns selected
+DataGroup
+ Demographics       Dietary   Examination    Laboratory Questionnaire 
+          175          1182          4791          2766          3373 
 ```
 
 Having variable-level information in a data frame like this allows us
@@ -289,33 +280,33 @@ subset(nhanesVarSummary, endsWith(table, "_C") &
 ```
 
 ```
-      table  varname                                    label nobs_cb na_cb has_range nlevels  skip nobs_data na_data  size   num   cat unique
-8550  BPQ_C   BPQ010    last blood pressure reading by doctor    6213     0     FALSE       8  TRUE      6213       0 50192 FALSE  TRUE  FALSE
-8551  BPQ_C   BPQ020    ever told you had high blood pressure    6213    75     FALSE       5  TRUE      6213      75 49928 FALSE  TRUE  FALSE
-8552  BPQ_C   BPQ030  told had high blood pressure - 2+ times    6213  4412     FALSE       5 FALSE      6213    4412 49928 FALSE  TRUE  FALSE
-8553  BPQ_C  BPQ040A     taking prescription for hypertension    6213  4412     FALSE       5 FALSE      6213    4412 49928 FALSE  TRUE  FALSE
-8554  BPQ_C  BPQ040B  told to control weight for hypertension    6213  4412     FALSE       5 FALSE      6213    4412 49928 FALSE  TRUE  FALSE
-8555  BPQ_C  BPQ040C   told to reduce sodium for hypertension    6213  4412     FALSE       5 FALSE      6213    4412 49928 FALSE  TRUE  FALSE
-8556  BPQ_C  BPQ040D   told to exercise more for hypertension    6213  4412     FALSE       5 FALSE      6213    4412 49928 FALSE  TRUE  FALSE
-8557  BPQ_C  BPQ040E  told to reduce alcohol for hypertension    6213  4412     FALSE       5 FALSE      6213    4412 49928 FALSE  TRUE  FALSE
-8558  BPQ_C  BPQ040F told to do other things for hypertension    6213  4412     FALSE       5 FALSE      6213    4412 49928 FALSE  TRUE  FALSE
-8559  BPQ_C  BPQ043A    told to stop smoking for hypertension    6213  6146     FALSE       4 FALSE      6213    6146 49816 FALSE  TRUE  FALSE
-8753  BPX_C PEASCST1                    blood pressure status    9643     0     FALSE       4 FALSE      9643       0 77376 FALSE  TRUE  FALSE
-8754  BPX_C PEASCTM1           blood pressure time in seconds    9643   306      TRUE       2 FALSE      9643     306 77192  TRUE FALSE  FALSE
-8755  BPX_C PEASCCT1                   blood pressure comment    9643  9194     FALSE      10 FALSE      9643    9194 77856 FALSE  TRUE  FALSE
-11522 CVX_C   CVAARM  arm selected for blood pressure monitor    4663  1451     FALSE       4 FALSE      4663    1451 37464 FALSE  TRUE  FALSE
-11523 CVX_C  CVACUFF     cuff size for blood pressure monitor    4663  1451     FALSE       4 FALSE      4663    1451 37528 FALSE  TRUE  FALSE
-29806 MCQ_C  MCQ250F    blood relatives w/hypertension/stroke    9645  4605     FALSE       5  TRUE      9645    4605 77384 FALSE  TRUE  FALSE
-29844 MCQ_C MCQ260FA       blood relative-hypertension-mother    9645  8974     FALSE       4  TRUE      9645    8974 77328 FALSE  TRUE  FALSE
-29845 MCQ_C MCQ260FB       blood relative-hypertension-father    9645  9160     FALSE       2  TRUE      9645    9160 77264 FALSE  TRUE  FALSE
-29846 MCQ_C MCQ260FC blood relative-hypertension-mom's mother    9645  9468     FALSE       2  TRUE      9645    9468 77272 FALSE  TRUE  FALSE
-29847 MCQ_C MCQ260FD blood relative-hypertension-mom's father    9645  9543     FALSE       2  TRUE      9645    9543 77272 FALSE  TRUE  FALSE
-29848 MCQ_C MCQ260FE blood relative-hypertension-dad's mother    9645  9566     FALSE       2  TRUE      9645    9566 77272 FALSE  TRUE  FALSE
-29849 MCQ_C MCQ260FF blood relative-hypertension-dad's father    9645  9582     FALSE       2  TRUE      9645    9582 77272 FALSE  TRUE  FALSE
-29850 MCQ_C MCQ260FG      blood relative-hypertension-brother    9645  9445     FALSE       2  TRUE      9645    9445 77264 FALSE  TRUE  FALSE
-29851 MCQ_C MCQ260FH       blood relative-hypertension-sister    9645  9445     FALSE       2  TRUE      9645    9445 77264 FALSE  TRUE  FALSE
-29852 MCQ_C MCQ260FI        blood relative-hypertension-other    9645  9475     FALSE       2  TRUE      9645    9475 77264 FALSE  TRUE  FALSE
-38091 PFQ_C  PFD069J  hypertension or high blood pressuredays    9645  9475      TRUE       5 FALSE      9645    9475 77208  TRUE FALSE  FALSE
+      table  varname                                    label nobs_cb na_cb has_range nlevels  skip nobs_data na_data  size   num   cat unique     DataGroup
+8550  BPQ_C   BPQ010    last blood pressure reading by doctor    6213     0     FALSE       8  TRUE      6213       0 50192 FALSE  TRUE  FALSE Questionnaire
+8551  BPQ_C   BPQ020    ever told you had high blood pressure    6213    75     FALSE       5  TRUE      6213      75 49928 FALSE  TRUE  FALSE Questionnaire
+8552  BPQ_C   BPQ030  told had high blood pressure - 2+ times    6213  4412     FALSE       5 FALSE      6213    4412 49928 FALSE  TRUE  FALSE Questionnaire
+8553  BPQ_C  BPQ040A     taking prescription for hypertension    6213  4412     FALSE       5 FALSE      6213    4412 49928 FALSE  TRUE  FALSE Questionnaire
+8554  BPQ_C  BPQ040B  told to control weight for hypertension    6213  4412     FALSE       5 FALSE      6213    4412 49928 FALSE  TRUE  FALSE Questionnaire
+8555  BPQ_C  BPQ040C   told to reduce sodium for hypertension    6213  4412     FALSE       5 FALSE      6213    4412 49928 FALSE  TRUE  FALSE Questionnaire
+8556  BPQ_C  BPQ040D   told to exercise more for hypertension    6213  4412     FALSE       5 FALSE      6213    4412 49928 FALSE  TRUE  FALSE Questionnaire
+8557  BPQ_C  BPQ040E  told to reduce alcohol for hypertension    6213  4412     FALSE       5 FALSE      6213    4412 49928 FALSE  TRUE  FALSE Questionnaire
+8558  BPQ_C  BPQ040F told to do other things for hypertension    6213  4412     FALSE       5 FALSE      6213    4412 49928 FALSE  TRUE  FALSE Questionnaire
+8559  BPQ_C  BPQ043A    told to stop smoking for hypertension    6213  6146     FALSE       4 FALSE      6213    6146 49816 FALSE  TRUE  FALSE Questionnaire
+8753  BPX_C PEASCST1                    blood pressure status    9643     0     FALSE       4 FALSE      9643       0 77376 FALSE  TRUE  FALSE   Examination
+8754  BPX_C PEASCTM1           blood pressure time in seconds    9643   306      TRUE       2 FALSE      9643     306 77192  TRUE FALSE  FALSE   Examination
+8755  BPX_C PEASCCT1                   blood pressure comment    9643  9194     FALSE      10 FALSE      9643    9194 77856 FALSE  TRUE  FALSE   Examination
+11522 CVX_C   CVAARM  arm selected for blood pressure monitor    4663  1451     FALSE       4 FALSE      4663    1451 37464 FALSE  TRUE  FALSE   Examination
+11523 CVX_C  CVACUFF     cuff size for blood pressure monitor    4663  1451     FALSE       4 FALSE      4663    1451 37528 FALSE  TRUE  FALSE   Examination
+29806 MCQ_C  MCQ250F    blood relatives w/hypertension/stroke    9645  4605     FALSE       5  TRUE      9645    4605 77384 FALSE  TRUE  FALSE Questionnaire
+29844 MCQ_C MCQ260FA       blood relative-hypertension-mother    9645  8974     FALSE       4  TRUE      9645    8974 77328 FALSE  TRUE  FALSE Questionnaire
+29845 MCQ_C MCQ260FB       blood relative-hypertension-father    9645  9160     FALSE       2  TRUE      9645    9160 77264 FALSE  TRUE  FALSE Questionnaire
+29846 MCQ_C MCQ260FC blood relative-hypertension-mom's mother    9645  9468     FALSE       2  TRUE      9645    9468 77272 FALSE  TRUE  FALSE Questionnaire
+29847 MCQ_C MCQ260FD blood relative-hypertension-mom's father    9645  9543     FALSE       2  TRUE      9645    9543 77272 FALSE  TRUE  FALSE Questionnaire
+29848 MCQ_C MCQ260FE blood relative-hypertension-dad's mother    9645  9566     FALSE       2  TRUE      9645    9566 77272 FALSE  TRUE  FALSE Questionnaire
+29849 MCQ_C MCQ260FF blood relative-hypertension-dad's father    9645  9582     FALSE       2  TRUE      9645    9582 77272 FALSE  TRUE  FALSE Questionnaire
+29850 MCQ_C MCQ260FG      blood relative-hypertension-brother    9645  9445     FALSE       2  TRUE      9645    9445 77264 FALSE  TRUE  FALSE Questionnaire
+29851 MCQ_C MCQ260FH       blood relative-hypertension-sister    9645  9445     FALSE       2  TRUE      9645    9445 77264 FALSE  TRUE  FALSE Questionnaire
+29852 MCQ_C MCQ260FI        blood relative-hypertension-other    9645  9475     FALSE       2  TRUE      9645    9475 77264 FALSE  TRUE  FALSE Questionnaire
+38091 PFQ_C  PFD069J  hypertension or high blood pressuredays    9645  9475      TRUE       5 FALSE      9645    9475 77208  TRUE FALSE  FALSE Questionnaire
 ```
 
 As with the table descriptions, information about these variables can
