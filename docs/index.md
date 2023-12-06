@@ -31,6 +31,7 @@ title: 'Phonto: Homepage'
 
 # Diagnostics
 
-- [Basic Diagnostics](vignettes/diagnostics-basic.html)
+- [Basic Diagnostics](vignettes/diagnostics-basics.html)
 
+- [Codebook Inconsistencies](vignettes/diagnostics-codebook.html)
 

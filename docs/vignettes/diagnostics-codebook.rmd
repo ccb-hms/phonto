@@ -1,0 +1,149 @@
+---
+layout: default
+title: "Diagnostics: Codebook Inconsistencies"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+library(knitr)
+opts_chunk$set(collapse = FALSE, autodep = TRUE, 
+               comment = "", warning = TRUE, message = TRUE, prompt = FALSE,
+               fig.path = "figures/diagnostics-codebook-",
+               out.width = "100%",
+               fig.width = 12, fig.height = 8,
+               dev = "svglite", dev.args = list(pointsize = 12),
+               cache = TRUE,
+               cache.path = "./knitr-cache/diagnostics-codebook/")
+options(warnPartialMatchDollar = FALSE, width = 85)
+```
+
+
+
+NHANES tables themselves have cryptic variable names, and must be used
+in conjunction with corresponding documentation files to be
+interpreted. Both standard and database versions of the `nhanes()` and
+`nhanesFromURL()` functions in the __nhanesA__ package return a
+"translated" data frame, which modify the raw data columns in the SAS
+transport files using per-variable translation tables, referred to as
+_codebooks_, obtained from the NHANES online documentation.
+
+This document describes a series of diagnostic checks to identify
+possible issues with these codebooks.
+
+# Variable codebooks
+
+Variable codebooks are obtained by downloading and parsing online
+documentation files. These codebooks are stored in the database,
+making it relatively easy to work with them.
+
+```{r}
+library(nhanesA)
+library(phonto)
+all_cb <- nhanesQuery("select * from Metadata.VariableCodebook")
+str(all_cb)
+```
+
+
+# Ambiguous variable types
+
+NHANES has both numeric and categorical variables. There is no
+indication in the data or documentation itself of what type a certain
+variable is supposed to be. However, for most numeric variables, the
+`ValueDescription` column will have an entry called `"Range of
+Values"`. The presence of this value is used by the __nhanesA__
+package to infer the type of a variable.
+
+Unfortunately, with this rule, some variables are flagged as numeric
+in some cycles but categorical in others. Such variables can be
+identified in the searchable variable tables available [here](../)
+with a `Type` value of `ambiguous`. Below, we try to take a closer
+look at such variables.
+
+We first restrict our attention to variables that are 'numeric' in at
+least one table. There may be others that are mistakenly classified as
+numeric, but those may be difficult to flag.
+
+```{r, warning = FALSE}
+numeric_vars <- with(all_cb, unique(Variable[ValueDescription == "Range of Values"]))
+numeric_cb <- subset(all_cb, Variable %in% numeric_vars, select = 1:5)
+```
+
+Ideally, all the 'numeric' values in these codebooks should be
+identified as `"Range of Values"`. If they are not, however, they are
+usually just the numeric value, or some indicator of thresholding such
+as `"more than 80"`. Let us look at the 'ValueDescription'-s that
+represent numeric values, in the sense that they can be coerced to a
+finite numeric value.
+
+
+```{r}
+maybe_numeric <- is.finite(as.numeric(numeric_cb$ValueDescription))
+table(maybe_numeric)
+```
+
+We will focus on these variables for now.
+
+```{r}
+problem_vars <- unique(numeric_cb[maybe_numeric, ]$Variable)
+str(problem_vars)
+length(num_cb_byVar <- numeric_cb |>
+           subset(Variable %in% problem_vars) |>
+           split(~ Variable))
+```
+
+Let's start by summarizing these to keep only the unique
+`CodeOrValue` + `ValueDescription` combinations, and then prioritize
+them by the number of numeric-like values that remain.
+
+```{r}
+summary_byVar <-
+    lapply(num_cb_byVar,
+           function(d) unique(d[c("Variable", "CodeOrValue",
+                                  "ValueDescription")]))
+numNumeric <- function(d) {
+    suppressWarnings(sum(is.finite(as.numeric(d$ValueDescription))))
+}
+(nnum <- sapply(summary_byVar, numNumeric) |> sort())
+```
+
+To get a sense of the problem cases, we look at the variables with 10
+or more numeric variables.
+
+```{r}
+num_cb_byVar[ names(which(nnum >= 10)) ]
+```
+
+## What to do about these?
+
+The last example is of particular concern, because the `KID221`
+variable clearly means different things in different
+tables. Otherwise, these all look like legitimate issues, and there
+are not many of them, so a possible workaround is to maintain an
+explicit list of such variables and handle them while creating the
+codebook. The least intrusive way would be to just insert a row with
+value description `"Range of Values"`, and perhaps drop the value
+descriptions which can be coerced to numeric.
+
+
+```{r, echo = FALSE, eval = FALSE}
+## Detecting thresholding keywords
+
+## An alternative approach to finding variables that are possibly
+## numeric but not identified as such is to look for phrases that
+## indicate thresholding, such as "more than" or "less than".
+
+with(all_cb, unique(c(grep("^more than", ValueDescription, ignore.case = TRUE, value = TRUE),
+                      grep("^less than", ValueDescription, ignore.case = TRUE, value = TRUE))))
+threshold_vars <-
+    with(all_cb,
+         unique(Variable[grepl("^more than", ValueDescription, ignore.case = TRUE) |
+                         grepl("^less than", ValueDescription, ignore.case = TRUE)]))
+categorical_vars <- setdiff(unique(all_cb$Variable), numeric_vars)
+threshold_cb <- subset(all_cb,
+                       Variable %in% intersect(categorical_vars, threshold_vars),
+                       select = 1:5)
+table(threshold_cb$Variable)
+split(threshold_cb, ~ Variable)
+```
+
