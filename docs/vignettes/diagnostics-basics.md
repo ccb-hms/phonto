@@ -19,7 +19,7 @@ the local SQL database, to identify possible issues.
 
 The NHANES website contains a [master
 list](https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx) of
-available. This can be downloaded and parsed via the
+available tables. This can be downloaded and parsed via the
 `nhanesManifest()` function in the __nhanesA__ package.  Here we use
 an alternative Python approach that does essentially the same thing.
 

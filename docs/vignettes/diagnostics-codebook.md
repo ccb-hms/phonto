@@ -530,3 +530,272 @@ descriptions which can be coerced to numeric.
 
 
 
+
+# Codebook conversion problems
+
+Ideally, each codebook (as returned by `nhanesCodebook()` should
+contain one element for each variable in the table, where each element
+is a list containing information about that variable. This information
+currently consists of the 'SAS Label', 'English Text', and 'Target',
+as recorded in the documentation files, along with a translation table
+with descriptions of the codes used in the data.
+
+The following functions checks to see if a given codebook satisfies
+these expectations. In addition to checking for the presence of a
+translation table, it flags cases where a potentially numeric variable
+has unusual codes, accounting for some common non-response codes and
+thresholding codes.
+
+
+```r
+acceptable <-
+    c("Range of Values", "Missing", "No response", "Refused", "Refuse",
+      "SP refused", "Could not obtain", "No Lab Result", "No lab specimen", 
+      "Don't know", "Don't  Know", "Cannot be assessed",
+      "Calculation cannot be determined", "Since birth",
+      "Fill Value of Limit of Detection", "Below Limit of Detection",
+      "None", "Never")
+agelimits <-
+    c("80 years or older", "85 years or older",
+      ">= 80 years of age", ">= 85 years of age", "80 years of age and over",
+      "9 or younger", "9 years or younger",
+      "12 years or younger ", "14 years or younger",
+      "45 years or older", "14 years or under",
+      "60 years or older")
+var_status <- function(v, cb) {
+    x <- cb[[v]][[v]]
+    if (is.null(x)) return(NA) # no info, usually for SEQN
+    probablyNumeric <- "Range of Values" %in% x$Value.Description
+    if (!probablyNumeric) return(TRUE) # OK - at least for now
+    ok <- all(tolower(x$Value.Description) %in% tolower(c(acceptable, agelimits)))
+    ok
+}
+find_conversion_problems <- function(nh_table)
+{
+    cb <- nhanesCodebook(nh_table)
+    cb_status <- vapply(names(cb), var_status, logical(1), cb = cb)
+    if (all(is.na(cb_status))) "INVALID CODEBOOK" # the whole table is problematic ?
+    else lapply(cb[ !is.na(cb_status) & !cb_status ],
+                function(x) x[[length(x)]][1:3])
+}
+```
+
+These are used below to find potential problems in importing codebooks.
+
+
+```r
+tables <- nhanesQuery("select TableName from Metadata.QuestionnaireDescriptions")$TableName
+status <- lapply(tables, find_conversion_problems)
+names(status) <- tables
+keep <- sapply(status, length) > 0 # tables with some issues
+status <- status[keep]
+tables <- tables[keep]
+```
+
+## Tables with no useful codebook in the database
+
+
+```r
+no_codebook <- sapply(status, identical, "INVALID CODEBOOK")
+cat(format(tables[no_codebook]), fill = TRUE)
+```
+
+```
+ALB_CR_G TELO_A   TELO_B   SSSAL_D 
+```
+
+`ALB_CR_G` is a known example where there are no translation tables;
+this is not a problem because all variables are numeric and do not
+require translation. Other instances should be investigated.
+
+
+## Tables with unexpected value descriptions
+
+Most of the remaining 'problems' arise from special numeric codes,
+which are perhaps too many to deal with systematically, but do need to
+be accounted for during analysis. They are listed below for reference.
+
+
+```r
+labels_df <- status[!no_codebook] |>
+    do.call(what = c) |> do.call(what = rbind)
+## keep only value and description
+labels_df <- labels_df[1:2]
+```
+
+Next, we count the number of variables each description occurs in, and
+sort by frequency.
+
+
+```r
+labels_df <- subset(labels_df, Value.Description != "Range of Values")
+labels_split <- split(labels_df, ~ Value.Description)
+labels_summary <-
+    lapply(labels_split,
+           function(d) with(d,
+                            data.frame(Desc = substring(as.character(Value.Description)[[1]],
+                                                        1, 45),
+                                       Count = length(Value.Description),
+                                       Codes = sort(unique(Code.or.Value))
+                                                 |> paste(collapse = "/")
+                                                 |> substring(1, 30)))) |>
+    do.call(what = rbind)
+```
+
+
+```r
+options(width = 200)
+rownames(labels_summary) <- NULL
+labels_summary[order(labels_summary$Count, decreasing = TRUE), ]
+```
+
+```
+                                             Desc Count                          Codes
+92                                        Missing   816                              .
+136                                       Refused   443 77/777/7777/77777/777777/77777
+73                                     Don't know   394 99/999/9999/99999/999999/99999
+1                                               0   162                              0
+67                              Compliance <= 0.2    32                            555
+68                               Could not obtain    32                            888
+59                                          900 +    27                            900
+83                              Less than 1 month    26                          0/666
+70       Day 1 dietary recall not done/incomplete    24                              0
+71       Day 2 dietary recall not done/incomplete    24                              0
+104                                         Never    22                              0
+60                          95 cigarettes or more    21                             95
+122                                          None    18                              0
+134                 Provider did not specify goal    18                           6666
+27                                   2000 or more    17                           2000
+3                             1 cigarette or less    15                              1
+108                        Never on a daily basis    15                              0
+131    Participants 6+ years with no lab specimen    13                              0
+29                                      3 or More    12                              3
+146           Value greater than or equal to 5.00    12                              5
+45                                      7 or more    11                              7
+53                              80 years or older    11                             80
+6                                    1-14 minutes    10                             14
+49                                     70 or more    10                             70
+54                                  8400 and over    10                           8400
+74                                     Don't Know    10                           9999
+80         First Below Detection Limit Fill Value    10             0.01/0.18/0.25/1.4
+111             Never smoked cigarettes regularly    10                              0
+118                               No modification    10                              0
+119                        No time spent outdoors    10                              0
+121                                Non-Respondent    10                              0
+137       Second Below Detection Limit Fill Value    10           0.009/0.21/0.28/1.25
+141                           Still breastfeeding    10                              0
+142                        Still drinking formula    10                              0
+9                                     100 or more     9                            100
+64               Below Detection Limit Fill Value     9                  0.14/1.25/2/4
+98                    More than 21 meals per week     9                           5555
+28                                      3 or more     8                              3
+84                               Less than 1 year     8                            666
+88                             Less than one hour     8                              0
+4                                 1 month or less     7                              1
+18                              13 pounds or more     7                             13
+24                               20 or more times     7                             20
+39                                6 years or less     7                              6
+47              7 or more people in the Household     7                              7
+57                              85 years or older     7                             85
+76                            Don't know/not sure     7                           9999
+81         First Fill Value of Limit of Detection     7 -0.001/-0.01/-0.02/-0.03/-0.07
+138       Second Fill Value of Limit of Detection     7 -0.004/-0.02/-0.04/-0.05/-0.23
+8                                           100 +     6                            100
+10                                     11 or more     6                             11
+13                              11 years or under     6                             11
+21                              19 years or under     6                             19
+43                              60 years or older     6                             60
+62         At or below detection limit fill value     6       0.01/0.04/0.07/0.21/6.36
+77                                      Dont Know     6                           9999
+95               More than 1095 days (3-year) old     6                         666666
+105                    Never had cholesterol test     6                           6666
+107                            Never heard of LDL     6                           5555
+110                Never smoked a whole cigarette     6                             55
+126   Participants 12+ years with no lab specimen     6                              0
+135                                        Refuse     6                            777
+14                               12 hours or more     5                             12
+23                                     20 or more     5                             20
+38                                6 times or more     5                              6
+40                               6 years or under     5                              6
+63  At work or at school 9 to 5 seven days a week     5                           3333
+72                  Does not work or go to school     5                           3333
+82                             Hasn't started yet     5                              0
+15                            12 years or younger     4                             12
+16                                     13 or more     4                             13
+32                                     40 or more     4                             40
+46                 7 or more people in the Family     4                              7
+69  Current HH FS benefits recipient last receive     4                          55555
+90                               Less than weekly     4                           6666
+103                 More than 90 times in 30 days     4                           6666
+120 Non-current HH FS benefits recipient last rec     4                          66666
+133       PIR value greater than or equal to 5.00     4                              5
+145                                    Ungradable     4                              2
+11                                     11 or More     3                             11
+33                                     40 or More     3                             40
+36                               50 years or more     3                          66666
+56                                    85 or older     3                             85
+61                                     95 or more     3                             95
+78                                        English     3                              1
+79                            English and Spanish     3                              3
+89                             Less than one year     3                            666
+94                   More than 1 year unspecified     3                            555
+109                 Never smoked a pipe regularly     3                              0
+112                 Never smoked cigars regularly     3                              0
+113          Never used chewing tobacco regularly     3                              0
+114                    Never used snuff regularly     3                              0
+115 No Lab Result or Not Fasting for 8 to <24 hou     3                              0
+116                                No lab samples     3                              0
+123                              Not MEC Examined     3                              0
+125                                         Other     3                              4
+140                                       Spanish     3                              2
+144                 Unable to do activity (blind)     3                            666
+12                              11 pounds or more     2                             11
+17                                     13 or More     2                             13
+19                               14 hours or more     2                             14
+20                              15 drinks or more     2                             15
+26                              20 years or older     2                             20
+30                               3 pounds or less     2                              3
+35                             480 Months or more     2                            480
+37                               500 mg or higher     2                            500
+41                             60 minutes or more     2                             60
+44                             600 Months or more     2                            600
+50                                      70 to 150     2                             70
+51                               80 Hours or more     2                             80
+55                            85 or greater years     2                             85
+65                 Below First Limit of Detection     2                        0.1/0.5
+66                Below Second Limit of Detection     2                       0.14/0.7
+75               Don't know what is 'whole grain'     2                       66666666
+86                              Less than monthly     2                          66666
+91                              Less then 3 hours     2                              2
+93                                More than $1000     2                          55555
+97                                   More than 21     2                           5555
+100                            More than 300 days     2                          55555
+101               More than 365 days (1-year) old     2                         666666
+102               More than 730 days (2-year) old     2                         666666
+106                       Never heard of A1C test     2                            666
+117                                No Lab samples     2                              0
+124                  Not tested in last 12 months     2                              0
+128    Participants 3+ years with no lab specimen     2                              0
+139                          Single person family     2                            666
+2                                      0-5 Months     1                              5
+5                                  1 year or less     1                              1
+7                                       1-5 Hours     1                              5
+22                                20 days or more     1                             20
+25                                      20 to 150     1                             20
+31                                      4 or more     1                              4
+34                                   400 and over     1                            400
+42                              60 or more months     1                            666
+48                                7 years or less     1                              7
+52                            80 or greater years     1                             80
+58                                     9 or fewer     1                              9
+85                      Less than 10 years of age     1                              1
+87                              Less than one day     1                              0
+96                     More than 20 times a month     1                             30
+99                    More than 21 times per week     1                           5555
+127      Participants 3+ years with no Lab Result     1                              0
+129 Participants 3+ years with no surplus lab spe     1                              0
+130      Participants 6+ years with no Lab Result     1                              0
+132   Participants 6+ years with no lab specimen.     1                              0
+143        Third Fill Value of Limit of Detection     1                          -0.03
+```
+
