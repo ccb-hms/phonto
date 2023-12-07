@@ -5,11 +5,21 @@ title: 'Phonto: Homepage'
 
 # Documentation
 
+- [Quick Start](../vignettes/quick_start.html)
+
 - [Introduction to Continuous NHANES](vignettes/nhanes-introduction.html)
 
 - [Accessing NHANES Data Locally](vignettes/nhanes-local.html)
 
 - [Search Interface for NHANES Tables and Variables](vignettes/search-tables.html)
+
+- [Building Variables defs](vignettes/VariableClassification.html)
+
+- [Building Variables defs](vignettes/VariableClassification.html)
+
+- [Incorporating Survey Weights into NHANES Analysis using R](vignettes/survey_weights_tutorial.html)
+
+- [An Example: Reproduce Cobalt Paper](vignettes/quick_start.html)
 
 - Sample analyses [TODO]
 

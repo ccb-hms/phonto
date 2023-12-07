@@ -15,35 +15,66 @@ the DB.
 
 ### Start Docker
 
-#### Start Docker on Mac or Linux
+**1. Start Docker**
+
+Start Docker on Mac or Linux
 
 ``` dockerfile
-docker run  --rm --name nhanes-workbench \
+docker \
+    run \
+        --rm \
+        --platform=linux/amd64 \
+        --name nhanes-workbench \
         -v <YOUR LOCAL PATH>:/mnt/ \
         -d \
         -p 8787:8787 \
         -p 2200:22 \
         -p 1433:1433 \
-        -e 'CONTAINER_USER_USERNAME=phonto' \
-        -e 'CONTAINER_USER_PASSWORD=phonto' \
+        -e 'CONTAINER_USER_USERNAME=USER' \
+        -e 'CONTAINER_USER_PASSWORD=PASSWORD' \
         -e 'ACCEPT_EULA=Y' \
         -e 'SA_PASSWORD=yourStrong(!)Password' \
-         hmsccb/nhanes-workbench:latest
+         hmsccb/nhanes-workbench:version-0.2.0
 ```
 
-#### Start Docker on Windows
+Start Docker on Windows
 
 ``` dockerfile
-docker run  --rm --name nhanes-workbench -d  -v <YOUR LOCAL PATH>:/mnt/ -p 8787:8787 -p 2200:22 -p 1433:1433  -e 'CONTAINER_USER_USERNAME=phonto'  -e 'CONTAINER_USER_PASSWORD=phonto' -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=yourStrong(!)Password' hmsccb/nhanes-workbench:latest
+docker ^
+    run ^
+        --rm ^
+        --platform=linux/amd64 ^
+        --name nhanes-workbench ^
+  -v <YOUR LOCAL PATH>:/mnt/ ^
+  -p 8787:8787 -p 2200:22 -p 1433:1433 ^
+  -e "CONTAINER_USER_USERNAME=USER" ^
+  -e "CONTAINER_USER_PASSWORD=PASSWORD" ^
+  -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=yourStrong(!)Password" ^
+  hmsccb/nhanes-workbench:version-0.2.0
+
 ```
+
+**2. Log into Rstudio**
+
+Log into RStudio via: <http://localhost:8787> and using the username set
+in the command above. In that command, both the username and password
+are set as “`nhanes`”, but you can modify them if you prefer.
+
+More details about the [NHANES
+Docker](https://github.com/ccb-hms/NHANES).
+
+<br/>
 
 ### Installation
 
 You can install the development version of `phonto` from
 [GitHub](https://github.com/) with:
 
-```{r}
+
+
+``` r
 # install.packages("devtools")
+
 devtools::install_github("ccb-hms/phonto")
 ```
 
