@@ -14,7 +14,7 @@ opts_chunk$set(collapse = FALSE, autodep = TRUE,
                fig.width = 12, fig.height = 8,
                dev = "svglite", dev.args = list(pointsize = 12),
                cache = TRUE,
-               cache.path = "./knitr-cache/diagnostics-codebook/")
+               cache.path = "~/knitr-cache/diagnostics-codebook/")
 options(warnPartialMatchDollar = FALSE, width = 85)
 ```
 
