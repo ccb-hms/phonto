@@ -1,4 +1,5 @@
 ---
+layout: default
 title: "A vignette that outlines a strategy to replicate a published analysis"
 author: Laha Ale, Robert Gentleman
 date: "Updated on : `r date()`"

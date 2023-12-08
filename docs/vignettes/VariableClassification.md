@@ -1,4 +1,5 @@
 ---
+layout: default
 title: "Building Variables defs"
 output: rmarkdown::html_vignette
 vignette: >
@@ -9,9 +10,7 @@ vignette: >
 date: "2023-04-28"
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+
 
 ## Get the data....
 One of the important aspects of the PHESANT package is that they provided some characterization of all the phenotypes, thereby making analysis easier.
@@ -20,13 +19,22 @@ We aim to provide a similar capability for NHANES and this document provides bot
 
 We first load `phonto`, and extract all questions together with the variable name, the SasLabel etc.  In the first part of this vignette we then label the different variables that are probably not useful as phenotypes.  Examples are things like survey weights, comment fields, etc.
 
-```{r cars}
+
+```r
 library(phonto)
  t1 = paste0("SELECT DISTINCT TableName, Variable, Description, SaSLabel FROM  Metadata.QuestionnaireVariables")
 xx = nhanesQuery(t1)
 #make a vector to store our variable labels
 outPut = rep(NA, nrow(xx))
 apply(xx,2, function(x) sum(is.na(x)))
+```
+
+```
+##   TableName    Variable Description    SaSLabel 
+##           0           0        3639        3472
+```
+
+```r
 ## we can see that only Description and SaSLabel are missing
 ##  TableName    Variable Description    SaSLabel
 ##          0           0         505         338
@@ -39,7 +47,8 @@ outPut[missLab] = "Missing"
 
 
 And we can see already that some of the variables that start with WT have either a missing Description field or a missing SasLabel field.
-```{r weights}
+
+```r
  isWT = grep("^WT", xx$Variable)
  outPut[isWT] = "Survey Weight"
  
@@ -59,12 +68,12 @@ And we can see already that some of the variables that start with WT have either
  g1 = grep("LC$", xx$Variable)
  g2 = grep("*[Cc]omment [Cc]ode$", xx$Description)
  outPut[union(g1,g2)] = "Comment"
- 
 ```
 
 Another set of variables that are not likely to be phenotypes are the interview IDs.
 
-```{r interviewerID}
+
+```r
 g1 = grep("DR[12D]EXMER", xx$Variable)
 outPut[g1] = "Interviewer ID code"
 
@@ -82,8 +91,17 @@ outPut[g3] = "Language Used"
 ```
 
 
-```{r classes, echo=TRUE}
+
+```r
  table(outPut, useNA="always")
+```
+
+```
+## outPut
+##             Comment           Interview Interviewer ID code       Language Used             Missing 
+##                2792                 162                  66                 106                3402 
+##       Recall Status       Survey Weight                <NA> 
+##                  60                1214               42107
 ```
 
 ## Build a searchable corpus
@@ -92,7 +110,8 @@ The code below can be used to build a searchable corpus using the `corpustools` 
 
 This is not run as part of the vignette testing but rather provides the details on how to do this for a release.
 
-```{r eval=FALSE}
+
+```r
 library("corpustools")
 nhanes_df = xx
 nhanes_df$Unique = paste0(nhanes_df$Questionnaire,"_", nhanes_df$Variable)
@@ -109,8 +128,6 @@ h3 = search_features(nhanes_tc, query="LDL")
    save(nhanes_tc, file= paste0(path, "/nhanes_tc.rda"), compress="xz")
    save(nhanes_df, file=paste0(path, "/nhanes_df.rda"), compress="xz")
   }
-
-
 ```
  And more from DEMO_I - not clear but they don't seem to be useful phenotypes
 
