@@ -2,7 +2,8 @@
 % Please edit documentation in R/query_data.R
 \name{nhanesQuery}
 \alias{nhanesQuery}
-\title{Query NHANES data from Database}
+\title{Query NHANES data from Database
+FIXME: More information goes here.}
 \usage{
 nhanesQuery(sql)
 }
@@ -14,6 +15,7 @@ data frame
 }
 \description{
 Query NHANES data from Database
+FIXME: More information goes here.
 }
 \examples{
  demo = nhanesQuery("select * from Translated.DEMO_C")

@@ -3,6 +3,7 @@
 export(checkDataConsistency)
 export(dataDescription)
 export(jointQuery)
+export(metaData)
 export(nhanesColnames)
 export(nhanesDim)
 export(nhanesHead)
