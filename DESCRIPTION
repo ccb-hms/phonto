@@ -19,8 +19,7 @@ Depends:
 Imports:
     DBI,
     stringr,
-    nhanesA,
-    MsSqlTools
+    nhanesA
 LazyData: true
 Suggests: 
     rmarkdown,

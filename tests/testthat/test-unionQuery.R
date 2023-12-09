@@ -12,7 +12,7 @@ test_that("unionQuery returns NULL for empty list", {
 # Test 3: Check if function returns error for tables having different columns
 test_that("unionQuery returns error for tables having different columns", {
   expect_error(unionQuery(list(DEMO_I = c("RIDAGEYR","RIAGENDR"), DEMO_J = c("RIDAGEYR","RIDRETH1"))),
-               "Please make sure the tables and chave the same columns")
+               "Please make sure the tables and have the same columns")
 })
 
 # Test 4: Check if function returns data.frame for valid input
