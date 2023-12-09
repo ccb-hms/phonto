@@ -143,8 +143,7 @@ The function `nhanesSearchTableNames` lets users search for tables in the databa
 ```r
 res = nhanesSearchTableNames("BPX", details=TRUE)
 datatable(res)
-#> PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.
-#> Error in path.expand(path): invalid 'path' argument
+#> Error in (function (url = NULL, file = "webshot.png", vwidth = 992, vheight = 744, : webshot.js returned failure value: 1
 ```
 
 We provide access to functions within the database for matching strings. In the example below the string "BPX[_]" string is passed to the database engine directly.  This string matches only tables containing the string "BPX_"; therefore, the table named "BPXO_J" will not match. We note that the table named "BPX" also has no underscore and it also will not match. Recall that in the first survey cycle the table names have no underscore or suffix.
@@ -153,8 +152,12 @@ We provide access to functions within the database for matching strings. In the 
 ```r
 res = nhanesSearchTableNames("BPX[_]", details=TRUE)
 datatable(res)
-#> PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.
-#> Error in path.expand(path): invalid 'path' argument
+#> Auto configuration failed
+#> 140393665206208:error:25066067:DSO support routines:DLFCN_LOAD:could not load the shared library:dso_dlfcn.c:185:filename(libproviders.so): libproviders.so: cannot open shared object file: No such file or directory
+#> 140393665206208:error:25070067:DSO support routines:DSO_load:could not load the shared library:dso_lib.c:244:
+#> 140393665206208:error:0E07506E:configuration file routines:MODULE_LOAD_DSO:error loading dso:conf_mod.c:285:module=providers, path=providers
+#> 140393665206208:error:0E076071:configuration file routines:MODULE_RUN:unknown module name:conf_mod.c:222:module=providers
+#> Error in (function (url = NULL, file = "webshot.png", vwidth = 992, vheight = 744, : webshot.js returned failure value: 1
 ```
 
 ----  
@@ -256,8 +259,12 @@ sttooth = nhanesSearch("^Tooth")
 dim(sttooth)
 #> [1] 331   7
 datatable(sttooth)
-#> PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.
-#> Error in path.expand(path): invalid 'path' argument
+#> Auto configuration failed
+#> 140245029119936:error:25066067:DSO support routines:DLFCN_LOAD:could not load the shared library:dso_dlfcn.c:185:filename(libproviders.so): libproviders.so: cannot open shared object file: No such file or directory
+#> 140245029119936:error:25070067:DSO support routines:DSO_load:could not load the shared library:dso_lib.c:244:
+#> 140245029119936:error:0E07506E:configuration file routines:MODULE_LOAD_DSO:error loading dso:conf_mod.c:285:module=providers, path=providers
+#> 140245029119936:error:0E076071:configuration file routines:MODULE_RUN:unknown module name:conf_mod.c:222:module=providers
+#> Error in (function (url = NULL, file = "webshot.png", vwidth = 992, vheight = 744, : webshot.js returned failure value: 1
 ```
 
 
@@ -269,8 +276,12 @@ Now suppose we wanted to find variables names that contain information about (lo
 ```r
 s1 = nhanesSearch("LDL", nchar=256, data_group="LAB")
 DT::datatable(s1)
-#> PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.
-#> Error in path.expand(path): invalid 'path' argument
+#> Auto configuration failed
+#> 140225679890368:error:25066067:DSO support routines:DLFCN_LOAD:could not load the shared library:dso_dlfcn.c:185:filename(libproviders.so): libproviders.so: cannot open shared object file: No such file or directory
+#> 140225679890368:error:25070067:DSO support routines:DSO_load:could not load the shared library:dso_lib.c:244:
+#> 140225679890368:error:0E07506E:configuration file routines:MODULE_LOAD_DSO:error loading dso:conf_mod.c:285:module=providers, path=providers
+#> 140225679890368:error:0E076071:configuration file routines:MODULE_RUN:unknown module name:conf_mod.c:222:module=providers
+#> Error in (function (url = NULL, file = "webshot.png", vwidth = 992, vheight = 744, : webshot.js returned failure value: 1
 ```
 
 Scrolling through the datatable we find that there are a number of variables that correspond to an actual LDL measurement, several are named `LBDLDL` and so we can now search for that variable.
@@ -328,7 +339,12 @@ nhanesSearchTableNames('BPX[_]')
 blood_df <- unionQuery(list(BPX_C=c("BPXDI1","BPXDI2","BPXSY1","BPXSY2"),
                             BPX_D=c("BPXDI1","BPXDI2","BPXSY1","BPXSY2")))
 DT::datatable(blood_df[1:400,])
-#> Error in path.expand(path): invalid 'path' argument
+#> Auto configuration failed
+#> 139684691142592:error:25066067:DSO support routines:DLFCN_LOAD:could not load the shared library:dso_dlfcn.c:185:filename(libproviders.so): libproviders.so: cannot open shared object file: No such file or directory
+#> 139684691142592:error:25070067:DSO support routines:DSO_load:could not load the shared library:dso_lib.c:244:
+#> 139684691142592:error:0E07506E:configuration file routines:MODULE_LOAD_DSO:error loading dso:conf_mod.c:285:module=providers, path=providers
+#> 139684691142592:error:0E076071:configuration file routines:MODULE_RUN:unknown module name:conf_mod.c:222:module=providers
+#> Error in (function (url = NULL, file = "webshot.png", vwidth = 992, vheight = 744, : webshot.js returned failure value: 1
 ```
 
 #### 4.2 jointQuery()
@@ -346,8 +362,12 @@ cols = list(DEMO_I=c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2"),
 data <- jointQuery(cols)
 tdata = data[1:100,]
 datatable(tdata)
-#> PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.
-#> Error in path.expand(path): invalid 'path' argument
+#> Auto configuration failed
+#> 139967535773632:error:25066067:DSO support routines:DLFCN_LOAD:could not load the shared library:dso_dlfcn.c:185:filename(libproviders.so): libproviders.so: cannot open shared object file: No such file or directory
+#> 139967535773632:error:25070067:DSO support routines:DSO_load:could not load the shared library:dso_lib.c:244:
+#> 139967535773632:error:0E07506E:configuration file routines:MODULE_LOAD_DSO:error loading dso:conf_mod.c:285:module=providers, path=providers
+#> 139967535773632:error:0E076071:configuration file routines:MODULE_RUN:unknown module name:conf_mod.c:222:module=providers
+#> Error in (function (url = NULL, file = "webshot.png", vwidth = 992, vheight = 744, : webshot.js returned failure value: 1
 ```
 
 
@@ -364,8 +384,12 @@ We can run a PHESANT-like process to convert each column into data types. It als
 phs_dat = phesant(data)
 data = phs_dat$data
 DT::datatable(phs_dat$phs_res)
-#> PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.
-#> Error in path.expand(path): invalid 'path' argument
+#> Auto configuration failed
+#> 140062286911424:error:25066067:DSO support routines:DLFCN_LOAD:could not load the shared library:dso_dlfcn.c:185:filename(libproviders.so): libproviders.so: cannot open shared object file: No such file or directory
+#> 140062286911424:error:25070067:DSO support routines:DSO_load:could not load the shared library:dso_lib.c:244:
+#> 140062286911424:error:0E07506E:configuration file routines:MODULE_LOAD_DSO:error loading dso:conf_mod.c:285:module=providers, path=providers
+#> 140062286911424:error:0E076071:configuration file routines:MODULE_RUN:unknown module name:conf_mod.c:222:module=providers
+#> Error in (function (url = NULL, file = "webshot.png", vwidth = 992, vheight = 744, : webshot.js returned failure value: 1
 ```
 
 We can also find out which variables are categorical.
