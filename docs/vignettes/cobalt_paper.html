@@ -3214,7 +3214,7 @@ display: none;
 <h1 class="title toc-ignore">A vignette that outlines a strategy to
 replicate a published analysis</h1>
 <h4 class="author">Laha Ale, Robert Gentleman</h4>
-<h4 class="date">Updated on : Sat Dec 9 03:46:26 2023</h4>
+<h4 class="date">Updated on : Thu Dec 14 08:22:15 2023</h4>
 
 </div>
 
@@ -3252,8 +3252,10 @@ library(knitr)</code></pre>
 <h2>2. Data and Preprocessiing</h2>
 <p>In the next few sections we attempt to load data from NHANES in a
 manner that is consistent with the description provided in Section 2 of
-the Cobalt paper. #### 2.1 Loading the Demographic, Body Measures, and
-Cholesterol data into R</p>
+the Cobalt paper.</p>
+<div id="loading-the-demographic-body-measures-and-cholesterol-data-into-r" class="section level4">
+<h4>2.1) Loading the Demographic, Body Measures, and Cholesterol data
+into R</h4>
 <p>The authors state: Participants with cobalt and lipid data were
 included (n = 6866). Demographic characteristics of the participants,
 including age, gender, body mass index (BMI), education level, race,
@@ -3329,9 +3331,10 @@ table(hypoglycemicMeds,useNA=&quot;always&quot;)
 #&gt;   Yes    No  &lt;NA&gt; 
 #&gt;  1360 12454  5411
 base_df$hypoglycemicMeds = hypoglycemicMeds</code></pre>
-<p>##Smoking In the code chunk below we extract the smoking data, and
-then try to create the groupings used in the paper. They have three
-groups, non-smokers, current smokers and ex-smokers. We use the
+<p>##Smoking</p>
+<p>In the code chunk below we extract the smoking data, and then try to
+create the groupings used in the paper. They have three groups,
+non-smokers, current smokers and ex-smokers. We use the
 <code>SMQ_I</code> and <code>SMQ_J</code> tables. We will define
 non-smoker as someone who as never smoked more than 100 cigarettes
 (<code>SMQ020</code>), anyone who has smoked more will be either a
@@ -3385,6 +3388,7 @@ dim(base_df)
 <p>If we were to remove all records with missing values at this point we
 would be left with a very small number of cases. So we will try to be
 careful not to loose too many data points.</p>
+</div>
 <div id="blood-pressure-data" class="section level4">
 <h4>2.2) Blood Pressure Data</h4>
 <p>In the next code segment we show how to obtain blood pressure
@@ -3617,8 +3621,8 @@ var2Table = c(var2Table, list(&quot;BPX_I&quot;=c(&quot;BPXDI1&quot;,&quot;BPXDI
 phs_dat = phesant(data)
 data = phs_dat$data
 DT::datatable(phs_dat$phs_res)</code></pre>
-<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-a0034c7f81e8694d1fe7" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-a0034c7f81e8694d1fe7">{"x":{"filter":"none","vertical":false,"data":[["SEQN","Begin.Year","EndYear","RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2","BPQ050A","BPQ020","BPQ080","BPQ100D","LBDHDD","LBXGH","DIQ010","DIQ050","DIQ070","DIQ160","BMXBMI","LBXTC","cholMeds","hypoglycemicMeds","LBXGLU","LBXTR","LBDLDL","LBXBCO","BPXDI1","BPXDI2","BPXSY1","BPXSY2","DIASTOLIC","SYSTOLIC","years"],[1,0.000104,0.000104,0.004213,0.000104,0.00026,0.000416,0.000156,0.000208,0.00026,0.000208,0.006918,0.005722,0.00026,0.00026,0.00026,0.000208,0.024759,0.014772,0.000156,0.000208,0.013628,0.02039,0.011443,0.007646,0.003069,0.003381,0.004005,0.004109,0.006034,0.007542,0.000104],[0,0,0,0.039168,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.009986999999999999,0.009882999999999999,0,0,0.006814,0,0],[0,0,0,0,0,0,0.412848,0.802705,0.350429,0.350429,0.834746,0.272094,0.356515,0.039168,0.039168,0.834122,0.389389,0.128166,0.272094,0.415449,0.281248,0.695033,0.7109490000000001,0.71355,0.637243,0.300546,0.278231,0.300546,0.278231,0.269961,0.269961,0],["Respondent sequence number","Multilevel(2)","Multilevel(2)","Continuous","Multilevel(2)","Multilevel(5)","Multilevel(8)","Multilevel(3)","Multilevel(4)","Multilevel(5)","Multilevel(4)","Continuous","Continuous","Multilevel(5)","Multilevel(5)","Multilevel(5)","Multilevel(4)","Continuous","Continuous","Multilevel(3)","Multilevel(4)","Continuous","Continuous","Continuous","Continuous","Continuous","Continuous","Continuous","Continuous","Continuous","Continuous","Multilevel(2)"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>r_unique<\/th>\n      <th>r_zero<\/th>\n      <th>r_NAs<\/th>\n      <th>types<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[1,2,3]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-6110594655d2e784732a" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-6110594655d2e784732a">{"x":{"filter":"none","vertical":false,"data":[["SEQN","Begin.Year","EndYear","RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2","BPQ050A","BPQ020","BPQ080","BPQ100D","LBDHDD","LBXGH","DIQ010","DIQ050","DIQ070","DIQ160","BMXBMI","LBXTC","cholMeds","hypoglycemicMeds","LBXGLU","LBXTR","LBDLDL","LBXBCO","BPXDI1","BPXDI2","BPXSY1","BPXSY2","DIASTOLIC","SYSTOLIC","years"],[1,0.000104,0.000104,0.004213,0.000104,0.00026,0.000416,0.000156,0.000208,0.00026,0.000208,0.006918,0.005722,0.00026,0.00026,0.00026,0.000208,0.024759,0.014772,0.000156,0.000208,0.013628,0.02039,0.011443,0.007646,0.003069,0.003381,0.004005,0.004109,0.006034,0.007542,0.000104],[0,0,0,0.039168,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.009986999999999999,0.009882999999999999,0,0,0.006814,0,0],[0,0,0,0,0,0,0.412848,0.802705,0.350429,0.350429,0.834746,0.272094,0.356515,0.039168,0.039168,0.834122,0.389389,0.128166,0.272094,0.415449,0.281248,0.695033,0.7109490000000001,0.71355,0.637243,0.300546,0.278231,0.300546,0.278231,0.269961,0.269961,0],["Respondent sequence number","Multilevel(2)","Multilevel(2)","Continuous","Multilevel(2)","Multilevel(5)","Multilevel(8)","Multilevel(3)","Multilevel(4)","Multilevel(5)","Multilevel(4)","Continuous","Continuous","Multilevel(5)","Multilevel(5)","Multilevel(5)","Multilevel(4)","Continuous","Continuous","Multilevel(3)","Multilevel(4)","Continuous","Continuous","Continuous","Continuous","Continuous","Continuous","Continuous","Continuous","Continuous","Continuous","Multilevel(2)"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>r_unique<\/th>\n      <th>r_zero<\/th>\n      <th>r_NAs<\/th>\n      <th>types<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[1,2,3]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <p>In the next code chunk we will convert the multilevel variables into
 R factors. To do this we make use of the nhanesTranslate function. While
 that function does most of the work, there are some variables we need to

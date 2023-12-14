@@ -36,7 +36,9 @@ library(knitr)
 
 ## 2. Data and Preprocessiing
 In the next few sections we attempt to load data from NHANES in a manner that is consistent with the description provided in Section 2 of the Cobalt paper.
-#### 2.1 Loading the Demographic, Body Measures, and Cholesterol data into R
+
+
+#### 2.1) Loading the Demographic, Body Measures, and Cholesterol data into R
 
 The authors state: 
 Participants with cobalt and lipid data were included (n = 6866). Demographic characteristics of the participants, including age, gender, body mass index (BMI), education level, race, family poverty-income ratio and smoking status, were collected. Clinical data, such as blood pressure, total cholesterol (TC), low-density lipoprotein cholesterol (LDL-C), HDL-C, triglycerides (TGs), hypertension, diabetes and history of medication use, including antihypertensive drugs, hypoglycemic drugs, and lipid-lowering drugs, were extracted.
@@ -103,6 +105,7 @@ base_df$hypoglycemicMeds = hypoglycemicMeds
 
 ```
 ##Smoking
+
 In the code chunk below we extract the smoking data, and then try to create the groupings
 used in the paper.  They have three groups, non-smokers, current smokers and ex-smokers. We use the `SMQ_I` and `SMQ_J` tables. We will define non-smoker as someone who as never smoked more than 100 cigarettes (`SMQ020`), anyone who has smoked more will be either
 a current smoker or an ex-smoker (`SMQ040`)
