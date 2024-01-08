@@ -282,7 +282,9 @@ nhanesNcol = function(tb_name,translated=TRUE){
 #' @examples nhanesColnames("BMX_I")
 nhanesColnames = function(tb_name){
   nhanesA:::.checkTableNames(tb_name)
-  sql_str = paste0("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '",tb_name,"'")
+  sql_str = paste0("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE
+                      TABLE_SCHEMA='raw' AND
+                      TABLE_NAME = '",tb_name,"'")
   nhanesQuery(sql_str)$COLUMN_NAME
 }
 
