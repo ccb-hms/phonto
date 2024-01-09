@@ -12,10 +12,13 @@ checkDataConsistency(table1, table2)
 \item{table2}{NHANES table name 2}
 }
 \value{
-it returns a matrix, and the first and second row show whether the variable existing in table 1 or table 2, TRUE values means existing, FALSE means not existing. The third whether the variables are encoded in the same values if they shown in both tables, TRUE means encoded as the same, FALSE means they are encoded as the different value.
+A matrix with columns named using the union of the column names for the two tables and three rows.
 }
 \description{
-Check if the variables across over two tables and encoded as the same values.
+The function extracts both tables from the database and determines the union of their column names. A matrix with three rows and one column for each entry in the union is returned.  The first row indicates whether the variable was found in the first table and similarly the second row indicates whether the variable was found in the second table.  The third row of the matrix indicates whether or not the same encoding was used in both tables.  Users will typically want to use this function before merging tables.
+}
+\details{
+Compare variables between two tables and report whether they are encoded the same.
 }
 \examples{
 checkDataConsistency("DEMO_C","DEMO_D")
