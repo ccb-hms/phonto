@@ -3,7 +3,11 @@ layout: default
 title: "A vignette that outlines a strategy to replicate a published analysis"
 author: Laha Ale, Robert Gentleman
 date: "Updated on : `r date()`"
-output: html_document
+# output: html_document
+vignette: >
+  %\VignetteIndexEntry{Quick Start}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
