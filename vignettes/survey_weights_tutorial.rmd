@@ -3,7 +3,7 @@ layout: default
 title: "Incorporating Survey Weights into NHANES Analysis using R"
 # output: html_document
 vignette: >
-  %\VignetteIndexEntry{Quick Start}
+  %\VignetteIndexEntry{Incorporating Survey Weights into NHANES Analysis using R}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
