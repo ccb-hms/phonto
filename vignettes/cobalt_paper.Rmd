@@ -33,7 +33,6 @@ library(ggpubr)
 library(dplyr)
 library(nhanesA)
 library(phonto)
-library(EnWAS)
 library(knitr)
 ```
 
