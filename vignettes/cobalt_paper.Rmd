@@ -18,10 +18,11 @@ knitr::opts_chunk$set(
 
 ## 0. Goal
 
-The goal of this vignette is to provide some details that will help understand the analysis presented in ``Association of blood cobalt concentrations with dyslipidemia, hypertension, and diabetes in a US population
-A cross-sectional study; Hongxin Wang, MD, Feng Li, MD, Jianghua Xue, MD, Yanshuang Li, MD, Jiyu Li, MD''.  For the remainder of this vignette we will refer to this as the "Cobalt paper", This vignette is incomplete and is not attempting to get identical results of the published paper. Our goal is to demonstrate how one might attempt a replication, but to leave some important details to the reader, who will be able to extend the analysis and if they want to make an attempt to obtain identical results.
+The goal of this vignette is to attempt to replicate the analysis presented in ``Association of blood cobalt concentrations with dyslipidemia, hypertension, and diabetes in a US population
+A cross-sectional study; Hongxin Wang, MD, Feng Li, MD, Jianghua Xue, MD, Yanshuang Li, MD, Jiyu Li, MD''.  For the remainder of this vignette we will refer to this as the "Cobalt paper", This vignette is incomplete in that we do not attempt to get identical results, rather we want to demonstrate that there are details of the analysis that are not included in the paper and
+that any explicit replication would require an enormous effort. We also want to emphasize that we are not criticizing these authors, they really have no easy way to provide those details. But it is exactly that problem that we hope to address with this `phonto` package and our efforts to create a Docker container that has all of NHANES together with appropriate software tools so that others can use that as a vehicle to publish research that is more transparent.
 
- The authors report using data for the years 2015-2016 and 2017-2018 which cover two of the two-year reporting epochs in NHANES. The Questionnaires we want will have the suffixes _I and _J. 
+ The Cobalt paper uses data for the years 2015-2016 and 2017-2018 which cover two NHANES cycles, the data tables we want will have the suffixes `_I` and `_J`. 
 
 ## 1. Load libs
 
@@ -46,7 +47,7 @@ In the next few sections we attempt to load data from NHANES in a manner that is
 The authors state: 
 Participants with cobalt and lipid data were included (n = 6866). Demographic characteristics of the participants, including age, gender, body mass index (BMI), education level, race, family poverty-income ratio and smoking status, were collected. Clinical data, such as blood pressure, total cholesterol (TC), low-density lipoprotein cholesterol (LDL-C), HDL-C, triglycerides (TGs), hypertension, diabetes and history of medication use, including antihypertensive drugs, hypoglycemic drugs, and lipid-lowering drugs, were extracted.
 
-In the code below, we start with the variable names, which we had obtained by searching based on the variable descriptions (not shown) and restrict by the years that the authors had chosen.  We will avoid looking at the LDL measurements and triglycerides as they were done on a subset of the participants, and we want to make sure we are as inclusive as possible.
+In the code below, we start with the variable names, which we had obtained by searching based on the variable descriptions (not shown) and restrict by the years that the authors had chosen. We do not use LDL or triglyceride measurements as they are only available on a subset of the participants, and we would need to run two parallel analyses, which is what we presume the authors did.
 
 ```{r demo_body,warning=FALSE,message=FALSE}
 
@@ -88,7 +89,9 @@ base_df <- jointQuery(cols)
 dim(base_df)
 
 ```
-##FIXUP some vars
+
+####FIXUP some vars
+
 ```{r}
 cholMeds = base_df$BPQ100D
 cholMeds[base_df$BPQ080=="No"] = "No"
@@ -107,11 +110,13 @@ table(hypoglycemicMeds,useNA="always")
 base_df$hypoglycemicMeds = hypoglycemicMeds
 
 ```
-##Smoking
+
+####Smoking
 
 In the code chunk below we extract the smoking data, and then try to create the groupings
 used in the paper.  They have three groups, non-smokers, current smokers and ex-smokers. We use the `SMQ_I` and `SMQ_J` tables. We will define non-smoker as someone who as never smoked more than 100 cigarettes (`SMQ020`), anyone who has smoked more will be either
 a current smoker or an ex-smoker (`SMQ040`)
+
 ```{r Smoking }
 cols = list(SMQ_I=c("SMQ020","SMQ040"), SMQ_J=c("SMQ020","SMQ040"))
 smokingTab= unionQuery(cols)
@@ -130,7 +135,9 @@ smokingVar = ifelse(tdf$SMQ020=="No", "Non-smoker",
 table(smokingVar, useNA="always")
 ##from the paper n=6866, Ex=1950,Non=3744,Current=1165
 ```
-#Glucose
+
+##Glucose
+
 ```{r Glucose, warning=FALSE, message=FALSE}
 ##fasting glucose
 Fastgluc = nhanesSearchVarName("LBXGLU", ystart="2015", ystop="2018")

@@ -1,6 +1,8 @@
 ---
-title: "testsuite"
+title: "NHANES testsuite"
 output: rmarkdown::html_vignette
+author: Deepayan Sarkar
+date: "Updated on : `r date()`"
 vignette: >
   %\VignetteIndexEntry{testsuite}
   %\VignetteEngine{knitr::rmarkdown}
