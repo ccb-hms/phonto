@@ -8,8 +8,10 @@
 #' @return a data frame with binned data frame
 #' @export
 #'
-#' @examples make_bins(x,y,200)
-make_bins <- function(x, y, nbin) {
+#' @examples x = runif(600, 1, 60)
+#' y = rnorm(600)
+#' make_bins(x,y,20)
+make_bins = function(x, y, nbin) {
   if (nbin == 0)
     nbin <- floor(sqrt(length(x)))
 
@@ -20,7 +22,7 @@ make_bins <- function(x, y, nbin) {
     dplyr::group_by(breaks) |>
     dplyr::summarize(mean = mean(y),
                      std = sd(y),
-                     cnt = dplyr::n()) |> dplyr::mutate(y_min = mean - 1.96 * std /
+                     cnt = dplyr::n()) |> dplyr::mutate("y_min" = mean - 1.96 * std /
                                                           sqrt(cnt),
                                                         y_max = mean + 1.96 * std / sqrt(cnt))
 
@@ -41,9 +43,11 @@ make_bins <- function(x, y, nbin) {
 #' @return plots binned data
 #' @export
 #'
-#' @examples plot_bins2(df_list)
-plot_bins2 <-
-  function(df_list,
+#' @importFrom stats na.omit sd
+#' @examples dflist = list( "norm"=make_bins(x=runif(600, 1, 60) ,y=rnorm(600),nbin=60),
+#'                          "romm"=make_bins(x=runif(600, 1, 60) ,y=runif(600, -1, 1),nbin=60))
+#' plot_bins2(dflist,is_facet = FALSE)
+plot_bins2 = function(df_list,
            xlab = "x",
            ylab = "Binned y",
            is_facet = TRUE) {
@@ -52,12 +56,12 @@ plot_bins2 <-
       rep(names(df_list), each = nrow(df_list[[1]]))
 
     g <-
-      ggplot(df, aes(breaks, mean, color = Model)) + geom_point(size=1.5) +
-      geom_errorbar(aes(ymin = y_min, ymax = y_max)) +
-      geom_smooth(aes(breaks, mean), method = "loess",
+      ggplot2::ggplot(df, ggplot2::aes(breaks, mean, color = Model)) +  ggplot2::geom_point(size=1.5) +
+      ggplot2::geom_errorbar(ggplot2::aes(ymin = y_min, ymax = y_max)) +
+      ggplot2::geom_smooth(ggplot2::aes(breaks, mean), method = "loess",
                   formula=y~x,
                   se = FALSE) +
-      scale_color_manual(
+      ggplot2::scale_color_manual(
         values = c(
           "#E69F00",
           "#56B4E9",
@@ -68,10 +72,10 @@ plot_bins2 <-
           "#CC79A7"
         )
       ) +
-      ylab(ylab) + xlab(xlab) +
-      theme_minimal()
+      ggplot2::ylab(ylab) + ggplot2::xlab(xlab) +
+      ggplot2::theme_minimal()
     if (is_facet) {
-      g <- g + facet_grid(cols = vars(Model))
+      g <- g + ggplot2::facet_grid(cols = ggplot2::vars(Model))
     }
 
     g

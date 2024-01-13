@@ -1,7 +1,7 @@
 Package: phonto
 Type: Package
 Title: Using NHANES via Epiconductor
-Version: 0.0.7
+Version: 0.0.8
 Maintainer: Laha Ale <ainilaha@gmail.com>, Robert Gentleman <robert_gentleman@g.harvard.edu>
 Authors@R: 
     c(
@@ -18,8 +18,8 @@ Depends:
     R (>= 4.0)
 Imports:
     DBI,
-    stringr,
-    nhanesA
+    nhanesA,
+    stats
 LazyData: true
 Suggests: 
     rmarkdown,
@@ -29,7 +29,15 @@ Suggests:
     dplyr,
     tidyr,
     DT,
-    EnWAS,
+    odbc,
+    ggplot2,
+    devtools,
+    Hmisc,
+    ggpubr,
+    reshape2,
+    sjPlot,
+    kableExtra,
+    plotROC,
     survey
 VignetteBuilder: knitr
 Config/testthat/edition: 3

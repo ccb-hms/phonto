@@ -22,5 +22,7 @@ plots binned data
 Plot multiple Bins
 }
 \examples{
-plot_bins2(df_list)
+dflist = list( "norm"=make_bins(x=runif(600, 1, 60) ,y=rnorm(600),nbin=60),
+                         "romm"=make_bins(x=runif(600, 1, 60) ,y=runif(600, -1, 1),nbin=60))
+plot_bins2(dflist,is_facet = FALSE)
 }

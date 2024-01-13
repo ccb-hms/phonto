@@ -20,5 +20,7 @@ a data frame with binned data frame
 Make Bins for y values based on x
 }
 \examples{
-make_bins(x,y,200)
+x = runif(600, 1, 60)
+y = rnorm(600)
+make_bins(x,y,20)
 }

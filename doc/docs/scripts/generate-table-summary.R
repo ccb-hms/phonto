@@ -1,5 +1,5 @@
 
-if (basename(getwd()) != "docs") stop("This script should be run in the phonto/docs/ folder")
+if (basename(getwd()) != "doc/docs") stop("This script should be run in the phonto/docs/ folder")
 
 require(nhanesA)
 require(phonto)
@@ -54,8 +54,8 @@ shortDesc <- function(nh_table, do_missing = FALSE) {
             if (inherits(e, "try-error")) NA_integer_ else e
         }
         nmissing_by_var <- sapply(cb[-1], nmissing)
-        sprintf("[%d x %d] (%g %% NA)", ncases, nvars, 
-                round(100 * (sum(nmissing_by_var, na.rm = TRUE) / 
+        sprintf("[%d x %d] (%g %% NA)", ncases, nvars,
+                round(100 * (sum(nmissing_by_var, na.rm = TRUE) /
                              (ncases * sum(!is.na(nmissing_by_var)))), 1))
     }
     else
@@ -66,25 +66,25 @@ shortDesc <- function(nh_table, do_missing = FALSE) {
 summarizeTables <- function(tableDesc)
 {
   tableSummary <- (
-    xtabs(~ TableBase + Description + DataGroup, tableDesc) 
-    |> as.data.frame.table() 
+    xtabs(~ TableBase + Description + DataGroup, tableDesc)
+    |> as.data.frame.table()
     |> subset(Freq > 0, select = -Freq)
   )
   subtableLinks <- function(i) {
     ## all tables matching i-th row of tableSummary
-    dmatch <- 
-      subset(tableDesc, 
-             TableBase == tableSummary$TableBase[i] & 
+    dmatch <-
+      subset(tableDesc,
+             TableBase == tableSummary$TableBase[i] &
                Description == tableSummary$Description[i])
-    tab_links <- 
-      with(dmatch, 
+    tab_links <-
+      with(dmatch,
            {
-             links <- sprintf("<a href='%s' target='_nhanes'>%s</a> %s", 
+             links <- sprintf("<a href='%s' target='_nhanes'>%s</a> %s",
                               DocFile, TableName, ShortDesc)
              ## some have DocFile == ""
              bad_doc <- trimws(dmatch$DocFile) == ""
              links[bad_doc] <-
-               sprintf("<span style='color: red;'>%s</span> %s", 
+               sprintf("<span style='color: red;'>%s</span> %s",
                        TableName[bad_doc], ShortDesc[bad_doc])
              paste(links, collapse = ", ")
            })

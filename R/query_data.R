@@ -1,5 +1,4 @@
 
-
 # inner function to convert columns for the tables
 .convertColunms = function(tables_n_cols,translated){
 
@@ -31,7 +30,7 @@
 #' @examples  demo = nhanesQuery("select * from Translated.DEMO_C")
 #' @examples  demo = nhanesQuery("select * from Raw.DEMO_C")
 nhanesQuery = function(sql){
-  return(nhanesA:::.nhanesQuery(sql))
+  return(.nhanesQuery(sql))
 }
 
 #' Joint Query
@@ -59,8 +58,8 @@ nhanesQuery = function(sql){
 jointQuery = function(tables_n_cols,translated=TRUE){
 
 if(is.null(tables_n_cols) | length(tables_n_cols) <1) return (NULL)
-nhanesA:::.checkTableNames(names(tables_n_cols))
-names(tables_n_cols) = nhanesA:::.convertTranslatedTable(names(tables_n_cols),translated)
+.checkTableNames(names(tables_n_cols))
+names(tables_n_cols) = .convertTranslatedTable(names(tables_n_cols),translated)
 cols_to_tables = .convertColunms(tables_n_cols,translated)
 
 
@@ -142,8 +141,8 @@ cols_to_tables = .convertColunms(tables_n_cols,translated)
 unionQuery= function(tables_n_cols,translated=TRUE){
 
 if(is.null(tables_n_cols) | length(tables_n_cols) <1) return (NULL)
-nhanesA:::.checkTableNames(names(tables_n_cols))
-names(tables_n_cols) = nhanesA:::.convertTranslatedTable(names(tables_n_cols),translated)
+.checkTableNames(names(tables_n_cols))
+names(tables_n_cols) = .convertTranslatedTable(names(tables_n_cols),translated)
 cols_to_tables = .convertColunms(tables_n_cols,translated)
 
  if(length(cols_to_tables)>1){
@@ -199,7 +198,7 @@ table_names = names(tables_n_cols)
 
 #' Check Variable Consistency
 #'
-#' Compare variables between two tables and report whether they are encoded the same. 
+#' Compare variables between two tables and report whether they are encoded the same.
 #'
 #'
 #' @param table1 NHANES table name 1
@@ -207,7 +206,7 @@ table_names = names(tables_n_cols)
 #'
 #' @description The function extracts both tables from the database and determines the union of their column names. A matrix with three rows and one column for each entry in the union is returned.  The first row indicates whether the variable was found in the first table and similarly the second row indicates whether the variable was found in the second table.  The third row of the matrix indicates whether or not the same encoding was used in both tables.  Users will typically want to use this function before merging tables.
 #'
-#' @return A matrix with columns named using the union of the column names for the two tables and three rows. 
+#' @return A matrix with columns named using the union of the column names for the two tables and three rows.
 #'
 #' @export
 #'
@@ -252,7 +251,7 @@ checkDataConsistency = function(table1,table2){
 #'
 #' @examples nhanesNrow("BMX_I")
 nhanesNrow = function(tb_name){
-  nhanesA:::.checkTableNames(tb_name)
+  .checkTableNames(tb_name)
   sql_str = paste0("SELECT COUNT(*) FROM Raw.",tb_name)
   nhanesQuery(sql_str)[1,1]
 }
@@ -283,7 +282,7 @@ nhanesNcol = function(tb_name,translated=TRUE){
 #'
 #' @examples nhanesColnames("BMX_I")
 nhanesColnames = function(tb_name){
-  nhanesA:::.checkTableNames(tb_name)
+  .checkTableNames(tb_name)
   sql_str = paste0("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE
                       TABLE_SCHEMA='raw' AND
                       TABLE_NAME = '",tb_name,"'")
@@ -300,7 +299,7 @@ nhanesColnames = function(tb_name){
 #'
 #' @examples nhanesDim("BMX_I")
 nhanesDim = function(nh_table,translated=TRUE){
-  nhanesA:::.checkTableNames(nh_table)
+  .checkTableNames(nh_table)
   c(nhanesNrow(nh_table),length(nhanesColnames(nh_table)))
 }
 
@@ -316,8 +315,8 @@ nhanesDim = function(nh_table,translated=TRUE){
 #' @examples nhanesHead("BMX_I")
 #' @examples nhanesHead("BMX_I",10)
 nhanesHead = function(nh_table,n=5,translated=TRUE){
-  nhanesA:::.checkTableNames(nh_table)
-  nh_table = nhanesA:::.convertTranslatedTable(nh_table,translated)
+  .checkTableNames(nh_table)
+  nh_table = .convertTranslatedTable(nh_table,translated)
   sql = paste0("SELECT TOP(",n, ") * FROM ",nh_table)
   nhanesQuery(sql)
 }
@@ -336,8 +335,8 @@ nhanesHead = function(nh_table,n=5,translated=TRUE){
 #' @examples nhanesTail("BMX_I")
 #' @examples nhanesTail("BMX_I",10)
 nhanesTail= function(nh_table,n=5,translated=TRUE){
-  nhanesA:::.checkTableNames(nh_table)
-  nh_table = nhanesA:::.convertTranslatedTable(nh_table,translated)
+  .checkTableNames(nh_table)
+  nh_table = .convertTranslatedTable(nh_table,translated)
 
   sql = paste0("SELECT TOP(",n, ") * FROM ",nh_table," ORDER BY SEQN DESC")
   df = nhanesQuery(sql)

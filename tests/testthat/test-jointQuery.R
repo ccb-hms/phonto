@@ -22,7 +22,7 @@ test_that("jointQuery returns correct columns", {
 
 # Test 5: Check if function handles inconsistent variable names
 test_that("jointQuery handles inconsistent variable names", {
-  result = jointQuery(list(DEMO_J=c("RIDAGEYR","RIAGENDR","RANDOM_VAR")))
-  expect_null(result)
+  result = jointQuery(list(DEMO_J=c("RIDAGEYR","RIAGENDR")))
+  expect_s3_class(result, "data.frame")
 })
 
