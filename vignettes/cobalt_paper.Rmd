@@ -42,7 +42,11 @@ library(knitr)
 In the next few sections we attempt to load data from NHANES in a manner that is consistent with the description provided in Section 2 of the Cobalt paper.
 
 
+![Table 1 from the paper: The table is divided into five columns: overall demographics, followed by four quintiles of blood cobalt levels (Q1 to Q4). The quintiles range from ≤0.12 µg/l in Q1 to ≥0.19 µg/l in Q4. For each quintile, the number of participants, average age, gender distribution, Body Mass Index (BMI), education level, race, family poverty-income ratio, and smoking status are provided, along with standard deviations for continuous variables.](images/CobaltTable1.png)
+
+
 #### 2.1) Loading the Demographic, Body Measures, and Cholesterol data into R
+
 
 The authors state: 
 Participants with cobalt and lipid data were included (n = 6866). Demographic characteristics of the participants, including age, gender, body mass index (BMI), education level, race, family poverty-income ratio and smoking status, were collected. Clinical data, such as blood pressure, total cholesterol (TC), low-density lipoprotein cholesterol (LDL-C), HDL-C, triglycerides (TGs), hypertension, diabetes and history of medication use, including antihypertensive drugs, hypoglycemic drugs, and lipid-lowering drugs, were extracted.
