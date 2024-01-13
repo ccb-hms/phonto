@@ -5,3 +5,5 @@ kramdown:
   syntax_highlighter_opts:
     disable: true
   math_engine: mathjax
+    - scope:
+      path: "doc"
