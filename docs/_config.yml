@@ -1,7 +1,6 @@
 ## Jekyll build settings
 markdown: kramdown
 highlighter: none
-source: doc
 kramdown:
   syntax_highlighter_opts:
     disable: true

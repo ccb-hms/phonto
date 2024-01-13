@@ -1,5 +1,5 @@
 
-if (basename(getwd()) != "doc/docs") stop("This script should be run in the phonto/doc/docs/ folder")
+if (basename(getwd()) != "docs") stop("This script should be run in the phonto/docs/ folder")
 
 require(nhanesA)
 require(phonto)
