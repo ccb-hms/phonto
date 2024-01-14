@@ -101,14 +101,17 @@ cols = list(DEMO_I=c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2", "INDFMPIR"),
             TCHOL_I="LBXTC", TCHOL_J="LBXTC",
             SMQ_I=c("SMQ020","SMQ040"), SMQ_J=c("SMQ020","SMQ040"),
             BPX_I=c("BPXDI1","BPXDI2","BPXSY1","BPXSY2"), 
-            BPX_J=c("BPXDI1","BPXDI2","BPXSY1","BPXSY2")
+            BPX_J=c("BPXDI1","BPXDI2","BPXSY1","BPXSY2"),
+            TRIGLY_I=c("LBXTR","LBDLDL"), TRIGLY_J=c("LBXTR","LBDLDL"), 
+            CRCO_I="LBXBCO", CRCO_J="LBXBCO"
             )
-var2Table = cols[c(1,3,5,7,9,11,13)]
+var2Table = cols[c(1,3,5,7,9,11,13,15,17,19,21)]
 base_df <- jointQuery(cols)
 
 
 ## the authors report only using individuals aged 40 and above, so we will subset to that group
-base_df = base_df[base_df$RIDAGEYR>=40,]
+##and since they are modeling cobalt, anyone who does not have a cobalt measurement cannot help, so drop them too
+base_df = base_df[base_df$RIDAGEYR>=40 & !is.na(base_df$LBXBCO),]
 dim(base_df)
 
 ##how many of the individuals in our cohort have complete data for all variables?
@@ -168,7 +171,7 @@ Lastly here, we will look just at the subset of demographic variables listed in 
 ```{r DemoSubset }
 
 demo_sub = base_df[, c("SEQN", "RIDAGEYR","RIAGENDR", "RIDRETH1", "DMDEDUC2",  
-                       "BMXBMI", "smokingVar", "PL")]
+                       "BMXBMI", "smokingVar", "PL", "LBXBCO" )]
 
 sapply(demo_sub, function(x) sum(is.na(x)))
 
@@ -206,15 +209,7 @@ base_df = merge(base_df, glucTab, all.x=TRUE)
 ```
 The two variables that require additional lab work are LDLs and cobalt levels. As a result they were done on a much smaller set of people.  So instead of loading them simultaneously we extract them below and then use the `merge`
 ```{r load TRIGLY and CRCO}
-ldlTab = unionQuery(list(TRIGLY_I=c("LBXTR","LBDLDL"),TRIGLY_J=c("LBXTR","LBDLDL"))) 
-dim(ldlTab)
-cobaltTab = unionQuery(list(CRCO_I="LBXBCO", CRCO_J="LBXBCO"))
-dim(cobaltTab)
-var2Table = c(var2Table, list("TRIGLY_I"=c("LBXTR","LBDLDL"), CRCO_I="LBXBCO"))
-##we merge keeping as many records as we can, the all.x argument is important
-bdf = merge(base_df, ldlTab, all.x=TRUE)
-base_df = merge(bdf, cobaltTab, all.x=TRUE)
-dim(base_df)
+
 ```
 If we were to remove all records with missing values at this point we would be left with a very small number of cases.  So we will try to be careful not to loose too many data points.
 
