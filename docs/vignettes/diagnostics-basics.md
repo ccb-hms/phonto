@@ -201,16 +201,9 @@ setdiff(manifest$Table, dbTableDesc$TableName) # missing from DB
 ```
 
 ```
-  [1] "P_ACQ"    "P_ALB_CR" "P_ALQ"    "SSAGP_I"  "SSAGP_J"  "P_UTAS"   "P_UAS"    "P_AUQ"    "P_AUX"    "AUXAR_I"  "P_AUXAR"  "P_AUXTYM" "P_AUXWBR" "SSDFS_A"  "SSANA_A"  "SSANA2_A" "P_BPXO"  
- [18] "P_BPQ"    "P_BMX"    "P_CDQ"    "CHLMDA_F" "CHLMDA_G" "CHLMDA_H" "CHLMDA_I" "LAB05"    "CHLMDA_D" "L05_C"    "L05_B"    "CHLMDA_E" "SSCT_H"   "SSCT_I"   "P_HDL"    "P_TRIGLY" "P_TCHOL" 
- [35] "P_UCM"    "P_CRCO"   "P_CBC"    "P_CBQPFA" "P_CBQPFC" "P_COT"    "P_HSQ"    "SSCMVG_A" "P_CMV"    "SSUCSH_A" "P_DEMO"   "P_DEQ"    "P_DIQ"    "P_DBQ"    "P_DR1IFF" "P_DR2IFF" "P_DR1TOT"
- [52] "P_DR2TOT" "DRXFMT"   "DRXFMT_B" "DRXFCD_I" "DRXFCD_J" "P_DRXFCD" "DSBI"     "DSII"     "DSPI"     "P_DS1IDS" "P_DS2IDS" "P_DS1TOT" "P_DS2TOT" "P_DSQIDS" "P_DSQTOT" "P_DXXFEM" "P_DXXSPN"
- [69] "P_ECQ"    "P_ETHOX"  "P_FASTQX" "P_FERTIN" "P_FR"     "P_FOLATE" "P_FOLFMS" "FOODLK_C" "FOODLK_D" "VARLK_C"  "VARLK_D"  "P_FSQ"    "SSCARD_A" "P_GHB"    "SSGLYP_J" "P_HIQ"    "P_HEQ"   
- [86] "P_HEPA"   "P_HEPB_S" "P_HEPBD"  "SSHCV_E"  "P_HEPC"   "P_HEPE"   "SSTROP_A" "P_HSCRP"  "P_HUQ"    "P_IMQ"    "P_INQ"    "P_IHGEM"  "P_INS"    "P_UIO"    "P_FETIB"  "P_KIQ_U"  "P_PBCD"  
-[103] "P_LUX"    "P_MCQ"    "P_DPQ"    "P_UHG"    "P_UM"     "P_UNI"    "SSBNP_A"  "P_OCQ"    "P_OHQ"    "P_OHXDEN" "P_OHXREF" "P_OPD"    "P_OSQ"    "P_PERNT"  "P_PUQMEC" "P_PAQ"    "P_PAQY"  
-[120] "PAXRAW_D" "PAXRAW_C" "PAXLUX_G" "PAXLUX_H" "PAXHR_H"  "PAXMIN_G" "PAXMIN_H" "PAX80_G"  "PAX80_H"  "P_GLU"    "PAHS_G"   "PAHS_I"   "PFC_POOL" "POOLTF_D" "POOLTF_E" "P_RXQ_RX" "RXQ_DRUG"
-[137] "P_RXQASA" "P_RHQ"    "P_SLQ"    "P_SMQ"    "P_SMQFAM" "P_SMQRTU" "P_SMQSHS" "SPXRAW_E" "SPXRAW_F" "SPXRAW_G" "P_BIOPRO" "SSNH4THY" "P_TFR"    "P_UCFLOW" "P_UCPREG" "VID_B"    "VID_C"   
-[154] "VID_D"    "VID_E"    "VID_F"    "VID_G"    "VID_H"    "VID_I"    "VID_J"    "P_UVOC"   "P_UVOC2"  "P_VOCWB"  "P_VTQ"    "P_WHQ"    "P_WHQMEC"
+ [1] "AUXAR_I"  "P_AUXAR"  "CHLMDA_F" "CHLMDA_G" "CHLMDA_H" "CHLMDA_I" "LAB05"    "CHLMDA_D" "L05_C"    "L05_B"    "CHLMDA_E" "SSCT_H"   "SSCT_I"   "DR1IFF_F" "PAXRAW_D" "PAXRAW_C" "PAXLUX_G"
+[18] "PAXLUX_H" "PAXHR_G"  "PAXHR_H"  "PAXMIN_G" "PAXMIN_H" "PAX80_G"  "PAX80_H"  "PAHS_G"   "PAHS_I"   "SPXRAW_E" "SPXRAW_F" "SPXRAW_G" "VID_B"    "VID_C"    "VID_D"    "VID_E"    "VID_F"   
+[35] "VID_G"    "VID_H"    "VID_I"    "VID_J"   
 ```
 
 ```r
@@ -232,17 +225,13 @@ mtabs
 ```
 
 ```
- [1] "SSAGP_I"  "SSAGP_J"  "AUXAR_I"  "SSDFS_A"  "SSANA_A"  "SSANA2_A"
- [7] "CHLMDA_F" "CHLMDA_G" "CHLMDA_H" "CHLMDA_I" "LAB05"    "CHLMDA_D"
-[13] "L05_C"    "L05_B"    "CHLMDA_E" "SSCT_H"   "SSCT_I"   "SSCMVG_A"
-[19] "SSUCSH_A" "DRXFMT"   "DRXFMT_B" "DRXFCD_I" "DRXFCD_J" "DSBI"    
-[25] "DSII"     "DSPI"     "FOODLK_C" "FOODLK_D" "VARLK_C"  "VARLK_D" 
-[31] "SSCARD_A" "SSGLYP_J" "SSHCV_E"  "SSTROP_A" "SSBNP_A"  "PAXRAW_D"
-[37] "PAXRAW_C" "PAXLUX_G" "PAXLUX_H" "PAXHR_H"  "PAXMIN_G" "PAXMIN_H"
-[43] "PAX80_G"  "PAX80_H"  "PAHS_G"   "PAHS_I"   "PFC_POOL" "POOLTF_D"
-[49] "POOLTF_E" "RXQ_DRUG" "SPXRAW_E" "SPXRAW_F" "SPXRAW_G" "SSNH4THY"
-[55] "VID_B"    "VID_C"    "VID_D"    "VID_E"    "VID_F"    "VID_G"   
-[61] "VID_H"    "VID_I"    "VID_J"   
+ [1] "AUXAR_I"  "CHLMDA_F" "CHLMDA_G" "CHLMDA_H" "CHLMDA_I" "LAB05"   
+ [7] "CHLMDA_D" "L05_C"    "L05_B"    "CHLMDA_E" "SSCT_H"   "SSCT_I"  
+[13] "DR1IFF_F" "PAXRAW_D" "PAXRAW_C" "PAXLUX_G" "PAXLUX_H" "PAXHR_G" 
+[19] "PAXHR_H"  "PAXMIN_G" "PAXMIN_H" "PAX80_G"  "PAX80_H"  "PAHS_G"  
+[25] "PAHS_I"   "SPXRAW_E" "SPXRAW_F" "SPXRAW_G" "VID_B"    "VID_C"   
+[31] "VID_D"    "VID_E"    "VID_F"    "VID_G"    "VID_H"    "VID_I"   
+[37] "VID_J"   
 ```
 
 Ideally, this should match the list of excluded tables given by.
@@ -253,23 +242,245 @@ nhanesQuery("select * from Metadata.ExcludedTables")
 ```
 
 ```
-   TableName         Reason
-1  All Years     Large File
-2       PAHS     Large File
-3      PAX80       FTP Only
-4     PAXLUX         Broken
-5     ALQYTH         Broken
-6        OMP         Broken
-7        VID         Broken
-8       SSCT         Broken
-9     SPXRAW Limited Access
-10    PAXRAW Limited Access
-11    CHLMDA Limited Access
-12      CHLA Limited Access
-13      CHLM Limited Access
-14     LAB05 Limited Access
-15       L05 Limited Access
-16    PAXMIN Limited Access
+     TableName         Reason
+1         PAHS     Large File
+2        PAX80       FTP Only
+3       PAXLUX         Broken
+4       ALQYTH         Broken
+5          OMP         Broken
+6          VID         Broken
+7         SSCT         Broken
+8       SPXRAW Limited Access
+9       PAXRAW Limited Access
+10      CHLMDA Limited Access
+11        CHLA Limited Access
+12        CHLM Limited Access
+13       LAB05 Limited Access
+14         L05 Limited Access
+15      PAXMIN Limited Access
+16     UR1_H_R Limited Access
+17     UR2_H_R Limited Access
+18    ALCR_G_R Limited Access
+19    ALQYTH_E Limited Access
+20    ALQYTH_D Limited Access
+21      ALQYTH Limited Access
+22    ALQY_F_R Limited Access
+23    ALQY_G_R Limited Access
+24    ALQY_H_R Limited Access
+25    ALQY_I_R Limited Access
+26    ALQY_J_R Limited Access
+27    P_ALQY_R Limited Access
+28    SSH7N9_R Limited Access
+29     L34_B_R Limited Access
+30     L34_C_R Limited Access
+31    L06_2_00 Limited Access
+32    U1CF_H_R Limited Access
+33    U2CF_H_R Limited Access
+34    CDEMO_EH Limited Access
+35    CDEMO_AD Limited Access
+36    CHLA_J_R Limited Access
+37    P_CHLA_R Limited Access
+38    CHLM_G_R Limited Access
+39    CHLM_H_R Limited Access
+40    CHLM_I_R Limited Access
+41    CHLM_J_R Limited Access
+42    P_CHLM_R Limited Access
+43    CHLM_E_R Limited Access
+44    L05RDC_A Limited Access
+45    CHLM_F_R Limited Access
+46    CHLMD_DR Limited Access
+47    L05RDC_C Limited Access
+48    L05RDC_B Limited Access
+49    SSCT_H_R Limited Access
+50    SSCT_I_R Limited Access
+51     L13_2_R Limited Access
+52     CFQ_K_R Limited Access
+53     L25_2_R Limited Access
+54     P_CBQ_R Limited Access
+55     L11_2_R Limited Access
+56     L16_2_R Limited Access
+57    DEMO_K_R Limited Access
+58     DEQ_E_R Limited Access
+59    DB24_K_R Limited Access
+60     P_DUQ_R Limited Access
+61    DUQYTH_E Limited Access
+62    DUQY_F_R Limited Access
+63    DUQY_G_R Limited Access
+64    DUQY_H_R Limited Access
+65    DUQY_I_R Limited Access
+66    DUQY_J_R Limited Access
+67    P_DUQY_R Limited Access
+68    DXXV_H_R Limited Access
+69    DXX_2_00 Limited Access
+70    EC24_K_R Limited Access
+71    U1LT_H_R Limited Access
+72    U2LT_H_R Limited Access
+73    HULT_H_R Limited Access
+74    SSLT_H_R Limited Access
+75    SSUECD_R Limited Access
+76     FAR_K_R Limited Access
+77    FLDW_K_R Limited Access
+78    U1FL_H_R Limited Access
+79    U2FL_H_R Limited Access
+80    FLXC_H_R Limited Access
+81    SSFA_B_R Limited Access
+82    FFMR_K_R Limited Access
+83     SSFOL_B Limited Access
+84     FSQ_E_R Limited Access
+85     FSQ_F_R Limited Access
+86     FSQ_G_R Limited Access
+87     FSQ_H_R Limited Access
+88     FSQ_I_R Limited Access
+89     FSQ_J_R Limited Access
+90     P_FSQ_R Limited Access
+91    FNQA_K_R Limited Access
+92    FNQC_K_R Limited Access
+93    GEO_2000 Limited Access
+94    GEO_2010 Limited Access
+95    L10_2_00 Limited Access
+96     HP_01_R Limited Access
+97    HP2_01_R Limited Access
+98    SSH1N1_E Limited Access
+99    SSHN10_R Limited Access
+100   SSHC_I_R Limited Access
+101   HEPC_I_R Limited Access
+102   HSVA_J_R Limited Access
+103   P_HSVA_R Limited Access
+104    HSV_I_R Limited Access
+105    P_HSV_R Limited Access
+106    HSV_E_R Limited Access
+107     HSV_DR Limited Access
+108   L09RDC_C Limited Access
+109   L09RDC_A Limited Access
+110   L09RDC_B Limited Access
+111    HSV_F_R Limited Access
+112    HSV_G_R Limited Access
+113    HSV_H_R Limited Access
+114    HSV_J_R Limited Access
+115    P_HIV_R Limited Access
+116    P_HOQ_R Limited Access
+117    B27_F_R Limited Access
+118   HPVS_D_R Limited Access
+119    SER_E_R Limited Access
+120    SER_F_R Limited Access
+121   HPVN_D_R Limited Access
+122   HPVM_D_R Limited Access
+123   OHPV_F_R Limited Access
+124   OHPV_G_R Limited Access
+125   OHPV_H_R Limited Access
+126   OHPV_I_R Limited Access
+127   HPVP_I_R Limited Access
+128    SWA_C_R Limited Access
+129   HPVS_F_R Limited Access
+130   HPVS_G_R Limited Access
+131    SWR_E_R Limited Access
+132    SWR_D_R Limited Access
+133   HPVS_H_R Limited Access
+134   HPWC_J_R Limited Access
+135   HPVC_I_R Limited Access
+136   HPVC_J_R Limited Access
+137   HPVW_J_R Limited Access
+138    SWR_C_R Limited Access
+139   HPVS_I_R Limited Access
+140   HPVS_J_R Limited Access
+141   HPVP_H_R Limited Access
+142   SSHP_F_R Limited Access
+143   IFII_K_R Limited Access
+144   IFLD_K_R Limited Access
+145   IFNI_K_R Limited Access
+146   IFPI_K_R Limited Access
+147   IFQF_K_R Limited Access
+148   SSIF_F_R Limited Access
+149   U1IO_H_R Limited Access
+150   U2IO_H_R Limited Access
+151   IODS_K_R Limited Access
+152   SSUIFG_R Limited Access
+153   U1KM_H_R Limited Access
+154   U2KM_H_R Limited Access
+155   HUKM_H_R Limited Access
+156    PBY_J_R Limited Access
+157    P_PBY_R Limited Access
+158     UM_J_R Limited Access
+159     P_UM_R Limited Access
+160    LA_DEMO Limited Access
+161   LDEMO_AD Limited Access
+162   LDEMO_EH Limited Access
+163    L19_2_R Limited Access
+164       YDQA Limited Access
+165        YCQ Limited Access
+166      YCQ_B Limited Access
+167      YCQ_C Limited Access
+168       YDQC Limited Access
+169   DPQYTH_E Limited Access
+170   DPQY_F_R Limited Access
+171   DPQYTH_D Limited Access
+172   DPQY_G_R Limited Access
+173   DPQY_H_R Limited Access
+174   DPQY_I_R Limited Access
+175   DPQY_J_R Limited Access
+176   P_DPQY_R Limited Access
+177       YDQE Limited Access
+178       YDQL Limited Access
+179       YDQG Limited Access
+180       YDQD Limited Access
+181       YDQP Limited Access
+182        YDQ Limited Access
+183   MGEA_J_R Limited Access
+184   MGEN_J_R Limited Access
+185   P_MGEA_R Limited Access
+186   P_MGEN_R Limited Access
+187    OCQ_H_R Limited Access
+188    OCQ_E_R Limited Access
+189    OCQ_D_R Limited Access
+190    OCQ_F_R Limited Access
+191    OCQ_G_R Limited Access
+192   U1PN_H_R Limited Access
+193   U2PN_H_R Limited Access
+194 PAXLUX_G_R Limited Access
+195   PAXD_G_R Limited Access
+196   PAXA_G_R Limited Access
+197   PAXH_G_R Limited Access
+198   PAXM_G_R Limited Access
+199  PAX80_G_R Limited Access
+200   U1PT_H_R Limited Access
+201   U2PT_H_R Limited Access
+202    RHQ_E_R Limited Access
+203    RHQ_F_R Limited Access
+204    RHQ_G_R Limited Access
+205    RHQ_H_R Limited Access
+206    RHQ_I_R Limited Access
+207    RHQ_J_R Limited Access
+208    P_RHQ_R Limited Access
+209    SUQ_K_R Limited Access
+210   DOC_2000 Limited Access
+211    TST_K_R Limited Access
+212    SXQ_J_R Limited Access
+213    P_SXQ_R Limited Access
+214   SXQYTH_D Limited Access
+215   SXQYTH_E Limited Access
+216   SXQY_F_R Limited Access
+217   SXQY_G_R Limited Access
+218     SXQYTH Limited Access
+219   SXQY_H_R Limited Access
+220   SXQY_I_R Limited Access
+221   SXQYTH_B Limited Access
+222   SXQYTH_C Limited Access
+223   SXQY_J_R Limited Access
+224   P_SXQY_R Limited Access
+225   SSUE10_R Limited Access
+226   L18_2_00 Limited Access
+227    BAQ_K_R Limited Access
+228    CSX_G_R Limited Access
+229   THYD_K_R Limited Access
+230   TRIA_J_R Limited Access
+231   P_TRIA_R Limited Access
+232   TRIC_I_R Limited Access
+233   TRIC_J_R Limited Access
+234   P_TRIC_R Limited Access
+235   TRIC_H_R Limited Access
+236     TB_K_R Limited Access
+237    VIT_2_R Limited Access
+238   VCWB_K_R Limited Access
 ```
 
 The following links can be used to explore the documentation of these
@@ -281,12 +492,7 @@ paste0("- <", subset(manifest, Table %in% mtabs)$DocURL, ">") |>
     cat(sep = "\n")
 ```
 
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2015-2016/SSAGP_I.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/SSAGP_J.htm>
 - <https://wwwn.cdc.gov/Nchs/Nhanes/2015-2016/AUXAR_I.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/SSDFS_A.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/SSANA_A.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/SSANA2_A.htm>
 - <https://wwwn.cdc.gov/Nchs/Nhanes/2009-2010/CHLMDA_F.htm>
 - <https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/CHLMDA_G.htm>
 - <https://wwwn.cdc.gov/Nchs/Nhanes/2013-2014/CHLMDA_H.htm>
@@ -298,28 +504,12 @@ paste0("- <", subset(manifest, Table %in% mtabs)$DocURL, ">") |>
 - <https://wwwn.cdc.gov/Nchs/Nhanes/2007-2008/CHLMDA_E.htm>
 - <https://wwwn.cdc.gov/Nchs/Nhanes/2013-2014/SSCT_H.htm>
 - <https://wwwn.cdc.gov/Nchs/Nhanes/2015-2016/SSCT_I.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/SSCMVG_A.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/SSUCSH_A.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/DRXFMT.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/DRXFMT_B.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2015-2016/DRXFCD_I.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/DRXFCD_J.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/DSBI.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/DSII.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/DSPI.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2003-2004/FOODLK_C.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2005-2006/FOODLK_D.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2003-2004/VARLK_C.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2005-2006/VARLK_D.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/SSCARD_A.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/SSGLYP_J.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2007-2008/SSHCV_E.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/SSTROP_A.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/SSBNP_A.htm>
+- <https://wwwn.cdc.gov/Nchs/Nhanes/2009-2010/DR1IFF_F.htm>
 - <https://wwwn.cdc.gov/Nchs/Nhanes/2005-2006/PAXRAW_D.htm>
 - <https://wwwn.cdc.gov/Nchs/Nhanes/2003-2004/PAXRAW_C.htm>
 - <https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/PAXLUX_G.htm>
 - <https://wwwn.cdc.gov/Nchs/Nhanes/2013-2014/PAXLUX_H.htm>
+- <https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/PAXHR_G.htm>
 - <https://wwwn.cdc.gov/Nchs/Nhanes/2013-2014/PAXHR_H.htm>
 - <https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/PAXMIN_G.htm>
 - <https://wwwn.cdc.gov/Nchs/Nhanes/2013-2014/PAXMIN_H.htm>
@@ -327,14 +517,9 @@ paste0("- <", subset(manifest, Table %in% mtabs)$DocURL, ">") |>
 - <https://wwwn.cdc.gov/Nchs/Nhanes/2013-2014/PAX80_H.htm>
 - <https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/PAHS_G.htm>
 - <https://wwwn.cdc.gov/Nchs/Nhanes/2015-2016/PAHS_I.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/PFC_POOL.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2005-2006/POOLTF_D.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2007-2008/POOLTF_E.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/RXQ_DRUG.htm>
 - <https://wwwn.cdc.gov/Nchs/Nhanes/2007-2008/SPXRAW_E.htm>
 - <https://wwwn.cdc.gov/Nchs/Nhanes/2009-2010/SPXRAW_F.htm>
 - <https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/SPXRAW_G.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/SSNH4THY.htm>
 - <https://wwwn.cdc.gov/Nchs/Nhanes/vitamind/analyticalnote.aspx?b=2001&e=2002&d=VID_B&x=htm>
 - <https://wwwn.cdc.gov/Nchs/Nhanes/vitamind/analyticalnote.aspx?b=2003&e=2004&d=VID_C&x=htm>
 - <https://wwwn.cdc.gov/Nchs/Nhanes/vitamind/analyticalnote.aspx?b=2005&e=2006&d=VID_D&x=htm>
@@ -360,35 +545,8 @@ subset(dbTableDesc, !startsWith(DocFile, "https"),
 ```
 
 ```
-     TableName DocFile DataFile
-37     L11_2_B                 
-39      PBCD_D                 
-40      PBCD_E                 
-41      PBCD_F                 
-56       L13_C                 
-149      LAB02                 
-162      L09_C                 
-204      IHG_D                 
-286   L11P_2_B                 
-354     APOB_F                 
-372      L34_B                 
-373      L34_C                 
-387     PBCD_G                 
-396      LAB13                 
-404    L25_2_B                 
-563      IHG_E                 
-564      IHG_F                 
-699     APOB_E                 
-700     APOB_G                 
-742      L13_B                 
-814    L39_2_B                 
-841   L02HPA_A                 
-853      L09_B                 
-1050    APOB_H                 
-1097   L13_2_B                 
-1192     LAB09                 
-1226   IHGEM_G                 
-1265   L26PP_B                 
+[1] TableName DocFile   DataFile 
+<0 rows> (or 0-length row.names)
 ```
 
 The corresponding documentation links from the online manifest are
@@ -401,34 +559,7 @@ paste0("- <", subset(manifest, Table %in% mdoc)$DocURL, ">") |>
     cat(sep = "\n")
 ```
 
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2007-2008/APOB_E.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2009-2010/APOB_F.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/APOB_G.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2013-2014/APOB_H.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L34_B.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2003-2004/L34_C.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2005-2006/PBCD_D.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2007-2008/PBCD_E.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2009-2010/PBCD_F.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/PBCD_G.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/LAB13.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L13_B.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2003-2004/L13_C.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L13_2_B.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L25_2_B.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L11_2_B.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L39_2_B.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/L02HPA_A.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/LAB02.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/LAB09.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L09_B.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2003-2004/L09_C.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2005-2006/IHG_D.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2009-2010/IHG_F.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2007-2008/IHG_E.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/IHGEM_G.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L26PP_B.htm>
-- <https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L11P_2_B.htm>
+- <>
 
 We end with a couple of sanity checks for the URLs that are _not_ missing.
 
@@ -450,7 +581,7 @@ all(metadata_doc_url == manifest_doc_url[names(metadata_doc_url)])
 ```
 
 ```
-[1] TRUE
+[1] FALSE
 ```
 
 ```r
@@ -458,7 +589,7 @@ all(metadata_data_url == manifest_data_url[names(metadata_data_url)])
 ```
 
 ```
-[1] TRUE
+[1] FALSE
 ```
 
 
