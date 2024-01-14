@@ -18,9 +18,11 @@ knitr::opts_chunk$set(
 
 ## 0. Goal
 
-The goal of this vignette is to attempt to replicate the analysis presented in ``Association of blood cobalt concentrations with dyslipidemia, hypertension, and diabetes in a US population
-A cross-sectional study; Hongxin Wang, MD, Feng Li, MD, Jianghua Xue, MD, Yanshuang Li, MD, Jiyu Li, MD''.  For the remainder of this vignette we will refer to this as the "Cobalt paper", This vignette is incomplete in that we do not attempt to get identical results, rather we want to demonstrate that there are details of the analysis that are not included in the paper and
-that any explicit replication would require an enormous effort. We also want to emphasize that we are not criticizing these authors, they really have no easy way to provide those details. But it is exactly that problem that we hope to address with this `phonto` package and our efforts to create a Docker container that has all of NHANES together with appropriate software tools so that others can use that as a vehicle to publish research that is more transparent.
+The goal of this vignette is provide some insight into how one might replicate a published analysis that was based on the NHANES data.  We have chosen the analysis presented in ``Association of blood cobalt concentrations with dyslipidemia, hypertension, and diabetes in a US population
+A cross-sectional study; Hongxin Wang, MD, Feng Li, MD, Jianghua Xue, MD, Yanshuang Li, MD, Jiyu Li, MD''.  For the remainder of this vignette we will refer to this as the "Cobalt paper".
+We want to emphasize that we are not, in any way attempting to critique the paper, we are simply trying to use our tools to replicate the reported results.  And even on that front, the authors had no good means to provide the sort of information that a reader would need to be able to replicate their results.  We hope that our efforts here will spur more substantial efforts to help support resources aimed at replication of research papers.  We also want to be clear, our definition of replication is very narrow - we simply want
+
+This vignette is incomplete in many ways.  We also want to emphasize that we are not criticizing these authors, they really have no easy way to provide those details. But it is exactly that problem that we hope to address with this `phonto` package and our efforts to create a Docker container that has all of NHANES together with appropriate software tools so that others can use that as a vehicle to publish research that is more transparent.
 
  The Cobalt paper uses data for the years 2015-2016 and 2017-2018 which cover two NHANES cycles, the data tables we want will have the suffixes `_I` and `_J`. 
 
@@ -39,7 +41,8 @@ library(knitr)
 
 
 ## 2. Data and Preprocessiing
-In the next few sections we attempt to load data from NHANES in a manner that is consistent with the description provided in Section 2 of the Cobalt paper.
+In the next few sections we attempt to load data from NHANES in a manner that is consistent with the description provided in Section 2 of the Cobalt paper. Note that in Table not
+all of the variables have the same number of cases. 
 
 
 ![Table 1 from the paper: The table is divided into five columns: overall demographics, followed by four quintiles of blood cobalt levels (Q1 to Q4). The quintiles range from ≤0.12 µg/l in Q1 to ≥0.19 µg/l in Q4. For each quintile, the number of participants, average age, gender distribution, Body Mass Index (BMI), education level, race, family poverty-income ratio, and smoking status are provided, along with standard deviations for continuous variables.](images/CobaltTable1.png)
@@ -51,7 +54,12 @@ In the next few sections we attempt to load data from NHANES in a manner that is
 The authors state: 
 Participants with cobalt and lipid data were included (n = 6866). Demographic characteristics of the participants, including age, gender, body mass index (BMI), education level, race, family poverty-income ratio and smoking status, were collected. Clinical data, such as blood pressure, total cholesterol (TC), low-density lipoprotein cholesterol (LDL-C), HDL-C, triglycerides (TGs), hypertension, diabetes and history of medication use, including antihypertensive drugs, hypoglycemic drugs, and lipid-lowering drugs, were extracted.
 
-In the code below, we start with the variable names, which we had obtained by searching based on the variable descriptions (not shown) and restrict by the years that the authors had chosen. We do not use LDL or triglyceride measurements as they are only available on a subset of the participants, and we would need to run two parallel analyses, which is what we presume the authors did.
+We will next present our attempt to replicate Table 1 in the Cobalt paper. This table is displayed as our Figure 1, and largely summarizes the demographic data that were used.
+
+In the code below, we start with the variable names, which we had obtained by searching based on the variable descriptions (not shown) and restrict by the years that the authors had chosen.
+While we are only going to report here on the demographic variables, we will extract all of the variables, as we are not sure how the original authors dealt with missing values.  In some cases authors only use individuals with complete data on all covariates they intend to model. But for some large data sets, such as NHANES, that can result in removing very many individuals.
+
+We do not use LDL or triglyceride measurements as they are only available on a subset of the participants, and we would need to run two parallel analyses, which is what we presume the authors did.
 
 ```{r demo_body,warning=FALSE,message=FALSE}
 
@@ -77,8 +85,12 @@ DIQTabs = nhanesSearchVarName("DIQ010",ystart="2015", ystop="2018")
 COBTabs = nhanesSearchVarName("LBXBCO",ystart="2015", ystop="2018" )
 TotChol = nhanesSearchVarName("LBXTC",ystart="2015", ystop="2018" )
 
-cols = list(DEMO_I=c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2"), 
-            DEMO_J=c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2"),
+##set up the description of the tables, and variables within those tables we
+## will use.  Then use the jointQuery function to merge the tables and to merge
+##across cycles
+
+cols = list(DEMO_I=c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2", "INDFMPIR"), 
+            DEMO_J=c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2", "INDFMPIR"),
             BPQ_I=c('BPQ050A','BPQ020','BPQ080','BPQ100D'),
             BPQ_J=c('BPQ050A','BPQ020','BPQ080','BPQ100D'), 
             HDL_I=c("LBDHDD"),HDL_J=c("LBDHDD"),
@@ -86,18 +98,88 @@ cols = list(DEMO_I=c("RIDAGEYR","RIAGENDR","RIDRETH1","DMDEDUC2"),
             DIQ_I=c("DIQ010","DIQ050","DIQ070","DIQ160"),
             DIQ_J=c("DIQ010","DIQ050","DIQ070","DIQ160"), 
             BMX_I="BMXBMI", BMX_J="BMXBMI",
-            TCHOL_I="LBXTC", TCHOL_J="LBXTC"
+            TCHOL_I="LBXTC", TCHOL_J="LBXTC",
+            SMQ_I=c("SMQ020","SMQ040"), SMQ_J=c("SMQ020","SMQ040"),
+            BPX_I=c("BPXDI1","BPXDI2","BPXSY1","BPXSY2"), 
+            BPX_J=c("BPXDI1","BPXDI2","BPXSY1","BPXSY2")
             )
 var2Table = cols[c(1,3,5,7,9,11,13)]
 base_df <- jointQuery(cols)
+
+
+## the authors report only using individuals aged 40 and above, so we will subset to that group
+base_df = base_df[base_df$RIDAGEYR>=40,]
 dim(base_df)
+
+##how many of the individuals in our cohort have complete data for all variables?
+table(complete.cases(base_df))
+```
+
+ In the code above we have identifed a set of tables/questionnaires from NHANES that seem to contain the relevant variables to reproduce Table 1 in the Cobalt paper.  The tables include demographic information (`DEMO`), blood pressure and cholesterol (`BPQ`), high density lipoprotein measurements (`HDL`), Glycohemoglobin (`GHI`), Diabetes (`DIQ`), body mass (`BMX`) and total cholesterol (`TCHOL`).  We subset these tables to extract the variables we think were used in the Cobalt paper, and then merged within years and across cycles.  The result is a dataframe with `r nrow(base_df)` rows and `r `ncol(base_df)` columns.  The number of individuals is close to the 6866 the authors report using in their Table 1.
+ 
+
+#### Modify the NHANES reported values to align with those used in the Paper
+
+Now we look at some of the different variables that are going to be used in the analysis.
+The authors combined the reported ethnicities of Mexican American and Other Hispanic into one group. So we will duplicate that.  They also combined the education levels into three groups, those who had no high school record, some high school, through to completion, or some education beyond high school. In the code below we carry out similar transformations of the data.
+
+
+In the code chunk below we extract the smoking data, and then try to create the groupings
+used in the paper.  They have three groups, non-smokers, current smokers and ex-smokers. We use the `SMQ_I` and `SMQ_J` tables. We will define non-smoker as someone who as never smoked more than 100 cigarettes (`SMQ020`), anyone who has smoked more will be either
+a current smoker or an ex-smoker (`SMQ040`)
+
+
+
+```{r}
+
+##Education levels
+base_df$DMDEDUC2 = factor(base_df$DMDEDUC2)
+
+levels(base_df$DMDEDUC2) <- c("HS",">HS",NA,"HS","<HS",NA,">HS")
+table(base_df$DMDEDUC2)
+
+##Ethnicity
+
+base_df$RIDRETH1 = factor(base_df$RIDRETH1)
+levels(base_df$RIDRETH1) = c("Hispanic/Mexican", "Non-Hispanic Black", "Non-Hispanic White",
+                          "Hispanic/Mexican", "Other")
+
+table(base_df$RIDRETH1)
+
+##Fixup the smoking variable to correspond to the way they defined the groups
+table(base_df$SMQ020, useNA="always")
+##for SMQ040 too
+table(base_df$SMQ040, useNA="always")
+smokingVar = ifelse(base_df$SMQ020=="No", "Non-smoker", 
+                    ifelse(base_df$SMQ040=="Not at all", "Ex-smoker",
+                    "Smoker"))
+table(smokingVar, useNA="always")
+##from the paper n=6866, Ex=1950,Non=3744,Current=1165
+base_df$smokingVar = smokingVar
+
+##Poverty level - grouped as <1, 1- 4.99, >5
+  PL = cut(base_df$INDFMPIR, breaks=c(1,5), right=FALSE)
+base_df$PL = PL
+```
+Lastly here, we will look just at the subset of demographic variables listed in Table 1.
+
+
+
+```{r DemoSubset }
+
+demo_sub = base_df[, c("SEQN", "RIDAGEYR","RIAGENDR", "RIDRETH1", "DMDEDUC2",  
+                       "BMXBMI", "smokingVar", "PL")]
+
+sapply(demo_sub, function(x) sum(is.na(x)))
 
 ```
 
-####FIXUP some vars
+## Glucose
 
-```{r}
+```{r cholmeds-fixup}
 cholMeds = base_df$BPQ100D
+table(cholMeds, useNA="always")
+
 cholMeds[base_df$BPQ080=="No"] = "No"
 cholMeds[cholMeds=="Don't know"] = NA
 cholMeds = factor(cholMeds)
@@ -112,35 +194,9 @@ hypoglycemicMeds[!dontskip] = "No"
 hypoglycemicMeds = factor(hypoglycemicMeds,levels=c("Yes", "No", "Don't know","Refused"), labels=c("Yes", "No",NA,NA))
 table(hypoglycemicMeds,useNA="always")
 base_df$hypoglycemicMeds = hypoglycemicMeds
-
 ```
 
-####Smoking
-
-In the code chunk below we extract the smoking data, and then try to create the groupings
-used in the paper.  They have three groups, non-smokers, current smokers and ex-smokers. We use the `SMQ_I` and `SMQ_J` tables. We will define non-smoker as someone who as never smoked more than 100 cigarettes (`SMQ020`), anyone who has smoked more will be either
-a current smoker or an ex-smoker (`SMQ040`)
-
-```{r Smoking }
-cols = list(SMQ_I=c("SMQ020","SMQ040"), SMQ_J=c("SMQ020","SMQ040"))
-smokingTab= unionQuery(cols)
-tdf = merge(base_df, smokingTab, all.x=TRUE)  
-tdf = tdf[tdf$RIDAGEYR>=40,]
-##nn = nhanesTranslate("SMQ_J", colnames=c("SMQ020","SMQ040"))
-##have a look at the coding for SMQ020
-##nn[[1]]
-##check to see what values are in the data
-table(tdf$SMQ020, useNA="always")
-##for SMQ040 too
-table(tdf$SMQ040, useNA="always")
-smokingVar = ifelse(tdf$SMQ020=="No", "Non-smoker", 
-                    ifelse(tdf$SMQ040=="Not at all", "Ex-smoker",
-                    "Smoker"))
-table(smokingVar, useNA="always")
-##from the paper n=6866, Ex=1950,Non=3744,Current=1165
-```
-
-##Glucose
+Then fixup glucose
 
 ```{r Glucose, warning=FALSE, message=FALSE}
 ##fasting glucose
@@ -164,68 +220,38 @@ If we were to remove all records with missing values at this point we would be l
 
 #### 2.2) Blood Pressure Data
 
- In the next code segment we show how to obtain blood pressure measurements from NHANES tables.  We have already ascertained that these measurements are contained in Questionnaires that are named BPX_I and BPX_J and that there were replicate measurements taken.  Both systolic (BPXS) and diastolic (BPXD) measurements were taken
-on each of two occassions.  We will use the average of these two measurements for individuals with two measurements, and in the case where only one measurement is available we will use it. The authors of the Cobalt paper don't specify which values they used, so this is one of the places where our analysis may differ from theirs.
-```{r data_blood,warning=FALSE,message=FALSE}
-bptablenames = nhanesSearchTableNames('BPX[_]')
-bptablenames |> kable()
-```
-We can see that blood pressure data was collected for other years as well, but for now we will just extract the data for the 2015-2016 and 2017-2018 years. We combine these into a single dataframe.
+Both systolic (BPXS) and diastolic (BPXD) measurements were taken twice, on two separate occassions.  The authors of the Cobalt paper do not specify how they dealt this, did they use the first, the second, an average of the two?  How did they deal with individuals that did not show up for their second measurement?  We will use the average of these two measurements for individuals with two measurements, and in the case where only one measurement is available we will use it. The authors of the Cobalt paper don't specify which values they used, so this is one of the places where our analysis may differ from theirs.
+
+We will just extract the data for the 2015-2016 and 2017-2018 years. We combine these into a single dataframe and then compute the average, for those who have two measurements.
 
 ```{r extract_data, warning=FALSE, message=FALSE}
-blood_df <- unionQuery(list(BPX_I=c("BPXDI1","BPXDI2","BPXSY1","BPXSY2"), 
-                            BPX_J=c("BPXDI1","BPXDI2","BPXSY1","BPXSY2")))
-dim(blood_df)
+##fixup the blood pressure data - using averages
 # Average the the first and second reads
 # taking some care to keep one measurement if the other is missing
-blood_df$DIASTOLIC <- rowMeans(blood_df[, c("BPXDI1", "BPXDI2")], na.rm=TRUE)
-blood_df$DIASTOLIC[is.na(blood_df$BPXDI1) & is.na(blood_df$BPXDI2)] = NA
-blood_df$SYSTOLIC <- rowMeans(blood_df[, c("BPXSY1", "BPXSY2")], na.rm=TRUE)
-blood_df$SYSTOLIC[is.na(blood_df$BPXSY1) & is.na(blood_df$BPXSY2)] = NA
-dim(blood_df)
-blood_df[1:10,] |> kable()
+base_df$DIASTOLIC <- rowMeans(base_df[, c("BPXDI1", "BPXDI2")], na.rm=TRUE)
+base_df$DIASTOLIC[is.na(base_df$BPXDI1) & is.na(base_df$BPXDI2)] = NA
+base_df$SYSTOLIC <- rowMeans(base_df[, c("BPXSY1", "BPXSY2")], na.rm=TRUE)
+base_df$SYSTOLIC[is.na(base_df$BPXSY1) & is.na(base_df$BPXSY2)] = NA
+
 ```
   In our analysis we can then look at the average of the measurements across the two different time points as a way to estimate the actual blood pressure for each participant.
 
 
-### 2.3)  merge and PHESANT-like process
 
 Now you have a dataframe with the data, but you will need to better understand the variables, exposures and responses.  To help with that we have created some tools, based on related work in the UK Biobank called PHESANT  (cite PHESANT)).  The process takes each variable (column)
-and reports what type of data it is, continuous or multi-level (ie factors). We report the number of levels, you can use the `nhanesTranslate` function to learn more about the levels of the factor. Some numeric quantities are reported such as the ratio of unique values to the length of vector, the proportion of zeros, and the proportion of missing values. NHANES has chosen to store categorical data types (ordered or unordered) as integers. For example, education level, `DMDEDUC2` is identified as `Multilevel-8 `.  You can learn more about the details of the NHANES data in the Quick Start Vignette (cite quick start).
+and reports what type of data it is, continuous or multi-level (ie factors). We report the number of levels. Some numeric quantities are reported such as the ratio of unique values to the length of vector, the proportion of zeros, and the proportion of missing values. NHANES has chosen to store categorical data types (ordered or unordered) as integers. For example, education level, `DMDEDUC2` is identified as `Multilevel-8 `.  You can learn more about the details of the NHANES data in the Quick Start Vignette (cite quick start).
 
-```{r data,warning=FALSE,message=FALSE}
-
-data <- merge(base_df, blood_df, all.x=TRUE,by=c("SEQN", "Begin.Year", "EndYear"))
-data$years = as.factor(paste0(data$Begin.Year,"-", data$EndYear))
-##fix up our list linking variable names to the table they came from
-var2Table = c(var2Table, list("BPX_I"=c("BPXDI1","BPXDI2","BPXSY1","BPXSY2")))
-phs_dat = phesant(data)
-data = phs_dat$data
-DT::datatable(phs_dat$phs_res)
-
-```
-
-In the next code chunk we will convert the multilevel variables into R factors. To do this we make use of the nhanesTranslate function. While that function does most of the work, there are some variables we need to deal with manually to replicate the analysis. First, the years variable is something we added, so we need to deal with it manually.  Then we use `nhanesTranslate` to transform all of the internal values.  Then we need to do a little more work on modifying levels of the education variable.  The authors decided to group education into three levels, less than high school (<HS), high school (HS), and more than school-school(>HS).  We also need to address some issues around the hypertension variables.
-Particpants were asked (BPQ020) whether they had ever been told by a doctor or health care professional that they had high blood pressure.  The survey was designed to then skip over a number of questions about their hypertension if they said they did not have hypertension. However this then introduces missing values in the question BPQ050A, which was whether or not they were currently taking a prescription for hypertension. Presumably only people who had been told by their doctor they have hypertension would be taking a perscription and we will need to manually adjust the data so that these are answered No, rather than missing.
+We also need to address some issues around the hypertension variables. Particpants were asked (BPQ020) whether they had ever been told by a doctor or health care professional that they had high blood pressure.  The survey was designed to then skip over a number of questions about their hypertension if they said they did not have hypertension. However this then introduces missing values in the question BPQ050A, which was whether or not they were currently taking a prescription for hypertension. Presumably only people who had been told by their doctor they have hypertension would be taking a perscription and we will need to manually adjust the data so that these are answered No, rather than missing.
 
 
 ```{r}
-
-data$DMDEDUC2 = factor(data$DMDEDUC2)
-
-levels(data$DMDEDUC2) <- c("<HS",">HS",NA,"HS","<HS",NA,">HS")
-
 ##
 ## fixup the data for a skipped question
-hypertensiveMeds = data$BPQ050A
-hypertensiveMeds[data$BPQ020=="No"] = "No"
-hypertensiveMeds[data$BPQ040A=="No"] = "No"
+hypertensiveMeds = base_df$BPQ050A
+hypertensiveMeds[base_df$BPQ020=="No"] = "No"
+hypertensiveMeds[base_df$BPQ040A=="No"] = "No"
 
-data$BPQ050A = hypertensiveMeds
-##remove any record with at least one NA and then subset to those over 40
-##data <- na.omit(data)
-data <- data[data$RIDAGEYR>=40,]
-dim(data)
+base_df$BPQ050A = hypertensiveMeds
 
 ```
 At this point we have `r nrow(data)` individuals left. 
@@ -235,16 +261,16 @@ Table 1 provides some basic summaries of the demographic data. We will create a
 temporary subset of the data that uses only the complete cases.
 
 ```{r, message=FALSE, warning=FALSE}
-pcobalt = ifelse(data$LBXBCO <= 0.12, "<=0.12", 
-                ifelse(data$LBXBCO >= 0.13 & data$LBXBCO <= 0.14, "0.13-0.14",
-                  ifelse(data$LBXBCO >= 0.15 & data$LBXBCO <= 0.18, "0.15-0.18",
-                         ifelse(data$LBXBCO >= 0.19, ">=1.9",
+pcobalt = ifelse(base_df$LBXBCO <= 0.12, "<=0.12", 
+                ifelse(base_df$LBXBCO >= 0.13 & base_df$LBXBCO <= 0.14, "0.13-0.14",
+                  ifelse(base_df$LBXBCO >= 0.15 & base_df$LBXBCO <= 0.18, "0.15-0.18",
+                         ifelse(base_df$LBXBCO >= 0.19, ">=1.9",
                          NA)  )))
 ##make it an ordered factor 
 pcob = factor(pcobalt, levels=c("<=0.12","0.13-0.14", "0.15-0.18",">=1.9"), ordered=TRUE)
-data$pcobalt = pcob
+base_df$pcobalt = pcob
 table(pcob, useNA="always")
-AgeGp = data |> group_by(pcobalt) |> summarise(mean=mean(RIDAGEYR,na.rm=TRUE),SD=sd(RIDAGEYR,na.rm=TRUE))
+AgeGp = base_df |> group_by(pcobalt) |> summarise(mean=mean(RIDAGEYR,na.rm=TRUE),SD=sd(RIDAGEYR,na.rm=TRUE))
 
 ```
 
@@ -258,40 +284,40 @@ https://wwwn.cdc.gov/nchs/nhanes/2011-2012/BPQ_G.htm
 
 ```{r RiskFactors,warning=FALSE,message=FALSE}
 # "Hypertension was defined as systolic blood pressure (SBP) ≥140 mm Hg, diastolic blood pressure ≥90mm Hg, or the use of antihypertensive medication. "
-data$hypertension <- data$DIASTOLIC >= 90 | data$SYSTOLIC >= 140 |  data$BPQ050A=="Yes"
-barplot(table(data$hypertension))
+base_df$hypertension <- base_df$DIASTOLIC >= 90 | base_df$SYSTOLIC >= 140 |  base_df$BPQ050A=="Yes"
+barplot(table(base_df$hypertension))
 ```
 ```{r Diabetes, warning=FALSE, message=FALSE}
-data$diabetes = data$DIQ010 == "Yes" | data$LBXGLU > 110 | data$LBXGH > 6.5
-barplot(table(data$diabetes))
+base_df$diabetes = base_df$DIQ010 == "Yes" | base_df$LBXGLU > 110 | base_df$LBXGH > 6.5
+barplot(table(base_df$diabetes))
 
-data$HighLDL = data$LBDLDL > 130
-barplot(table(data$HighLDL))
+base_df$HighLDL = base_df$LBDLDL > 130
+barplot(table(base_df$HighLDL))
  
-data$LowHDL = (data$RIAGENDR=="Male" & data$LBDHDD < 40) |    (data$RIAGENDR=="Female" & data$LBDHDD < 50) 
-barplot(table(data$LowHDL))
+base_df$LowHDL = (base_df$RIAGENDR=="Male" & base_df$LBDHDD < 40) |    (base_df$RIAGENDR=="Female" & base_df$LBDHDD < 50) 
+barplot(table(base_df$LowHDL))
 
 ```
 Now lets define the elevated total cholesterol variable.
 
 ```{r Dyslipidemia}
-elevatedTC = data$LBXTC>200
-data$elevatedTC = elevatedTC
+elevatedTC = base_df$LBXTC>200
+base_df$elevatedTC = elevatedTC
 ```
 
 Note that some of our groupings are very similar to those reported in the Cobalt paper, but some, notably Elevated LDLs are quite different. This discrepency should be explored (it may have to do with incorrect subsetting by age).
 ## 2.5 Compare with Table-2
 ```{r, message=FALSE,warning=FALSE}
 
-DBP = data |> group_by(pcobalt) |> summarise(mean=mean(DIASTOLIC, na.rm=TRUE),SD=sd(DIASTOLIC,na.rm=TRUE))
+DBP = base_df |> group_by(pcobalt) |> summarise(mean=mean(DIASTOLIC, na.rm=TRUE),SD=sd(DIASTOLIC,na.rm=TRUE))
 DBP$stat = paste(round(DBP$mean,1),"±",round(DBP$SD,1))
-DBPmn = mean(data$DIASTOLIC, na.rm=TRUE)
-DBPsd = sd(data$DIASTOLIC, na.rm=TRUE)
+DBPmn = mean(base_df$DIASTOLIC, na.rm=TRUE)
+DBPsd = sd(base_df$DIASTOLIC, na.rm=TRUE)
 
-SBP = data |> group_by(pcobalt) |> summarise(mean=mean(SYSTOLIC,na.rm=TRUE),SD=sd(SYSTOLIC, na.rm=TRUE))
+SBP = base_df |> group_by(pcobalt) |> summarise(mean=mean(SYSTOLIC,na.rm=TRUE),SD=sd(SYSTOLIC, na.rm=TRUE))
 SBP$stat = paste(round(SBP$mean,1),"±",round(SBP$SD,1))
-SBPmn = mean(data$SYSTOLIC, na.rm=TRUE)
-SBPsd = sd(data$SYSTOLIC, na.rm=TRUE)
+SBPmn = mean(base_df$SYSTOLIC, na.rm=TRUE)
+SBPsd = sd(base_df$SYSTOLIC, na.rm=TRUE)
 
 dbp_t = t(DBP)
 colnames(dbp_t) = DBP$pcobalt
@@ -324,7 +350,7 @@ In Section 3.2 of the Cobalt paper the authors describe their use of binary logi
 In the following section, we run the logistic regression models as generalized linear models (GLMs). In the models, the outcome of the hypertension indicator and the adjusted variables are age (RIDAGEYR), gender (RIAGENDR), BMI (BMXBMI), education (DMDEDUC2), and ethnicity (RIDRETH1). The first GLM is with linear terms, and the second GLM also adds terms linearly together but applies a natural spline to the continuous variables.      
 
 ```{r Model1, warnings=FALSE, message=FALSE}
-subSet = data[, c("hypertension","RIDAGEYR", "RIAGENDR", "BMXBMI","DMDEDUC2", "RIDRETH1")]
+subSet = base_df[, c("hypertension","RIDAGEYR", "RIAGENDR", "BMXBMI","DMDEDUC2", "RIDRETH1")]
 subSet = na.omit(subSet)
 
 lm_logit <- glm(hypertension ~ RIDAGEYR + RIAGENDR + BMXBMI+DMDEDUC2+RIDRETH1, data = subSet, family = "binomial",na.action=na.omit)
@@ -339,7 +365,7 @@ In the code below we fit model two.
 ```{r QA/QC, warnings=FALSE, message=FALSE}
 ## glm linear in the covariates
 ##we first want to reduce to those that have values for these covariates
-subSet = data[, c("hypertension","RIDAGEYR", "RIAGENDR", "BMXBMI","DMDEDUC2", "RIDRETH1")]
+subSet = base_df[, c("hypertension","RIDAGEYR", "RIAGENDR", "BMXBMI","DMDEDUC2", "RIDRETH1")]
 subSet = na.omit(subSet)
 
 lm_logit <- glm(hypertension ~ RIDAGEYR + RIAGENDR + BMXBMI+DMDEDUC2+RIDRETH1, data = subSet, family = "binomial",na.action=na.omit)
@@ -358,12 +384,12 @@ longtest <- reshape2::melt(test,id.vars="hypertension")
 colnames(longtest) = c('hypertension','model','value')
 ggplot(longtest, aes(d = as.numeric(hypertension), m = value, color = model))+ geom_abline()+ geom_roc(size = 1.25) + style_roc()
 
-# plot(roc(data$hypertension,
+# plot(roc(base_df$hypertension,
 #                    fitted(lm_logit)),
 #                print.auc = T, 
 #                col = "red")
 # 
-# plot(roc(data$hypertension,
+# plot(roc(base_df$hypertension,
 #                    fitted(ns_logit)),
 #                print.auc = T, 
 #                col = "blue", 
@@ -406,7 +432,7 @@ As the authors pointed out, the blood cobalt concentrations are not associated w
 FIXME: but they have a bunch of other features in their table 2 - and it would be good if we can start to look at them.
 
 ```{r model1,warning=FALSE,message=FALSE}
-subSet2 = data[, c("hypertension","RIDAGEYR", "RIAGENDR", "BMXBMI","DMDEDUC2", "RIDRETH1", "LBXBCO")]
+subSet2 = base_df[, c("hypertension","RIDAGEYR", "RIAGENDR", "BMXBMI","DMDEDUC2", "RIDRETH1", "LBXBCO")]
 subSet2 = na.omit(subSet2)
 
 lm_logit <- glm(hypertension ~ RIDAGEYR + RIAGENDR + BMXBMI+DMDEDUC2+RIDRETH1+LBXBCO, data = subSet2, family = "binomial")
@@ -430,7 +456,7 @@ FIXME: yes the point here is to develop a better summary of the comparison of mo
 ```{r model2,warning=FALSE,message=FALSE}
    # base_logit <- glm(hypertension ~ RIDAGEYR + RIAGENDR + BMXBMI+DMDEDUC2+RIDRETH1 + sqrt(LBXBCO), data = data, family = "binomial")
    # base_logit <- glm(hypertension ~ ns(RIDAGEYR,df=7) + RIAGENDR + ns(BMXBMI,df=7) + DMDEDUC2 + RIDRETH1 + ns(sqrt(LBXBCO), df=7) + years, data = data, family = "binomial")
-   base_logit <- glm(hypertension ~ ns(RIDAGEYR,df=7) + RIAGENDR + ns(BMXBMI,df=7) + DMDEDUC2 + RIDRETH1, data = data, family = "binomial")
+   base_logit <- glm(hypertension ~ ns(RIDAGEYR,df=7) + RIAGENDR + ns(BMXBMI,df=7) + DMDEDUC2 + RIDRETH1, data = base_df, family = "binomial")
 
    ## try to do some prediction - and then get a plot of the age spline
   ##46 of these
