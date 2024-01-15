@@ -121,7 +121,7 @@ table(complete.cases(base_df))
  In the code above we have identifed a set of tables/questionnaires from NHANES that seem to contain the relevant variables to reproduce Table 1 in the Cobalt paper.  The tables include demographic information (`DEMO`), blood pressure and cholesterol (`BPQ`), high density lipoprotein measurements (`HDL`), Glycohemoglobin (`GHI`), Diabetes (`DIQ`), body mass (`BMX`) and total cholesterol (`TCHOL`).  We subset these tables to extract the variables we think were used in the Cobalt paper, and then merged within years and across cycles.  The result is a dataframe with `r nrow(base_df)` rows and `r `ncol(base_df)` columns.  The number of individuals is close to the 6866 the authors report using in their Table 1.
  
 
-#### Modify the NHANES reported values to align with those used in the Paper
+#### Modify the NHANES phenotypes to align with those used in the Cobalt Paper
 
 Now we look at some of the different variables that are going to be used in the analysis.
 The authors combined the reported ethnicities of Mexican American and Other Hispanic into one group. So we will duplicate that.  They also combined the education levels into three groups, those who had no high school record, some high school, through to completion, or some education beyond high school. In the code below we carry out similar transformations of the data.
@@ -161,11 +161,12 @@ table(smokingVar, useNA="always")
 base_df$smokingVar = smokingVar
 
 ##Poverty level - grouped as <1, 1- 4.99, >5
-  PL = cut(base_df$INDFMPIR, breaks=c(1,5), right=FALSE)
-base_df$PL = PL
+  PL = cut(base_df$INDFMPIR, breaks=c(-1,1,5,10), right=FALSE)
+  levels(PL) = c("<1.0", "1.0-4.99", ">=5")
+  base_df$PL = PL
 ```
 Lastly here, we will look just at the subset of demographic variables listed in Table 1.
-
+In this we see that there are 106 individuals that have missing BMI data, and our count is now 108 more than were reported in Table 1.  So here we will remove those missing the BMI data.  We also note that this then makes both the Smoking and Education particpants closer to the numbers reported in table 1.
 
 
 ```{r DemoSubset }
@@ -174,9 +175,28 @@ demo_sub = base_df[, c("SEQN", "RIDAGEYR","RIAGENDR", "RIDRETH1", "DMDEDUC2",
                        "BMXBMI", "smokingVar", "PL", "LBXBCO" )]
 
 sapply(demo_sub, function(x) sum(is.na(x)))
+##now one last filtering step - drop those wiht missing BMI 
+demo_sub = demo_sub[!is.na(demo_sub$BMXBMI), ]
+table(complete.cases(demo_sub))
 
 ```
+ FIXME: Laha - can you please spend some time and try to replicate table 1 - I think for the paper it is probably enough just to do column 1, 
+ 
+```{r replicateCol1Table1}
+ 
+ table(demo_sub$PL)
+ table(demo_sub$DMDEDUC2)
+ table(demo_sub$smokingVar)
+ table(demo_sub$RIDRETH1)
+ table(demo_sub$RIAGENDR)
+ 
+ mean(demo_sub$BMXBMI)
+ sd(demo_sub$BMXBMI)
+ mean(demo_sub$RIDAGEYR)
+ sd(demo_sub$RIDAGEYR)
+```
 
+### FIXME: below here we will need to switch the analysis to just use the data.frame demo_sub - easiest is to replace base_df with it.
 ## Glucose
 
 ```{r cholmeds-fixup}
