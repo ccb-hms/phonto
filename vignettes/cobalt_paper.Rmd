@@ -199,6 +199,11 @@ table(complete.cases(demo_sub))
 ### FIXME: below here we will need to switch the analysis to just use the data.frame demo_sub - easiest is to replace base_df with it.
 ## Glucose
 
+```{r fixupbase_df}
+base_df = base_df[base_df$SEQN %in% demo_sub$SEQN,]
+
+```
+
 ```{r cholmeds-fixup}
 cholMeds = base_df$BPQ100D
 table(cholMeds, useNA="always")
