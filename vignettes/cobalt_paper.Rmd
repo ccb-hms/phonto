@@ -164,6 +164,18 @@ base_df$smokingVar = smokingVar
   PL = cut(base_df$INDFMPIR, breaks=c(-1,1,5,10), right=FALSE)
   levels(PL) = c("<1.0", "1.0-4.99", ">=5")
   base_df$PL = PL
+  
+##now set up the split for cobalt to match the values used in the paper
+  pcobalt = ifelse(base_df$LBXBCO <= 0.12, "<=0.12", 
+                ifelse(base_df$LBXBCO >= 0.13 & base_df$LBXBCO <= 0.14, "0.13-0.14",
+                  ifelse(base_df$LBXBCO >= 0.15 & base_df$LBXBCO <= 0.18, "0.15-0.18",
+                         ifelse(base_df$LBXBCO >= 0.19, ">=1.9",
+                         NA)  )))
+##make it an ordered factor 
+pcob = factor(pcobalt, levels=c("<=0.12","0.13-0.14", "0.15-0.18",">=1.9"), ordered=TRUE)
+base_df$pcobalt = pcob
+table(base_df$pcobalt)
+
 ```
 Lastly here, we will look just at the subset of demographic variables listed in Table 1.
 In this we see that there are 106 individuals that have missing BMI data, and our count is now 108 more than were reported in Table 1.  So here we will remove those missing the BMI data.  We also note that this then makes both the Smoking and Education particpants closer to the numbers reported in table 1.
@@ -172,7 +184,7 @@ In this we see that there are 106 individuals that have missing BMI data, and ou
 ```{r DemoSubset }
 
 demo_sub = base_df[, c("SEQN", "RIDAGEYR","RIAGENDR", "RIDRETH1", "DMDEDUC2",  
-                       "BMXBMI", "smokingVar", "PL", "LBXBCO" )]
+                       "BMXBMI", "smokingVar", "PL", "LBXBCO", "pcobalt" )]
 
 sapply(demo_sub, function(x) sum(is.na(x)))
 ##now one last filtering step - drop those wiht missing BMI 
@@ -196,13 +208,19 @@ table(complete.cases(demo_sub))
  sd(demo_sub$RIDAGEYR)
 ```
 
-### FIXME: below here we will need to switch the analysis to just use the data.frame demo_sub - easiest is to replace base_df with it.
-## Glucose
+
+## Looking at the other features in the data set
+
+First we will subset the base dataframe (containing almost all the variables of interest) down to the same subset of cases as we used in the analysis above.
 
 ```{r fixupbase_df}
 base_df = base_df[base_df$SEQN %in% demo_sub$SEQN,]
 
 ```
+
+Because of the way the survey was run we will need to fix up some variables.
+We want to convert some of the categories, such as those reporting "Don't know",
+or "Refused" to missing values, since for our purposes that seems reasonable.
 
 ```{r cholmeds-fixup}
 cholMeds = base_df$BPQ100D
@@ -224,7 +242,7 @@ table(hypoglycemicMeds,useNA="always")
 base_df$hypoglycemicMeds = hypoglycemicMeds
 ```
 
-Then fixup glucose
+In the next code chunk we load the glucose data.
 
 ```{r Glucose, warning=FALSE, message=FALSE}
 ##fasting glucose
@@ -232,17 +250,10 @@ Fastgluc = nhanesSearchVarName("LBXGLU", ystart="2015", ystop="2018")
 glucTab = unionQuery(list(GLU_I="LBXGLU", GLU_J="LBXGLU"))
 base_df = merge(base_df, glucTab, all.x=TRUE)
 ```
-The two variables that require additional lab work are LDLs and cobalt levels. As a result they were done on a much smaller set of people.  So instead of loading them simultaneously we extract them below and then use the `merge`
-```{r load TRIGLY and CRCO}
 
-```
-If we were to remove all records with missing values at this point we would be left with a very small number of cases.  So we will try to be careful not to loose too many data points.
-
-#### 2.2) Blood Pressure Data
+#### Blood Pressure Data
 
 Both systolic (BPXS) and diastolic (BPXD) measurements were taken twice, on two separate occassions.  The authors of the Cobalt paper do not specify how they dealt this, did they use the first, the second, an average of the two?  How did they deal with individuals that did not show up for their second measurement?  We will use the average of these two measurements for individuals with two measurements, and in the case where only one measurement is available we will use it. The authors of the Cobalt paper don't specify which values they used, so this is one of the places where our analysis may differ from theirs.
-
-We will just extract the data for the 2015-2016 and 2017-2018 years. We combine these into a single dataframe and then compute the average, for those who have two measurements.
 
 ```{r extract_data, warning=FALSE, message=FALSE}
 ##fixup the blood pressure data - using averages
@@ -256,12 +267,7 @@ base_df$SYSTOLIC[is.na(base_df$BPXSY1) & is.na(base_df$BPXSY2)] = NA
 ```
   In our analysis we can then look at the average of the measurements across the two different time points as a way to estimate the actual blood pressure for each participant.
 
-
-
-Now you have a dataframe with the data, but you will need to better understand the variables, exposures and responses.  To help with that we have created some tools, based on related work in the UK Biobank called PHESANT  (cite PHESANT)).  The process takes each variable (column)
-and reports what type of data it is, continuous or multi-level (ie factors). We report the number of levels. Some numeric quantities are reported such as the ratio of unique values to the length of vector, the proportion of zeros, and the proportion of missing values. NHANES has chosen to store categorical data types (ordered or unordered) as integers. For example, education level, `DMDEDUC2` is identified as `Multilevel-8 `.  You can learn more about the details of the NHANES data in the Quick Start Vignette (cite quick start).
-
-We also need to address some issues around the hypertension variables. Particpants were asked (BPQ020) whether they had ever been told by a doctor or health care professional that they had high blood pressure.  The survey was designed to then skip over a number of questions about their hypertension if they said they did not have hypertension. However this then introduces missing values in the question BPQ050A, which was whether or not they were currently taking a prescription for hypertension. Presumably only people who had been told by their doctor they have hypertension would be taking a perscription and we will need to manually adjust the data so that these are answered No, rather than missing.
+In the code below we want to adjust the reported answers for the question about the use of hypertensive medicines.  Because of the way the survey was carried out, individuals who responded "No" when asked if they had ever been told they had high blood pressure were never asked if they were taking medication for high blood pressure.  It seems reasonable to assume that they would have said "No" had they been asked and so we make that adjustment. Otherwise such individuals will have a missing value for that variable and will be removed during many of the modeling steps we report on below.  Different users might choose to address this in different ways. We want to maximize the number of cases and feel that this is a reasonable choice.
 
 
 ```{r}
@@ -281,14 +287,6 @@ Table 1 provides some basic summaries of the demographic data. We will create a
 temporary subset of the data that uses only the complete cases.
 
 ```{r, message=FALSE, warning=FALSE}
-pcobalt = ifelse(base_df$LBXBCO <= 0.12, "<=0.12", 
-                ifelse(base_df$LBXBCO >= 0.13 & base_df$LBXBCO <= 0.14, "0.13-0.14",
-                  ifelse(base_df$LBXBCO >= 0.15 & base_df$LBXBCO <= 0.18, "0.15-0.18",
-                         ifelse(base_df$LBXBCO >= 0.19, ">=1.9",
-                         NA)  )))
-##make it an ordered factor 
-pcob = factor(pcobalt, levels=c("<=0.12","0.13-0.14", "0.15-0.18",">=1.9"), ordered=TRUE)
-base_df$pcobalt = pcob
 table(pcob, useNA="always")
 AgeGp = base_df |> group_by(pcobalt) |> summarise(mean=mean(RIDAGEYR,na.rm=TRUE),SD=sd(RIDAGEYR,na.rm=TRUE))
 
