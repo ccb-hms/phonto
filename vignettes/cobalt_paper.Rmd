@@ -29,7 +29,6 @@ This vignette is incomplete in many ways.  We also want to emphasize that we are
 ## 1. Load libs
 
 ```{r setup,warning=FALSE,message=FALSE}
-# install EnWAS package via: devtools::install_github("ccb-hms/EnWAS")
 library(splines)
 library(ggplot2)
 library(ggpubr)
@@ -177,6 +176,16 @@ base_df$pcobalt = pcob
 table(base_df$pcobalt)
 
 ```
+FIXME: Laha - you had this code below, I just moved it here - please check it carefully though - 
+```{r, message=FALSE, warning=FALSE}
+table(pcob, useNA="always")
+AgeGp = base_df |> group_by(pcobalt) |> summarise(mean=mean(RIDAGEYR,na.rm=TRUE),SD=sd(RIDAGEYR,na.rm=TRUE))
+AgeGp
+
+```
+
+
+
 Lastly here, we will look just at the subset of demographic variables listed in Table 1.
 In this we see that there are 106 individuals that have missing BMI data, and our count is now 108 more than were reported in Table 1.  So here we will remove those missing the BMI data.  We also note that this then makes both the Smoking and Education particpants closer to the numbers reported in table 1.
 
@@ -282,15 +291,7 @@ base_df$BPQ050A = hypertensiveMeds
 ```
 At this point we have `r nrow(data)` individuals left. 
 
-## Replication of Table 1
-Table 1 provides some basic summaries of the demographic data. We will create a 
-temporary subset of the data that uses only the complete cases.
 
-```{r, message=FALSE, warning=FALSE}
-table(pcob, useNA="always")
-AgeGp = base_df |> group_by(pcobalt) |> summarise(mean=mean(RIDAGEYR,na.rm=TRUE),SD=sd(RIDAGEYR,na.rm=TRUE))
-
-```
 
 ## 2.4 Definitions
 Here we implement the definitions from Section 3.1 of the Cobalt paper. For hypertension they described using reported systolic and diastolic blood pressure measurements as well as self-reported statements regarding whether a physician had ever told them that they have high blood pressure.  
@@ -303,17 +304,18 @@ https://wwwn.cdc.gov/nchs/nhanes/2011-2012/BPQ_G.htm
 ```{r RiskFactors,warning=FALSE,message=FALSE}
 # "Hypertension was defined as systolic blood pressure (SBP) ≥140 mm Hg, diastolic blood pressure ≥90mm Hg, or the use of antihypertensive medication. "
 base_df$hypertension <- base_df$DIASTOLIC >= 90 | base_df$SYSTOLIC >= 140 |  base_df$BPQ050A=="Yes"
-barplot(table(base_df$hypertension))
+table(base_df$hypertension)
+#barplot(table(base_df$hypertension))
 ```
 ```{r Diabetes, warning=FALSE, message=FALSE}
 base_df$diabetes = base_df$DIQ010 == "Yes" | base_df$LBXGLU > 110 | base_df$LBXGH > 6.5
-barplot(table(base_df$diabetes))
+#barplot(table(base_df$diabetes))
 
 base_df$HighLDL = base_df$LBDLDL > 130
-barplot(table(base_df$HighLDL))
+#barplot(table(base_df$HighLDL))
  
 base_df$LowHDL = (base_df$RIAGENDR=="Male" & base_df$LBDHDD < 40) |    (base_df$RIAGENDR=="Female" & base_df$LBDHDD < 50) 
-barplot(table(base_df$LowHDL))
+#barplot(table(base_df$LowHDL))
 
 ```
 Now lets define the elevated total cholesterol variable.
@@ -358,7 +360,7 @@ kbl(table2) |>
 ```
 
 
-The authors don't seem to explore the relationship between taking medications (eg. insulin and oral hypoglycemic drugs) and disease (eg diabetes, or fasting glucose rate).  For hypertension, hypoglycemia and dislipemia it seems like these would be interesting relationships to explore.
+The authors don't seem to explore the relationship between taking medications (eg. insulin and oral hypoglycemic drugs) and disease (eg diabetes, or fasting glucose rate).  For hypertension, hypoglycemia and dislipidemia it seems like these would be interesting relationships to explore.
 
 
 ## 3.Regression Models
@@ -397,9 +399,10 @@ ns_logit <- glm(hypertension ~ ns(RIDAGEYR,df=7)+RIAGENDR + ns(BMXBMI,df=7) + DM
 ```{r}
 # library(pROC)
 library(plotROC)
-test = data_frame(hypertension=subSet$hypertension,lm=lm_logit$fitted.values,   ns=ns_logit$fitted.values)
-longtest <- reshape2::melt(test,id.vars="hypertension")
-colnames(longtest) = c('hypertension','model','value')
+test = data.frame(hypertension=subSet$hypertension,lm=lm_logit$fitted.values,   ns=ns_logit$fitted.values)
+longtest = rbind(data.frame(hypertension = test$hypertension, model="lm", value=test$lm), 
+                 data.frame(hypertension = test$hypertension, model="ns", value=test$ns))
+
 ggplot(longtest, aes(d = as.numeric(hypertension), m = value, color = model))+ geom_abline()+ geom_roc(size = 1.25) + style_roc()
 
 # plot(roc(base_df$hypertension,
