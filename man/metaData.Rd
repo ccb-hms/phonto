@@ -2,20 +2,20 @@
 % Please edit documentation in R/metadata.R
 \name{metaData}
 \alias{metaData}
-\title{Show meta data information}
+\title{Retrieve meta data information from the SQL database}
 \usage{
 metaData(meta)
 }
 \arguments{
-\item{meta}{meta values. If meta set as \code{T} or \code{Tables}, it shows the information of NHANES tables.
-If meta set as \code{V} or \code{Variables}, it shows the information of NHANES Variables.
-If meta set as \code{C} or \code{Codebook}, it shows the Codebook information.}
+\item{meta}{meta values. If meta set as \code{T} or \code{Tables}, it shows the information on NHANES tables.
+If meta set as \code{V} or \code{Variables}, it returns the information of NHANES Variables.
+If meta set as \code{C} or \code{Codebook}, it returns the Codebook information.}
 }
 \value{
-dataframe contains the meta data
+dataframe containing the meta data
 }
 \description{
-It shows NAHANES medata such as, tables, variables and codebooks.
+Retrieve NHANES medata tables, variables and codebooks.
 }
 \examples{
 metaData("T")

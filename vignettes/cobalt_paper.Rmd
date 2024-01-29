@@ -373,29 +373,21 @@ In the following section, we run the logistic regression models as generalized l
 subSet = base_df[, c("hypertension","RIDAGEYR", "RIAGENDR", "BMXBMI","DMDEDUC2", "RIDRETH1")]
 subSet = na.omit(subSet)
 
+##linear in the covariates
 lm_logit <- glm(hypertension ~ RIDAGEYR + RIAGENDR + BMXBMI+DMDEDUC2+RIDRETH1, data = subSet, family = "binomial",na.action=na.omit)
 
-##spline covariates
+##spline fits for the covariates
 ns_logit <- glm(hypertension ~ ns(RIDAGEYR,df=7)+RIAGENDR + ns(BMXBMI,df=7) + DMDEDUC2 + RIDRETH1, 
                    data = subSet, family = "binomial",na.action=na.omit)
 
 ```
-###Model 2
-In the code below we fit model two.
-```{r QA/QC, warnings=FALSE, message=FALSE}
-## glm linear in the covariates
-##we first want to reduce to those that have values for these covariates
-subSet = base_df[, c("hypertension","RIDAGEYR", "RIAGENDR", "BMXBMI","DMDEDUC2", "RIDRETH1")]
-subSet = na.omit(subSet)
 
-lm_logit <- glm(hypertension ~ RIDAGEYR + RIAGENDR + BMXBMI+DMDEDUC2+RIDRETH1, data = subSet, family = "binomial",na.action=na.omit)
-
-##spline covariates
-ns_logit <- glm(hypertension ~ ns(RIDAGEYR,df=7)+RIAGENDR + ns(BMXBMI,df=7) + DMDEDUC2 + RIDRETH1, 
-                   data = subSet, family = "binomial",na.action=na.omit)
 
 ```
 ### 3.1) QA/QC
+
+FIXME: RG - I don't see what the plot is supposed to be showing us?  Why is it here?
+
 ```{r}
 # library(pROC)
 library(plotROC)
@@ -405,18 +397,9 @@ longtest = rbind(data.frame(hypertension = test$hypertension, model="lm", value=
 
 ggplot(longtest, aes(d = as.numeric(hypertension), m = value, color = model))+ geom_abline()+ geom_roc(size = 1.25) + style_roc()
 
-# plot(roc(base_df$hypertension,
-#                    fitted(lm_logit)),
-#                print.auc = T, 
-#                col = "red")
-# 
-# plot(roc(base_df$hypertension,
-#                    fitted(ns_logit)),
-#                print.auc = T, 
-#                col = "blue", 
-#                add = T)
 ```
 
+### Compare the models 
 ```{r}
 # Age
 df_age_fitt = list("Binned Data"=make_bins(x=subSet$RIDAGEYR,y=as.numeric(subSet$hypertension),nbin=600),
@@ -434,13 +417,11 @@ df_bmi_fit =list("Linear"=make_bins(x=subSet$BMXBMI,y=lm_logit$fitted.values,nbi
 bmi_fit <- plot_bins2(df_bmi_fit,xlab="BMI",ylab="Hypertension",is_facet=F) 
 
 ```
-The following plots show binned Hypertension data; each bin contains about 600 data points and we compute the proportion of the participants who reported hypertension. 
-Linear and Spline present the fitted values (probabilities) from the GLM with linear terms and apply the natural spline function on continuous terms of the participants who have 
-hypertension. For both age, panel a), and BMI, panel b),  the GLM model using splines agrees with the estimates obtained by binning, while when these terms are modeled using
-a simple linear term there are more substantial discrepancies. 
+The following plots show estimates of the proportion of hypertensive individuals based
+on binning the data by either age or BMI. 
+We will also compare them to a simple estimate of the probability of being hypertensive that is based on binning the data for each variable. This model does not rely on any of the other covariates.  So, we choose to have about 600 individuals per bin and then compute the proportion of hypertensives per bin, and for each model we take the average of the fitted values for the cases in a bin.
+For both age, panel a), and BMI, panel b),  the GLM model using splines agrees with the simple binned estimates while the predictions from the model that assumes the covariate effects are linear show more substantial discrepancies.
 
-To compute the model estimates for each bin we simply average the computed fitted values (which are defined to be back-transformed to probabilities for logistic regression) over the 
-same individuals in each bin. One might want to examine the relationship on the logit scale, which is easily done.
 
 ```{r qa_qc_plot, echo=TRUE,warning=FALSE,message=FALSE, fig.width = 12,fig.height=6}
 
@@ -449,6 +430,7 @@ ggpubr::ggarrange(age_fitt,bmi_fit,nrow = 1,ncol = 2,labels = c('a)','b)'))
 
 
 ## 4. Their findings
+
 As the authors pointed out, the blood cobalt concentrations are not associated with the risk of hypertension based on the following summary table. The cobalt concentration does not significantly impact hypertension.
 FIXME: but they have a bunch of other features in their table 2 - and it would be good if we can start to look at them.
 
@@ -459,7 +441,29 @@ subSet2 = na.omit(subSet2)
 lm_logit <- glm(hypertension ~ RIDAGEYR + RIAGENDR + BMXBMI+DMDEDUC2+RIDRETH1+LBXBCO, data = subSet2, family = "binomial")
 ns_logit <- glm(hypertension ~ ns(RIDAGEYR,df=7)+RIAGENDR + ns(BMXBMI,df=7) + DMDEDUC2 + RIDRETH1+LBXBCO, 
                    data = subSet2, family = "binomial",na.action=na.omit)
+                   
+##drop the Age term and then do ANOVA to get a p-value comparable to the age coef
+##in the anova from lm_logit
+ns_logitAge <- glm(hypertension ~ RIAGENDR + ns(BMXBMI,df=7) + DMDEDUC2 + RIDRETH1+LBXBCO, 
+                   data = subSet2, family = "binomial",na.action=na.omit)
+                   
+anova(ns_logitAge, ns_logit, test = "LRT")
 
+##now ns for Age vs linear for Age
+lm_logitAge <- glm(hypertension ~ RIDAGEYR + RIAGENDR + ns(BMXBMI,df=7) + DMDEDUC2 + RIDRETH1+LBXBCO,  data = subSet2, family = "binomial",na.action=na.omit)
+anova(lm_logitAge, ns_logit, test="LRT")
+
+##compare ns for BMI to no BMI
+ns_logitBMI <- glm(hypertension ~ ns(RIDAGEYR,df=7)+RIAGENDR + DMDEDUC2 + RIDRETH1+LBXBCO,  data = subSet2, family = "binomial",na.action=na.omit)
+
+anova(ns_logitBMI, ns_logit, test="LRT")
+
+##compare ns for BMI to linear BMI
+lm_logitBMI  <- glm(hypertension ~ ns(RIDAGEYR,df=7)+RIAGENDR + BMXBMI + DMDEDUC2 + RIDRETH1+LBXBCO,  data = subSet2, family = "binomial",na.action=na.omit)
+
+anova(lm_logitBMI, ns_logit, test="LRT")
+
+##produce a table of estimates
 sjPlot::tab_model(lm_logit,ns_logit,
                   dv.labels = c("lm", "spline"),
                   show.ci = FALSE,show.stat = TRUE,show.se = TRUE,p.style = "scientific", digits.p = 2)
