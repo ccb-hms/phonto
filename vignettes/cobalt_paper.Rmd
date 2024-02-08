@@ -385,6 +385,8 @@ lm_logit <- glm(hypertension ~ RIDAGEYR + RIAGENDR + BMXBMI+DMDEDUC2+RIDRETH1, d
 ns_logit <- glm(hypertension ~ ns(RIDAGEYR,df=7)+RIAGENDR + ns(BMXBMI,df=7) + DMDEDUC2 + RIDRETH1, 
                    data = subSet, family = "binomial",na.action=na.omit)
 
+##use LRT to compare models
+anova(lm_logit, ns_logit, test ="LRT")
 ```
 
 
@@ -392,6 +394,9 @@ ns_logit <- glm(hypertension ~ ns(RIDAGEYR,df=7)+RIAGENDR + ns(BMXBMI,df=7) + DM
 ### 3.1) QA/QC
 
 FIXME: RG - I don't see what the plot is supposed to be showing us?  Why is it here?
+RG: probably we need to find a variable that has an effect and show what that is..
+added the anova above and it seems like the spline models for the covariates are important -
+not sure why we don't see any separation in the plot below.
 
 ```{r}
 # library(pROC)
