@@ -119,6 +119,8 @@ table(complete.cases(base_df))
 
  In the code above we have identifed a set of tables/questionnaires from NHANES that seem to contain the relevant variables to reproduce Table 1 in the Cobalt paper.  The tables include demographic information (`DEMO`), blood pressure and cholesterol (`BPQ`), high density lipoprotein measurements (`HDL`), Glycohemoglobin (`GHI`), Diabetes (`DIQ`), body mass (`BMX`) and total cholesterol (`TCHOL`).  We subset these tables to extract the variables we think were used in the Cobalt paper, and then merged within years and across cycles.  The result is a dataframe with `r nrow(base_df)` rows and `r `ncol(base_df)` columns.  The number of individuals is close to the 6866 the authors report using in their Table 1.
  
+ FIXME: here I think we need to run PHESANT, or something like it, on these tables and report the output.
+ 
 
 #### Modify the NHANES phenotypes to align with those used in the Cobalt Paper
 
@@ -186,8 +188,8 @@ AgeGp
 
 
 
-Lastly here, we will look just at the subset of demographic variables listed in Table 1.
-In this we see that there are 106 individuals that have missing BMI data, and our count is now 108 more than were reported in Table 1.  So here we will remove those missing the BMI data.  We also note that this then makes both the Smoking and Education particpants closer to the numbers reported in table 1.
+Lastly we examine the subset of demographic variables listed in Table 1.
+We see that there are 106 individuals that have missing BMI data, and our total count is now 108 more than were reported in Table 1.  So we will remove those missing the BMI data and stop with this process. We have not identifed the same subset, but it is probably close enough.  We also note that this then makes both the values for Smoking and Education closer to the numbers reported in Table 1.
 
 
 ```{r DemoSubset }
@@ -230,6 +232,7 @@ base_df = base_df[base_df$SEQN %in% demo_sub$SEQN,]
 Because of the way the survey was run we will need to fix up some variables.
 We want to convert some of the categories, such as those reporting "Don't know",
 or "Refused" to missing values, since for our purposes that seems reasonable.
+FIXME: need to see how this aligns with what Deepayan and Rafael are doing.
 
 ```{r cholmeds-fixup}
 cholMeds = base_df$BPQ100D
@@ -326,6 +329,7 @@ base_df$elevatedTC = elevatedTC
 ```
 
 Note that some of our groupings are very similar to those reported in the Cobalt paper, but some, notably Elevated LDLs are quite different. This discrepency should be explored (it may have to do with incorrect subsetting by age).
+
 ## 2.5 Compare with Table-2
 ```{r, message=FALSE,warning=FALSE}
 
@@ -349,7 +353,8 @@ table2 = rbind(sbp_t["stat",],dbp_t["stat",])
 table2 = table2[,c("<=0.12","0.13-0.14","0.15-0.18",">=1.9")]
 table2 = cbind("Blood Pressures"=c("SBP (mm Hg), mean±SD","DBP (mm Hg), mean±SD"),table2)
 ```
-It shows the number we have is not exactly the same as the one in the table-2 in the paper. The authors did not use the average of two reads of the blood pressure measurements.
+It shows the number we have is not exactly the same as the one in the Table 2. 
+
 
 ```{r, message=FALSE,warning=FALSE}
 library(kableExtra)
@@ -474,9 +479,8 @@ to the data.  To do that, we pick a covariate, say Age, where we want to compute
 To get predictions from the model for a specific age we also need to specify values for all the other covariates in the model.  
 Our suggestion is that for categorical variables choose the most common category and for continuous variables use the median value.
 
-*** Robert, you only keep one base model in the end, do you want to me plot or compare somethings***
-FIXME: yes the point here is to develop a better summary of the comparison of models with spline terms. I really don't like the R output that shows each term individually, as you can't really interpret them and they take up a lot of room.  I think we should instead, create one line for each spline term, and in it only put the value of the LRT comparing the model with the spline to the model without it.  From that comparison you can get the chi-squared statistic, the p-value and the df and those could be put into the table.  I think that would be a better thing.
-
+   We probably need to drop everything below this - not at all sure that it should
+   be in the vignette
 
 ```{r model2,warning=FALSE,message=FALSE}
    # base_logit <- glm(hypertension ~ RIDAGEYR + RIAGENDR + BMXBMI+DMDEDUC2+RIDRETH1 + sqrt(LBXBCO), data = data, family = "binomial")
