@@ -388,7 +388,7 @@ ns_logit <- glm(hypertension ~ ns(RIDAGEYR,df=7)+RIAGENDR + ns(BMXBMI,df=7) + DM
 ```
 
 
-```
+
 ### 3.1) QA/QC
 
 FIXME: RG - I don't see what the plot is supposed to be showing us?  Why is it here?
@@ -474,31 +474,27 @@ sjPlot::tab_model(lm_logit,ns_logit,
                   show.ci = FALSE,show.stat = TRUE,show.se = TRUE,p.style = "scientific", digits.p = 2)
 
 ```
-  FIXME:  This likely belongs in the QA/QC section.  The point of this code is to show the reader how they can estimate the functional form of the spline that they are fitting
-to the data.  To do that, we pick a covariate, say Age, where we want to compute the spline.  Then we pick a set of Age values that cover the range of ages in the model.  
+## Plotting the estimated splines 
+
+ In the code below we demonstrate how to plot the estimated logits for spline models. The basic approach is to create a set of values for the variable of interest and then to fix the other variables in the model.  One typically sets these at a mid-point for continuous variables and the most common value for any categorical variables.  One can also show the effects of covariates by plotting multiple estimates with different choices for the values used for these variables. To do that, we pick a covariate, say Age, where we want to compute the spline.  Then we pick a set of Age values that cover the range of ages in the model.  
 To get predictions from the model for a specific age we also need to specify values for all the other covariates in the model.  
-Our suggestion is that for categorical variables choose the most common category and for continuous variables use the median value.
-
-   We probably need to drop everything below this - not at all sure that it should
-   be in the vignette
-
+FIXME: would be good to 
+ 
 ```{r model2,warning=FALSE,message=FALSE}
-   # base_logit <- glm(hypertension ~ RIDAGEYR + RIAGENDR + BMXBMI+DMDEDUC2+RIDRETH1 + sqrt(LBXBCO), data = data, family = "binomial")
-   # base_logit <- glm(hypertension ~ ns(RIDAGEYR,df=7) + RIAGENDR + ns(BMXBMI,df=7) + DMDEDUC2 + RIDRETH1 + ns(sqrt(LBXBCO), df=7) + years, data = data, family = "binomial")
+
    base_logit <- glm(hypertension ~ ns(RIDAGEYR,df=7) + RIAGENDR + ns(BMXBMI,df=7) + DMDEDUC2 + RIDRETH1, data = base_df, family = "binomial")
 
-   ## try to do some prediction - and then get a plot of the age spline
-  ##46 of these
+  ##pick a set of age values - within the range of the data, and enough values to get a reasonably smooth line
+  ## look at the effect of high school - which is substantial
   yvals = seq(40,85,by=1)
-  dfimpute = data.frame(RIDAGEYR=yvals, RIAGENDR=rep("Male", 46), BMXBMI=rep(28.9, 46), DMDEDUC2=rep("HS", 46), RIDRETH1=rep("Non-Hispanic White", 46))
+  dfpred1 = data.frame(RIDAGEYR=yvals, RIAGENDR=rep("Male", 46), BMXBMI=rep(28.9, 46), DMDEDUC2=rep("HS", 46), RIDRETH1=rep("Non-Hispanic White", 46))
 
-  predV = predict(base_logit, newdata=dfimpute)
+  dfpred2 = data.frame(RIDAGEYR=yvals, RIAGENDR=rep("Male", 46), BMXBMI=rep(28.9, 46), DMDEDUC2=rep(">HS", 46), RIDRETH1=rep("Non-Hispanic White", 46))
+
+  predVM = predict(base_logit, newdata=dfpred1)
+  predVF = predict(base_logit, newdata=dfpred2)
   # lines(40:85, predV)
-  qplot(40:85,predV,geom = "line") + theme_bw()
-
- ##now look at BMI
-  yBMI = 14:80
-  dfBMIimpute = data.frame(RIDAGEYR=rep(60,67) , RIAGENDR=rep("Male", 67), BMXBMI=yBMI, DMDEDUC2=rep("HS", 67), RIDRETH1=rep("Non-Hispanic White", 67))
-  predBMI = predict(base_logit, newdata=dfBMIimpute)
-  qplot(14:80,predBMI,geom = "line") + theme_bw()
+  plot(40:85, predVM, type="l", xlab="Age", ylab = "logit(p(hypertension))")
+  lines(40:85, predVF, col="skyblue")
 ```
+ 
