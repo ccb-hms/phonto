@@ -207,16 +207,57 @@ table(complete.cases(demo_sub))
  
 ```{r replicateCol1Table1}
  
- table(demo_sub$PL)
- table(demo_sub$DMDEDUC2)
- table(demo_sub$smokingVar)
- table(demo_sub$RIDRETH1)
- table(demo_sub$RIAGENDR)
+ income = table(demo_sub$PL)
+ edu = table(demo_sub$DMDEDUC2)
+ smoking = table(demo_sub$smokingVar)
+ eth  = table(demo_sub$RIDRETH1)
+ age = table(demo_sub$RIAGENDR)
+ sex = table(demo_sub$RIAGENDR)
  
- mean(demo_sub$BMXBMI)
- sd(demo_sub$BMXBMI)
- mean(demo_sub$RIDAGEYR)
- sd(demo_sub$RIDAGEYR)
+ # mean(demo_sub$BMXBMI)
+ # sd(demo_sub$BMXBMI)
+ # mean(demo_sub$RIDAGEYR)
+ # sd(demo_sub$RIDAGEYR)
+```
+
+```{r, message=FALSE,warning=FALSE}
+library(kableExtra)
+percent <- function(x, digits = 2, format = "f", ...) {
+  paste0("(",formatC(100 * x, format = format, digits = digits, ...), "%",")")
+}
+mean_sd = function(x){
+  paste0(round(mean(x),2),"±",round(sd(x),2))
+}
+age_t1 = mean_sd(demo_sub$RIDAGEYR)
+BMI_t1 = mean_sd(demo_sub$BMXBMI)
+edu_t1 = paste0(edu,percent(edu/nrow(demo_sub)))
+eth_t1 = paste0(eth,percent(eth/nrow(demo_sub)))
+inc_t1 = paste0(income,percent(income/nrow(demo_sub)))
+sex_t1 = paste0(sex,percent(sex/nrow(demo_sub)))
+smoke_t1 = paste0(smoking,percent(smoking/nrow(demo_sub)))
+
+table1 = data.frame(All=c(nrow(demo_sub),age_t1,sex_t1[2],BMI_t1,edu_t1,eth_t1,inc_t1,smoke_t1),
+                    Q1 = rep("",17), Q2 = rep("",17), Q3 = rep("",17), Q4 = rep("",17),
+                    row.names=c("Number","Age (yrs),   Mean±SD", 
+                                "Male n(%)","BMI,Mean±SD",
+                                "<High School","High School",">High School",
+                                names(eth),names(income),names(smoking)))
+
+# row1 = c("Cobalt Quartiles (ug/L)","<=0.12","0.13-0.14","0.15-0.18",">=1.9")
+table1[1,2:5] = table(demo_sub$pcobalt)
+table1[2,2:5] = c(mean_sd(demo_sub[demo_sub$pcobalt=="<=0.12","RIDAGEYR"]),
+                  mean_sd(demo_sub[demo_sub$pcobalt=="0.13-0.14","RIDAGEYR"]),
+                  mean_sd(demo_sub[demo_sub$pcobalt=="0.15-0.18","RIDAGEYR"]),
+                  mean_sd(demo_sub[demo_sub$pcobalt==">=1.9","RIDAGEYR"])
+                  )
+
+
+table1 |> kbl(caption = "Reproduce partial of Table 1") |>
+    kable_classic() |> pack_rows("Education Level, n(%)",5,7) |>
+    pack_rows("Race, n(%)",8,11) |> 
+    pack_rows("Family Poverty income Ratio, n(%)",12,14) |>
+    pack_rows("Smoking, n(%)",15,17)
+
 ```
 
 
@@ -357,7 +398,6 @@ It shows the number we have is not exactly the same as the one in the Table 2.
 
 
 ```{r, message=FALSE,warning=FALSE}
-library(kableExtra)
 kbl(table2) |>
   kable_classic() |>
   add_header_above(c(" " = 1, "Cobalt Quartiles (ug/L)" = 4))
