@@ -178,13 +178,7 @@ base_df$pcobalt = pcob
 table(base_df$pcobalt)
 
 ```
-FIXME: Laha - you had this code below, I just moved it here - please check it carefully though - 
-```{r, message=FALSE, warning=FALSE}
-table(pcob, useNA="always")
-AgeGp = base_df |> group_by(pcobalt) |> summarise(mean=mean(RIDAGEYR,na.rm=TRUE),SD=sd(RIDAGEYR,na.rm=TRUE))
-AgeGp
 
-```
 
 
 
@@ -203,30 +197,23 @@ demo_sub = demo_sub[!is.na(demo_sub$BMXBMI), ]
 table(complete.cases(demo_sub))
 
 ```
- FIXME: Laha - can you please spend some time and try to replicate table 1 - I think for the paper it is probably enough just to do column 1, 
- 
-```{r replicateCol1Table1}
- 
- income = table(demo_sub$PL)
- edu = table(demo_sub$DMDEDUC2)
- smoking = table(demo_sub$smokingVar)
- eth  = table(demo_sub$RIDRETH1)
- age = table(demo_sub$RIAGENDR)
- sex = table(demo_sub$RIAGENDR)
- 
- # mean(demo_sub$BMXBMI)
- # sd(demo_sub$BMXBMI)
- # mean(demo_sub$RIDAGEYR)
- # sd(demo_sub$RIDAGEYR)
-```
+
+In the code below we produce the first column and the first two rows of Table 1 from @citeCobalt based on the assumptions we have made.  The interested reader can fill in some of the other columns, if they want to follow along in a little more detail.  As we have noted above, the reproduction is not exact, but it is also not very far off.
 
 ```{r, message=FALSE,warning=FALSE}
+
+ edu = table(demo_sub$DMDEDUC2)
+ eth  = table(demo_sub$RIDRETH1)
+ income = table(demo_sub$PL)
+ sex = table(demo_sub$RIAGENDR)
+ smoking = table(demo_sub$smokingVar)
+ 
 library(kableExtra)
-percent <- function(x, digits = 2, format = "f", ...) {
+percent <- function(x, digits = 1, format = "f", ...) {
   paste0("(",formatC(100 * x, format = format, digits = digits, ...), "%",")")
 }
 mean_sd = function(x){
-  paste0(round(mean(x),2),"±",round(sd(x),2))
+  paste0(round(mean(x),1),"±",round(sd(x),1))
 }
 age_t1 = mean_sd(demo_sub$RIDAGEYR)
 BMI_t1 = mean_sd(demo_sub$BMXBMI)
@@ -236,11 +223,12 @@ inc_t1 = paste0(income,percent(income/nrow(demo_sub)))
 sex_t1 = paste0(sex,percent(sex/nrow(demo_sub)))
 smoke_t1 = paste0(smoking,percent(smoking/nrow(demo_sub)))
 
+##Warning - this pasting in the row.names is very dangerous - and easy to get wrong
 table1 = data.frame(All=c(nrow(demo_sub),age_t1,sex_t1[2],BMI_t1,edu_t1,eth_t1,inc_t1,smoke_t1),
                     Q1 = rep("",17), Q2 = rep("",17), Q3 = rep("",17), Q4 = rep("",17),
                     row.names=c("Number","Age (yrs),   Mean±SD", 
                                 "Male n(%)","BMI,Mean±SD",
-                                "<High School","High School",">High School",
+                                names(edu),
                                 names(eth),names(income),names(smoking)))
 
 # row1 = c("Cobalt Quartiles (ug/L)","<=0.12","0.13-0.14","0.15-0.18",">=1.9")
@@ -252,7 +240,7 @@ table1[2,2:5] = c(mean_sd(demo_sub[demo_sub$pcobalt=="<=0.12","RIDAGEYR"]),
                   )
 
 
-table1 |> kbl(caption = "Reproduce partial of Table 1") |>
+table1 |> kbl(caption = "Partial Reproduction of Table 1") |>
     kable_classic() |> pack_rows("Education Level, n(%)",5,7) |>
     pack_rows("Race, n(%)",8,11) |> 
     pack_rows("Family Poverty income Ratio, n(%)",12,14) |>
