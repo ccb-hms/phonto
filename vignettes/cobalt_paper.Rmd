@@ -179,9 +179,6 @@ table(base_df$pcobalt)
 
 ```
 
-
-
-
 Lastly we examine the subset of demographic variables listed in Table 1.
 We see that there are 106 individuals that have missing BMI data, and our total count is now 108 more than were reported in Table 1.  So we will remove those missing the BMI data and stop with this process. We have not identifed the same subset, but it is probably close enough.  We also note that this then makes both the values for Smoking and Education closer to the numbers reported in Table 1.
 
@@ -251,17 +248,17 @@ table1 |> kbl(caption = "Partial Reproduction of Table 1") |>
 
 ## Looking at the other features in the data set
 
-First we will subset the base dataframe (containing almost all the variables of interest) down to the same subset of cases as we used in the analysis above.
+First we will subset the base dataframe (containing almost all the variables of interest) down to the same subset of cases as we used in the analysis above which we believe comes close to the set of individuals used in the @citecobalt paper.
 
 ```{r fixupbase_df}
 base_df = base_df[base_df$SEQN %in% demo_sub$SEQN,]
 
 ```
 
-Because of the way the survey was run we will need to fix up some variables.
-We want to convert some of the categories, such as those reporting "Don't know",
-or "Refused" to missing values, since for our purposes that seems reasonable.
-FIXME: need to see how this aligns with what Deepayan and Rafael are doing.
+For some variables NHANES reports multiple different variants of non-response
+such as "Don't know", or "Refused".  We will convert all of these to missing values, since for our purposes that seems reasonable.  We also address one of the issues around the design of the survey. In order to minimize irrelevant questions the survey taker will skip over some questions if they are not relevant.  There are many such instances in the NHANES surveys, and users will need to examine the variables they use carefully. From the Blood Pressure & Cholesterol survey the question `BPQ080` asks if the respondents doctor has ever told them that they have high blood pressure.  Respondents that answer yes, are then asked question `BPQ060`: Have you ever had your cholesterol checked, but those that answered no will not be asked that, and instead their response to `BPQ060` is a missing value. We feel, that for our purposes it would be better to *guess* that they would have said no to `BPQ060` and so we fill in a response of `no`.  If we don't do that, then in lots of other analyses we would lose those individuals as most modeling methods drop any cases with missing values.
+
+FIXME: Deepayan - not sure how we are automating this.
 
 ```{r cholmeds-fixup}
 cholMeds = base_df$BPQ100D
