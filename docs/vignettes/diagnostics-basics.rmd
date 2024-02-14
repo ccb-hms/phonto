@@ -15,15 +15,22 @@ opts_chunk$set(collapse = FALSE, autodep = TRUE,
                dev = "svglite", dev.args = list(pointsize = 12),
                cache = TRUE,
                cache.path = "~/knitr-cache/diagnostics-basic/")
-options(warnPartialMatchDollar = FALSE, width = 200)
+options(warnPartialMatchDollar = FALSE, width = 80)
 ```
-
 
 
 NHANES is a large project, and while the data distribution strategy
 employed by CDC works quite well overall, inconsistencies do creep
 in. This document describes a series of diagnostic checks, enabled by
 the local SQL database, to identify possible issues.
+
+
+## Version information
+
+```{r}
+Sys.getenv("EPICONDUCTOR_CONTAINER_VERSION")
+print(sessionInfo(), locale = FALSE)
+```
 
 
 ## Cross check tables with NHANES master list
@@ -71,7 +78,7 @@ f.close()
 ```{r}
 manifest <- read.csv("table_manifest.csv")
 str(manifest)
-## Some weird URLs to fix up
+## Some redirect URLs to fix up
 subset(manifest, grepl("cdc.gov../", DocURL, fixed = TRUE) |
                  grepl("cdc.gov../", DataURL, fixed = TRUE))
 manifest <- within(manifest, {
@@ -121,8 +128,6 @@ minute-by-minute results recorded in a physical activity monitoring device.
 These data are not included in the database (and probably should not be), but 
 we will retain these rows to remind us that the tables exist.
 
-
-
 Next, we check if any of these tables are missing from the table
 metadata in the database.
 
@@ -131,23 +136,14 @@ metadata in the database.
 library(nhanesA)
 library(phonto)
 dbTableDesc <- nhanesQuery("select * from Metadata.QuestionnaireDescriptions")
-setdiff(manifest$Table, dbTableDesc$TableName) # missing from DB
+(mtabs <- setdiff(manifest$Table, dbTableDesc$TableName)) # missing from DB
 setdiff(dbTableDesc$TableName, manifest$Table) # and the other way
-```
-
-If we exclude the pre-pandemic tables, we are left with 
-
-```{r}
-options(width = 80)
-mtabs <- setdiff(manifest$Table, dbTableDesc$TableName) |>
-             grep(pattern = "^P_", invert = TRUE, value = TRUE)
-mtabs
 ```
 
 Ideally, this should match the list of excluded tables given by.
 
 ```{r}
-nhanesQuery("select * from Metadata.ExcludedTables")
+nhanesQuery("select * from Metadata.ExcludedTables where Reason != 'limited access'")
 ```
 
 The following links can be used to explore the documentation of these
@@ -158,6 +154,19 @@ paste0("- <", subset(manifest, Table %in% mtabs)$DocURL, ">") |>
     cat(sep = "\n")
 ```
 
+## Consistency check for limited access tables
+
+```{r}
+ltd <- nhanesQuery("select * from Metadata.ExcludedTables where Reason = 'limited access'")
+```
+
+Verify that these are excluded from the manifest, as well as from the database.
+
+
+```{r}
+table(ltd$TableName %in% manifest$Table)
+table(ltd$TableName %in% dbTableDesc$TableName)
+```
 
 
 
@@ -176,8 +185,9 @@ given below.
 
 ```{r results='asis'}
 mdoc <- subset(dbTableDesc, !startsWith(DocFile, "https"))$TableName
-paste0("- <", subset(manifest, Table %in% mdoc)$DocURL, ">") |>
-    cat(sep = "\n")
+if (length(mdoc))
+    paste0("- <", subset(manifest, Table %in% mdoc)$DocURL, ">") |>
+        cat(sep = "\n")
 ```
 
 We end with a couple of sanity checks for the URLs that are _not_ missing.
@@ -194,8 +204,12 @@ metadata_data_url <- with(subset(dbTableDesc, DataFile != ""),
 If not missing, doc / data URLs in the metadata should match those in the manifest.
 
 ```{r}
-all(metadata_doc_url == manifest_doc_url[names(metadata_doc_url)])
-all(metadata_data_url == manifest_data_url[names(metadata_data_url)])
+doc_mismatch <- (metadata_doc_url != manifest_doc_url[names(metadata_doc_url)])
+data_mismatch <- (metadata_data_url != manifest_data_url[names(metadata_data_url)])
+if (any(doc_mismatch))
+    cbind(metadata_doc_url, manifest_doc_url[names(metadata_doc_url)])[doc_mismatch, ]
+if (any(data_mismatch))
+    cbind(metadata_data_url, manifest_data_url[names(metadata_data_url)])[data_mismatch, ]
 ```
 
 
