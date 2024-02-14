@@ -388,85 +388,31 @@ metadata_data_url <- with(subset(dbTableDesc, DataFile != ""),
                           structure(DataFile, names = TableName))
 ```
 
-If not missing, doc / data URLs in the metadata should match those in the manifest.
+If not missing, doc / data URLs in the metadata should match those in
+the manifest. Some mismatches are due to differences in case, so we
+only look for mismatch upto case.
 
 
 ```r
-doc_mismatch <- (metadata_doc_url != manifest_doc_url[names(metadata_doc_url)])
-data_mismatch <- (metadata_data_url != manifest_data_url[names(metadata_data_url)])
+doc_mismatch <- tolower(metadata_doc_url) != tolower(manifest_doc_url[names(metadata_doc_url)])
+data_mismatch <- tolower(metadata_data_url) != tolower(manifest_data_url[names(metadata_data_url)])
 if (any(doc_mismatch))
     cbind(metadata_doc_url, manifest_doc_url[names(metadata_doc_url)])[doc_mismatch, ]
 ```
 
 ```
-         metadata_doc_url                                         
-APOB_F   "https://wwwn.cdc.gov/Nchs/Nhanes/2009-2010/ApoB_F.htm"  
-APOB_H   "https://wwwn.cdc.gov/Nchs/Nhanes/2013-2014/ApoB_H.htm"  
-L11_2_B  "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L11_2_b.htm" 
-PBCD_D   "https://wwwn.cdc.gov/Nchs/Nhanes/2005-2006/PbCd_D.htm"  
-PBCD_E   "https://wwwn.cdc.gov/Nchs/Nhanes/2007-2008/PbCd_E.htm"  
-PBCD_F   "https://wwwn.cdc.gov/Nchs/Nhanes/2009-2010/PbCd_F.htm"  
-IHG_D    "https://wwwn.cdc.gov/Nchs/Nhanes/2005-2006/IHg_D.htm"   
-IHG_F    "https://wwwn.cdc.gov/Nchs/Nhanes/2009-2010/IHg_F.htm"   
-APOB_G   "https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/ApoB_G.htm"  
-L34_B    "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/l34_b.htm"   
-PBCD_G   "https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/PbCd_G.htm"  
-L13_B    "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/l13_b.htm"   
-L39_2_B  "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/l39_2_b.htm" 
-L02HPA_A "https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/L02HPA_a.htm"
-IHGEM_G  "https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/IHgEM_G.htm" 
-APOB_E   "https://wwwn.cdc.gov/Nchs/Nhanes/2007-2008/ApoB_E.htm"  
-L13_2_B  "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/l13_2_b.htm" 
-L25_2_B  "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/l25_2_b.htm" 
-L09_C    "https://wwwn.cdc.gov/Nchs/Nhanes/2003-2004/l09_c.htm"   
-LAB09    "https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/lab09.htm"   
-L11P_2_B "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/l11p_2_b.htm"
-VID_B    "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/VID_B.htm"   
-VID_D    "https://wwwn.cdc.gov/Nchs/Nhanes/2005-2006/VID_D.htm"   
-L34_C    "https://wwwn.cdc.gov/Nchs/Nhanes/2003-2004/l34_c.htm"   
-L13_C    "https://wwwn.cdc.gov/Nchs/Nhanes/2003-2004/l13_c.htm"   
-LAB13    "https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/Lab13.htm"   
-LAB02    "https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/Lab02.htm"   
-L09_B    "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/l09_b.htm"   
-IHG_E    "https://wwwn.cdc.gov/Nchs/Nhanes/2007-2008/IHg_E.htm"   
-L26PP_B  "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/l26PP_B.htm" 
-VID_C    "https://wwwn.cdc.gov/Nchs/Nhanes/2003-2004/VID_C.htm"   
-VID_F    "https://wwwn.cdc.gov/Nchs/Nhanes/2009-2010/VID_F.htm"   
-VID_E    "https://wwwn.cdc.gov/Nchs/Nhanes/2007-2008/VID_E.htm"   
-                                                                                                    
-APOB_F   "https://wwwn.cdc.gov/Nchs/Nhanes/2009-2010/APOB_F.htm"                                    
-APOB_H   "https://wwwn.cdc.gov/Nchs/Nhanes/2013-2014/APOB_H.htm"                                    
-L11_2_B  "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L11_2_B.htm"                                   
-PBCD_D   "https://wwwn.cdc.gov/Nchs/Nhanes/2005-2006/PBCD_D.htm"                                    
-PBCD_E   "https://wwwn.cdc.gov/Nchs/Nhanes/2007-2008/PBCD_E.htm"                                    
-PBCD_F   "https://wwwn.cdc.gov/Nchs/Nhanes/2009-2010/PBCD_F.htm"                                    
-IHG_D    "https://wwwn.cdc.gov/Nchs/Nhanes/2005-2006/IHG_D.htm"                                     
-IHG_F    "https://wwwn.cdc.gov/Nchs/Nhanes/2009-2010/IHG_F.htm"                                     
-APOB_G   "https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/APOB_G.htm"                                    
-L34_B    "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L34_B.htm"                                     
-PBCD_G   "https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/PBCD_G.htm"                                    
-L13_B    "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L13_B.htm"                                     
-L39_2_B  "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L39_2_B.htm"                                   
-L02HPA_A "https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/L02HPA_A.htm"                                  
-IHGEM_G  "https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/IHGEM_G.htm"                                   
-APOB_E   "https://wwwn.cdc.gov/Nchs/Nhanes/2007-2008/APOB_E.htm"                                    
-L13_2_B  "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L13_2_B.htm"                                   
-L25_2_B  "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L25_2_B.htm"                                   
-L09_C    "https://wwwn.cdc.gov/Nchs/Nhanes/2003-2004/L09_C.htm"                                     
-LAB09    "https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/LAB09.htm"                                     
-L11P_2_B "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L11P_2_B.htm"                                  
-VID_B    "https://wwwn.cdc.gov/Nchs/Nhanes/vitamind/analyticalnote.aspx?b=2001&e=2002&d=VID_B&x=htm"
-VID_D    "https://wwwn.cdc.gov/Nchs/Nhanes/vitamind/analyticalnote.aspx?b=2005&e=2006&d=VID_D&x=htm"
-L34_C    "https://wwwn.cdc.gov/Nchs/Nhanes/2003-2004/L34_C.htm"                                     
-L13_C    "https://wwwn.cdc.gov/Nchs/Nhanes/2003-2004/L13_C.htm"                                     
-LAB13    "https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/LAB13.htm"                                     
-LAB02    "https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/LAB02.htm"                                     
-L09_B    "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L09_B.htm"                                     
-IHG_E    "https://wwwn.cdc.gov/Nchs/Nhanes/2007-2008/IHG_E.htm"                                     
-L26PP_B  "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L26PP_B.htm"                                   
-VID_C    "https://wwwn.cdc.gov/Nchs/Nhanes/vitamind/analyticalnote.aspx?b=2003&e=2004&d=VID_C&x=htm"
-VID_F    "https://wwwn.cdc.gov/Nchs/Nhanes/vitamind/analyticalnote.aspx?b=2009&e=2010&d=VID_F&x=htm"
-VID_E    "https://wwwn.cdc.gov/Nchs/Nhanes/vitamind/analyticalnote.aspx?b=2007&e=2008&d=VID_E&x=htm"
+      metadata_doc_url                                      
+VID_B "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/VID_B.htm"
+VID_D "https://wwwn.cdc.gov/Nchs/Nhanes/2005-2006/VID_D.htm"
+VID_C "https://wwwn.cdc.gov/Nchs/Nhanes/2003-2004/VID_C.htm"
+VID_F "https://wwwn.cdc.gov/Nchs/Nhanes/2009-2010/VID_F.htm"
+VID_E "https://wwwn.cdc.gov/Nchs/Nhanes/2007-2008/VID_E.htm"
+                                                                                                 
+VID_B "https://wwwn.cdc.gov/Nchs/Nhanes/vitamind/analyticalnote.aspx?b=2001&e=2002&d=VID_B&x=htm"
+VID_D "https://wwwn.cdc.gov/Nchs/Nhanes/vitamind/analyticalnote.aspx?b=2005&e=2006&d=VID_D&x=htm"
+VID_C "https://wwwn.cdc.gov/Nchs/Nhanes/vitamind/analyticalnote.aspx?b=2003&e=2004&d=VID_C&x=htm"
+VID_F "https://wwwn.cdc.gov/Nchs/Nhanes/vitamind/analyticalnote.aspx?b=2009&e=2010&d=VID_F&x=htm"
+VID_E "https://wwwn.cdc.gov/Nchs/Nhanes/vitamind/analyticalnote.aspx?b=2007&e=2008&d=VID_E&x=htm"
 ```
 
 ```r
@@ -475,77 +421,21 @@ if (any(data_mismatch))
 ```
 
 ```
-         metadata_data_url                                        
-APOB_F   "https://wwwn.cdc.gov/Nchs/Nhanes/2009-2010/ApoB_F.XPT"  
-APOB_H   "https://wwwn.cdc.gov/Nchs/Nhanes/2013-2014/ApoB_H.XPT"  
-L11_2_B  "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L11_2_b.XPT" 
-PBCD_D   "https://wwwn.cdc.gov/Nchs/Nhanes/2005-2006/PbCd_D.XPT"  
-PBCD_E   "https://wwwn.cdc.gov/Nchs/Nhanes/2007-2008/PbCd_E.XPT"  
-PBCD_F   "https://wwwn.cdc.gov/Nchs/Nhanes/2009-2010/PbCd_F.XPT"  
-IHG_D    "https://wwwn.cdc.gov/Nchs/Nhanes/2005-2006/IHg_D.XPT"   
-IHG_F    "https://wwwn.cdc.gov/Nchs/Nhanes/2009-2010/IHg_F.XPT"   
-APOB_G   "https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/ApoB_G.XPT"  
-L34_B    "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/l34_b.XPT"   
-PBCD_G   "https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/PbCd_G.XPT"  
-L13_B    "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/l13_b.XPT"   
-L39_2_B  "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/l39_2_b.XPT" 
-L02HPA_A "https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/L02HPA_a.XPT"
-IHGEM_G  "https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/IHgEM_G.XPT" 
-APOB_E   "https://wwwn.cdc.gov/Nchs/Nhanes/2007-2008/ApoB_E.XPT"  
-L13_2_B  "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/l13_2_b.XPT" 
-L25_2_B  "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/l25_2_b.XPT" 
-L09_C    "https://wwwn.cdc.gov/Nchs/Nhanes/2003-2004/l09_c.XPT"   
-LAB09    "https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/lab09.XPT"   
-L11P_2_B "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/l11p_2_b.XPT"
-VID_B    "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/VID_B.XPT"   
-VID_D    "https://wwwn.cdc.gov/Nchs/Nhanes/2005-2006/VID_D.XPT"   
-L34_C    "https://wwwn.cdc.gov/Nchs/Nhanes/2003-2004/l34_c.XPT"   
-L13_C    "https://wwwn.cdc.gov/Nchs/Nhanes/2003-2004/l13_c.XPT"   
-LAB13    "https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/Lab13.XPT"   
-LAB02    "https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/Lab02.XPT"   
-L09_B    "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/l09_b.XPT"   
-IHG_E    "https://wwwn.cdc.gov/Nchs/Nhanes/2007-2008/IHg_E.XPT"   
-L26PP_B  "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/l26PP_B.XPT" 
-VID_C    "https://wwwn.cdc.gov/Nchs/Nhanes/2003-2004/VID_C.XPT"   
-VID_F    "https://wwwn.cdc.gov/Nchs/Nhanes/2009-2010/VID_F.XPT"   
-VID_E    "https://wwwn.cdc.gov/Nchs/Nhanes/2007-2008/VID_E.XPT"   
-                                                                                                    
-APOB_F   "https://wwwn.cdc.gov/Nchs/Nhanes/2009-2010/APOB_F.XPT"                                    
-APOB_H   "https://wwwn.cdc.gov/Nchs/Nhanes/2013-2014/APOB_H.XPT"                                    
-L11_2_B  "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L11_2_B.XPT"                                   
-PBCD_D   "https://wwwn.cdc.gov/Nchs/Nhanes/2005-2006/PBCD_D.XPT"                                    
-PBCD_E   "https://wwwn.cdc.gov/Nchs/Nhanes/2007-2008/PBCD_E.XPT"                                    
-PBCD_F   "https://wwwn.cdc.gov/Nchs/Nhanes/2009-2010/PBCD_F.XPT"                                    
-IHG_D    "https://wwwn.cdc.gov/Nchs/Nhanes/2005-2006/IHG_D.XPT"                                     
-IHG_F    "https://wwwn.cdc.gov/Nchs/Nhanes/2009-2010/IHG_F.XPT"                                     
-APOB_G   "https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/APOB_G.XPT"                                    
-L34_B    "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L34_B.XPT"                                     
-PBCD_G   "https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/PBCD_G.XPT"                                    
-L13_B    "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L13_B.XPT"                                     
-L39_2_B  "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L39_2_B.XPT"                                   
-L02HPA_A "https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/L02HPA_A.XPT"                                  
-IHGEM_G  "https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/IHGEM_G.XPT"                                   
-APOB_E   "https://wwwn.cdc.gov/Nchs/Nhanes/2007-2008/APOB_E.XPT"                                    
-L13_2_B  "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L13_2_B.XPT"                                   
-L25_2_B  "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L25_2_B.XPT"                                   
-L09_C    "https://wwwn.cdc.gov/Nchs/Nhanes/2003-2004/L09_C.XPT"                                     
-LAB09    "https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/LAB09.XPT"                                     
-L11P_2_B "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L11P_2_B.XPT"                                  
-VID_B    "https://wwwn.cdc.gov/Nchs/Nhanes/vitamind/analyticalnote.aspx?b=2001&e=2002&d=VID_B&x=XPT"
-VID_D    "https://wwwn.cdc.gov/Nchs/Nhanes/vitamind/analyticalnote.aspx?b=2005&e=2006&d=VID_D&x=XPT"
-L34_C    "https://wwwn.cdc.gov/Nchs/Nhanes/2003-2004/L34_C.XPT"                                     
-L13_C    "https://wwwn.cdc.gov/Nchs/Nhanes/2003-2004/L13_C.XPT"                                     
-LAB13    "https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/LAB13.XPT"                                     
-LAB02    "https://wwwn.cdc.gov/Nchs/Nhanes/1999-2000/LAB02.XPT"                                     
-L09_B    "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L09_B.XPT"                                     
-IHG_E    "https://wwwn.cdc.gov/Nchs/Nhanes/2007-2008/IHG_E.XPT"                                     
-L26PP_B  "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/L26PP_B.XPT"                                   
-VID_C    "https://wwwn.cdc.gov/Nchs/Nhanes/vitamind/analyticalnote.aspx?b=2003&e=2004&d=VID_C&x=XPT"
-VID_F    "https://wwwn.cdc.gov/Nchs/Nhanes/vitamind/analyticalnote.aspx?b=2009&e=2010&d=VID_F&x=XPT"
-VID_E    "https://wwwn.cdc.gov/Nchs/Nhanes/vitamind/analyticalnote.aspx?b=2007&e=2008&d=VID_E&x=XPT"
+      metadata_data_url                                     
+VID_B "https://wwwn.cdc.gov/Nchs/Nhanes/2001-2002/VID_B.XPT"
+VID_D "https://wwwn.cdc.gov/Nchs/Nhanes/2005-2006/VID_D.XPT"
+VID_C "https://wwwn.cdc.gov/Nchs/Nhanes/2003-2004/VID_C.XPT"
+VID_F "https://wwwn.cdc.gov/Nchs/Nhanes/2009-2010/VID_F.XPT"
+VID_E "https://wwwn.cdc.gov/Nchs/Nhanes/2007-2008/VID_E.XPT"
+                                                                                                 
+VID_B "https://wwwn.cdc.gov/Nchs/Nhanes/vitamind/analyticalnote.aspx?b=2001&e=2002&d=VID_B&x=XPT"
+VID_D "https://wwwn.cdc.gov/Nchs/Nhanes/vitamind/analyticalnote.aspx?b=2005&e=2006&d=VID_D&x=XPT"
+VID_C "https://wwwn.cdc.gov/Nchs/Nhanes/vitamind/analyticalnote.aspx?b=2003&e=2004&d=VID_C&x=XPT"
+VID_F "https://wwwn.cdc.gov/Nchs/Nhanes/vitamind/analyticalnote.aspx?b=2009&e=2010&d=VID_F&x=XPT"
+VID_E "https://wwwn.cdc.gov/Nchs/Nhanes/vitamind/analyticalnote.aspx?b=2007&e=2008&d=VID_E&x=XPT"
 ```
 
-
-
-
+We expect mismatches in the `VID_*` tables as the original manifest
+points to redirect pages that have been suitably mapped before being
+stored in the database.
 

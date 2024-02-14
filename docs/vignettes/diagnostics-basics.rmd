@@ -201,18 +201,20 @@ metadata_data_url <- with(subset(dbTableDesc, DataFile != ""),
                           structure(DataFile, names = TableName))
 ```
 
-If not missing, doc / data URLs in the metadata should match those in the manifest.
+If not missing, doc / data URLs in the metadata should match those in
+the manifest. Some mismatches are due to differences in case, so we
+only look for mismatch upto case.
 
 ```{r}
-doc_mismatch <- (metadata_doc_url != manifest_doc_url[names(metadata_doc_url)])
-data_mismatch <- (metadata_data_url != manifest_data_url[names(metadata_data_url)])
+doc_mismatch <- tolower(metadata_doc_url) != tolower(manifest_doc_url[names(metadata_doc_url)])
+data_mismatch <- tolower(metadata_data_url) != tolower(manifest_data_url[names(metadata_data_url)])
 if (any(doc_mismatch))
     cbind(metadata_doc_url, manifest_doc_url[names(metadata_doc_url)])[doc_mismatch, ]
 if (any(data_mismatch))
     cbind(metadata_data_url, manifest_data_url[names(metadata_data_url)])[data_mismatch, ]
 ```
 
-
-
-
+We expect mismatches in the `VID_*` tables as the original manifest
+points to redirect pages that have been suitably mapped before being
+stored in the database.
 
