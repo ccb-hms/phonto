@@ -84,7 +84,6 @@ qc_var_saslabel <- function(x, var, cb, tab, ignore.case = FALSE)
     else NULL
 }
 
-
 qc_var_target <- function(x, var, cb, tab, ignore.case = FALSE)
 {
     target <- subset(var, Variable == x)[["Target"]]
@@ -121,12 +120,12 @@ qc_var_target <- function(x, var, cb, tab, ignore.case = FALSE)
 
 ##' QC report for a variable in NHANES
 ##'
-##' .. content for \details{} ..
-##' @param x 
+##' @title qc_var: QC on NHANES variable
+##' @param x Character string naming a variable in one or more NHANES tables 
 ##' @param var Optional data frame containing variable metadata
 ##' @param cb Optional data frame containing codebook metadata
 ##' @param tab Optional data frame containing table metadata
-##' @return
+##' @return An object of S3 class \code{"qc_var"} with suitable print and summary methods.
 ##' @export
 ##' @author Deepayan Sarkar
 qc_var <- function(x, var = metadata_var(x), cb = metadata_cb(x), tab = metadata_tab())
@@ -141,6 +140,10 @@ qc_var <- function(x, var = metadata_var(x), cb = metadata_cb(x), tab = metadata
               class = "qc_var")
 }
 
+#' @rdname qc_var
+#' @export
+#' @param object An object of class \code{"qv_var"}
+#' @param ... Additional arguments, ignored
 summary.qc_var <- function(object, ...)
 {
     data.frame(Variable = attr(object, "variable"),
@@ -152,6 +155,8 @@ summary.qc_var <- function(object, ...)
 
 
 
+#' @rdname qc_var
+#' @export
 print.qc_var <- function(x, ...)
 {
     ok <- TRUE
