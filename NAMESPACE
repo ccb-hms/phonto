@@ -2,8 +2,12 @@
 
 S3method(print,qc_var)
 S3method(summary,qc_var)
+export(addPrimaryKey)
 export(checkDataConsistency)
 export(dataDescription)
+export(dbInsertNhanesTable)
+export(get_skip_info)
+export(insertTableDB)
 export(jointQuery)
 export(make_bins)
 export(metaData)
