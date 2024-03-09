@@ -26,6 +26,7 @@
 ##' @rdname insertTableDB
 ##' @param columns Character vector, giving names of one or more columns in the table
 ##' @author Deepayan Sarkar
+##' @export
 
 addPrimaryKey <- function(con, table, columns)
 {
@@ -60,6 +61,7 @@ isWholeNumber <- function(x) all(x == as.integer(x))
 ##' @param non_null 
 ##' @param make_primary_key 
 ##' @author Deepayan Sarkar
+##' @export
 insertTableDB <-
     function(con, data, table,
              check_integer = TRUE,
@@ -170,6 +172,7 @@ dbTableNameFromNHANES <- function(x, type = c("raw", "translated"))
 ##'     special values for numeric variables should be converted to
 ##'     missing values. TODO more details.
 ##' @author Deepayan Sarkar
+##' @export
 dbInsertNhanesTable <-
     function(con, x, data = nhanes(x, translated = FALSE),
              type = c("raw", "translated", "both"),
