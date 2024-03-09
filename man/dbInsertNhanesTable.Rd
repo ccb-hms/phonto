@@ -9,7 +9,7 @@ dbInsertNhanesTable(
   x,
   data = nhanes(x, translated = FALSE),
   type = c("raw", "translated", "both"),
-  codebook = NULL,
+  codebook = .codebookFromDB(x),
   make_primary_key = TRUE,
   check_integer = TRUE,
   cleanse_numeric = TRUE

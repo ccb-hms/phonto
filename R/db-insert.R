@@ -1,3 +1,21 @@
+### FIXME: Review for proper quoting of table and variable names
+### (remember Bobby Tables)
+
+
+### Tools to support creation of database to be included in
+### Epiconductor docker image. Main steps (assuming postgresql):
+
+## 1. Create database NhanesLandingZone
+
+## 2. create schema Metadata; create schema Raw; create schema Translated;
+
+## 3. Fill in Metadata.QuestionnaireVariables,
+##    Metadata.VariableCodebook, possibly using insertTableDB(). These
+##    are required to create the codebook for translations (unless we
+##    want to download on the fly). Do we need support functions for
+##    these?
+
+## 4. Fill in Raw.* and Translated.* tables in a loop
 
 
 ##' Declare one or more non-null columns to be primary key
@@ -85,7 +103,45 @@ dbTableNameFromNHANES <- function(x, type = c("raw", "translated"))
            translated = paste0("Translated.", x))
 }
 
-translateNhData <- function(data, codebook, cleanse_numeric = FALSE)
+## Simplified reimplentation of nhanesA::nhanesCodebook() to bypass nhanesA
+
+.dbqTableVars <- paste0(
+    "SELECT ",
+    "Variable AS 'Variable Name:', ",
+    "SasLabel AS 'SAS Label:', ",
+    "Description AS 'English Text:', ",
+    "Target AS 'Target:' ",
+    "FROM Metadata.QuestionnaireVariables ",
+    "WHERE TableName = '%s'"
+)
+
+.dbqTableCodebook <- paste0(
+    "SELECT ",
+    "Variable, ",
+    "CodeOrValue AS 'Code.or.Value', ",
+    "ValueDescription AS 'Value.Description', ",
+    "Count, ",
+    "Cumulative, ",
+    "SkipToItem AS 'Skip.to.Item' ",
+    "FROM Metadata.VariableCodebook ",
+    "WHERE TableName = '%s'"
+)
+
+.codebookFromDB <- function(table)
+{
+    tvars <- .nhanesQuery(sprintf(.dbqTableVars, table))
+    tcb <- .nhanesQuery(sprintf(.dbqTableCodebook, table))
+    tcb_list <- split(tcb[-1], tcb$Variable)
+    cb <- split(tvars, ~ `Variable Name:`) |> lapply(as.list)
+    vnames <- names(cb)
+    for (i in seq_along(cb)) {
+        iname <- vnames[[i]]
+        cb[[i]][[iname]] <- tcb_list[[iname]]
+    }
+    cb
+}
+
+.translateNhData <- function(data, codebook, cleanse_numeric = FALSE)
 {
     nhanesA:::raw2translated(data, codebook, 
                              cleanse_numeric = cleanse_numeric)
@@ -117,7 +173,7 @@ translateNhData <- function(data, codebook, cleanse_numeric = FALSE)
 dbInsertNhanesTable <-
     function(con, x, data = nhanes(x, translated = FALSE),
              type = c("raw", "translated", "both"),
-             codebook = NULL,
+             codebook = .codebookFromDB(x),
              make_primary_key = TRUE,
              check_integer = TRUE,
              cleanse_numeric = TRUE)
@@ -136,8 +192,8 @@ dbInsertNhanesTable <-
     if (type %in% c("translated", "both")) {
         target <- dbTableNameFromNHANES(x, type = c("raw", "translated"))
         insertTableDB(con = con,
-                      data = translateNhData(data, codebook,
-                                             cleanse_numeric = cleanse_numeric),
+                      data = .translateNhData(data, codebook,
+                                              cleanse_numeric = cleanse_numeric),
                       table = target,
                       check_integer = check_integer,
                       non_null = pk,
