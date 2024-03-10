@@ -32,7 +32,7 @@ addPrimaryKey <- function(con, table, columns)
 {
     qcol <- DBI::dbQuoteIdentifier(con, columns)
     sql <- sprintf("ALTER TABLE %s ADD PRIMARY KEY (%s);",
-                   x,
+                   table,
                    paste0(qcol, collapse = ", "))
     query <- DBI::SQL(sql)
     dbExecute(con, query)
@@ -44,7 +44,10 @@ addPrimaryKey <- function(con, table, columns)
 ## isWholeNumber <- function(x, tol = .Machine$double.eps^0.5) all(abs(x - round(x)) < tol)
 
 ## But this one is faster and should be OK for NHANES data
-isWholeNumber <- function(x) all(x == as.integer(x))
+isWholeNumber <- function(x) {
+    keep <- !is.na(x)
+    isTRUE(all(x[keep] == as.integer(x[keep])))
+}
 
 
 
@@ -78,9 +81,9 @@ insertTableDB <-
     qtable <- DBI::dbQuoteIdentifier(con, table)
     dtype <- DBI::dbDataType(con, data)
     if (!is.null(non_null)) {
-        if (!all(non_null %in% dcol)) {
+        if (!all(non_null %in% dcols)) {
             stop("Columns specified as non-null do not exists in data:",
-                  non_null[!(non_null %in% dcol)] |> paste(collapse = ", "))
+                  non_null[!(non_null %in% dcols)] |> paste(collapse = ", "))
         }
         dtype[non_null] <- paste0(dtype[non_null], " NOT NULL")
     }
@@ -173,6 +176,7 @@ dbTableNameFromNHANES <- function(x, type = c("raw", "translated"))
 ##'     missing values. TODO more details.
 ##' @author Deepayan Sarkar
 ##' @export
+
 dbInsertNhanesTable <-
     function(con, x, data = nhanes(x, translated = FALSE),
              type = c("raw", "translated", "both"),
@@ -182,7 +186,7 @@ dbInsertNhanesTable <-
              cleanse_numeric = TRUE)
 {
     type <- match.arg(type)
-    pk <- if (isTRUE(primary_key)) 
+    pk <- if (isTRUE(make_primary_key)) 
               primary_keys(x, require_unique = FALSE)
           else NULL
     if (type %in% c("raw", "both")) {
