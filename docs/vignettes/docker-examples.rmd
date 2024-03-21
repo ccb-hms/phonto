@@ -1,0 +1,413 @@
+---
+layout: default
+title: "Examples of workflows enabled by docker"
+author: "Deepayan Sarkar"
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(comment = "",
+                      fig.path = "figures/dockereg-",
+                      out.width = "100%",
+                      fig.width = 12, fig.height = 8,
+                      dev = "svglite", dev.args = list(pointsize = 12),
+                      cache = TRUE,
+                      warning = TRUE, error = FALSE,
+                      cache.path = "~/knitr-cache/dockereg/")
+options(width = 80)
+```
+
+
+## Introduction
+
+One of the goals of the Epiconductor project is to make the analysis
+of NHANES data simpler. To this end, it provides tools that can be
+used to (a) download all public NHANES data and and load it into an
+SQL database, and (b) make snapshots of this database available
+locally through docker images. The primary goal in distributing the
+pre-built docker images is to provide a ready-to-use tool for data
+analysts who may not be conversant with database technologies. The
+docker image thus includes R and RStudio, along with a version of the
+`nhanesA` R package that is configured to obtain data from the SQL
+database rather than the CDC website. We expect most users of the
+docker image to use it through the `nhanesA` package. Such analyses
+will run even outside the docker environment as well, albeit more
+slowly as it will involve downloading data from the CDC website.
+
+The potential uses of the docker image goes beyond this, however. As
+NHANES collects and publishes data on a continuous basis, it is
+natural to want to combine data across cycles. This is not
+straightforward because a certain variable of interest may be present
+in different tables in different cyles, or may not even be present in
+all cycles. With all data locally available, it is possible to
+efficiently check where variables are to be found (if at all), examine
+differences over NHANES cycles, and detect a range of anomalies that
+any analyst needs to be aware of, but would normally be difficult to
+find. This vignette provides some illustrative examples, and describes
+some relevant tools in the `phonto` package that could be useful to
+practitioners.
+
+
+## Combining data across cycles
+
+
+We start with a straightforward illustration of the process of
+combining data across cycles, where we combine the demographic data
+table from all cycles. NHANES table names typically have a suffix; the
+suffixes `_A`, `_B`, `_C`,and so on generally correspond to NHANES
+cycle years from 1999-2000, 2001-2002, 2003-2004, etc. However, it is
+important to highlight that not every table strictly adheres to this
+naming convention. For instance, while `DEMO_B` and `DEMO_C` are
+associated with the 2001-2002 and 2003-2004 cycles, respectively, the
+corresponding table for the 1999-2000 cycle is named 'DEMO', without
+the `_A` suffix. While this pattern holds for most tables, certain
+tables such as `SSAFB_A` and `SSANA_A` from the 1999-2000 cycle do
+include the `_A` suffix. To assist users in navigating these
+variations, the `nhanesA` package includes the
+`nhanesSearchTableNames()` function, which allows users to easily
+locate all table names containing a specific string, thus simplifying
+the process of identifying relevant table names.
+
+```{r alldemo}
+library(nhanesA)
+demo_all <- nhanesSearchTableNames("DEMO")
+demo_all
+```
+
+The last table in this list merits special mention. During the
+2019-2020 cycle, data collection was disrupted by the COVID-19
+pandemic. Therefore, the partial 2019-2020 data (herein 2019-March
+2020 data) were combined with data from the previous cycle (2017-2018)
+to create a nationally representative sample covering 2017-March 2020.
+These data files have the same basic file name, e.g., `DEMO`, but add
+the prefix `P_`. These 'pre-pandemic' files require special handling
+and the CDC has provided substantial guidance as well as updated
+survey weights.
+
+We can now collect all these datasets using `nhanes()`
+function. Normally, this process is likely to be somewhat slow as
+several files will need to be downloaded from the CDC website. Within
+the docker environment, however, it should be almost instantaneous.
+
+```{r getalldemo, error = TRUE}
+all_demo_data <- sapply(demo_all, nhanes, simplify = FALSE)
+object.size(all_demo_data) # ~45 MB
+sapply(all_demo_data, dim)
+```
+
+The first row in the output above gives the number of participants in
+each cycle, and the second row denotes the number of variables in the
+corresponding `DEMO` table. We can see that each cycle has around
+10,000 participants, who are unique across cycles. Note, however, that
+the larger number of participants in the `P_DEMO` dataset is
+misleading, because many of these participants are actually from the
+previous cycle as described above. We will drop this table before
+combining the remaining datasets.
+
+The differing number of variables across cycles indicate that
+variables are not measured consistently across cycles. In fact, many
+variables included in the `DEMO` table in the first cycle were
+subsequently included in other tables, and others have been dropped
+altogether or added. We can make a list of the variables that are
+common to all `DEMO` tables, and combine the corresponding data
+subsets together, as follows.
+
+```{r combinedemo}
+all_demo_data <- head(all_demo_data, -1)
+common_vars <- lapply(all_demo_data, names) |> Reduce(f = intersect)
+common_vars
+demo_combined <-
+    lapply(all_demo_data, `[`, common_vars) |>
+    do.call(what = rbind) |>
+    transform(cycle = substring(SDDSRVYR, 8, 17))
+dim(demo_combined)
+```
+
+The combined dataset can be analysed further using standard tools. For
+example, the following code uses the `lattice` package to summarize
+the number of participants by recorded ethnicity and gender by cycle.
+
+```{r demoplot,fig.width=12, fig.height=7, fig.caption=""}
+library("lattice")
+demo_combined |>
+    xtabs(~ cycle + RIAGENDR + RIDRETH1, data = _) |>
+    array2DF() |>
+    dotplot(Value ~ cycle | RIAGENDR,
+            groups = RIDRETH1,
+            layout = c(1, 2), type = "b",
+            par.settings = simpleTheme(pch = 16),
+            auto.key = list(columns = 3))
+```
+
+
+One must be cautious when combining data across
+cycles, because the NHANES data are sometimes inconsistent in
+unexpected ways. As a simple example, consider the `DMDEDUC3`
+variable, which records education level of children and youth. The
+following code illustrates that the values of this variable have
+inconsistent capitalization in different cycles.
+
+```{r changes}
+xtabs(~ cycle + DMDEDUC3, demo_combined)[, 1:4]
+```
+
+
+## Cross-cycle Consistency checks using variable codebooks
+
+In our experience, inconsistencies such as the change in
+capitalization described above occur quite often, and in a variety of
+different ways, requiring attention to detail when combining data from
+across cycles. These inconsistencies are not necessarily mistakes, as
+NHANES questionnaires and variables are often modified from cycle to
+cycle. The primary source that must be consulted to identify such
+inconsistencies are the per-table documentation, and in particular the
+variable codebooks giving details of how each variable is recorded.
+
+The NHANES database contains the variable codebooks for all tables
+across all cycles in a single database table called
+`Metadata.VariableCodebook`. Once imported into R, this information
+can be manipulated in various ways to glean information of
+interest. See the [codebook
+diagnostics](https://ccb-hms.github.io/phonto/vignettes/diagnostics-codebook.html)
+vignette for a different set of diagnostics that are enabled by having
+easy access to this information.
+
+```{r}
+library("phonto")
+dim(all_cb <- nhanesQuery("select * from Metadata.VariableCodebook"))
+## dim(all_cb <- metaData("Codebook")) # alt interface
+all_cb <- dplyr::filter(all_cb, !startsWith(TableName, "P_")) # skip pre-pandemic tables
+```
+
+An analyst would typically be interested in some specific variables
+that are relevant to their study. The first step is to identify how
+many cycles these variables were recorded in.  To this end, we may
+start by examining the number of _tables_ each variable appears in
+across all cycles of continuous NHANES.
+
+```{r}
+var_freq <- 
+    all_cb[c("Variable", "TableName")] |> unique() |>
+        xtabs(~ Variable, data = _) |>
+        sort(decreasing = TRUE)
+table(var_freq)
+```
+
+Not surprisingly, many variables appear only once or twice across all
+cycles, and for such variables combining data across cycles would not
+be interesting. Variables that appear in multiple cycles, but only
+once per cycle, may usually be merged as in the `DEMO` example above,
+but note that they may appear in different tables. One must be careful
+about ensuring that the variable is measuring the same quantity in all
+cycles. This is usually true, but not always. For example, the range
+of values for the `LBCBHC` variable in different cycles seem to
+exhibit some discrepancy.
+
+```{r}
+subset(all_cb, Variable == "LBCBHC")[1:5]
+```
+
+More useful information about the variables may be obtained from the
+`Metadata.QuestionnaireVariables` table in the database, which
+contains one row for each variable in each table containing its
+description, target group, etc., obtained from the HTML documentation
+of NHANES tables.
+
+```{r}
+dim(all_var <- phonto::nhanesQuery("select * from Metadata.QuestionnaireVariables"))
+## dim(all_var <- metaData("Variables"))
+subset(all_var, Variable == "LBCBHC")[1:5]
+```
+
+This shows that the unit of measurement was changed from the
+2009--2010 cycle, explaining the discrepancy. Without a careful check,
+such changes may be overlooked, leading to errors in interpretation.
+
+It is not easy to systematically detect such changes without manual
+inspection of variables of interest. One way to shortlist possible
+candidate variables are to identify those for whom the `Description`
+or `SasLabel` field has changed. Unfortunately, such changes happen
+frequently for completely benign reasons, leading to many false
+positives.
+
+
+## Within-cycle consistency
+
+Somewhat more surprisingly, several variables appear
+in more tables than there are cycles, which means that they must
+appear in multiple tables within the same cycle. The following
+variables appear in more than 20 tables.
+
+```{r}
+var_freq[ var_freq > 20 ]
+```
+
+For such variables, selecting the corresponding subset of `all_cb`
+shows all entries in the codebook tables for that variable, across all
+tables and cycles. For example,
+
+```{r}
+subset(all_cb, Variable == "PHAFSTMN")[1:5]
+```
+
+
+Inspection of this table shows that the `PHAFSTMN` variable was
+initially recorded in the `PH` table for the first three cycles, after
+which it was recorded in three different tables (`FASTQX`, `GLU`, and
+`OGTT`) for several cycles, before being dropped again from the latter
+two tables. It is natural to wonder whether all these tables contain
+the same data. This can only be verified by comparing the actual data,
+which we will not do for this example, but some hints are provided by
+the data counts included in the codebook. For example, for the
+2005--2006 cycle, we have
+
+```{r}
+subset(all_cb, Variable == "PHAFSTMN" & endsWith(TableName, "_D"))[1:5]
+```
+
+From the variable metadata table, we see that 
+
+```{r}
+subset(all_var, Variable == "PHAFSTMN" & endsWith(TableName, "_D"))[c(1, 2, 4, 5)]
+```
+
+While not definitive, this suggests that the `PHAFSTMN` variable
+measures the same quantity in all three tables, and the difference in
+number of observations may be due to the difference in target age
+group.
+
+Even if a preliminary inspection suggests no obvious problems, one
+should verify by comparing the actual recorded data. For example,
+consider the `ENQ100` variable, which appears in both `ENX` and `SPX`
+tables.
+
+
+```{r}
+subset(all_var, Variable == "ENQ100" & endsWith(TableName, "_E"))[c(1, 2, 4, 5)]
+merge(nhanes("ENX_E")[c("SEQN", "ENQ100")],
+      nhanes("SPX_E")[c("SEQN", "ENQ100")], by = "SEQN") |>
+    xtabs(~ ENQ100.x + ENQ100.y, data =_, addNA = TRUE)
+```
+
+Comparing the records in the two tables after matching by `SEQN`, the
+participant identifier, we see that even though most records are
+consistent, several records with `Yes` or `No` answers in the `SPX`
+tables are recorded as `NA` (missing) in the `ENX` tables.
+
+
+A more egregious example, where the same variable is clearly measuring
+two different things, is provided by the `LBXHCT` variable.
+
+```{r}
+subset(all_cb, Variable == "LBXHCT" & endsWith(TableName, "_H"))[1:5]
+subset(all_var, Variable == "LBXHCT" & endsWith(TableName, "_H"))[c(1, 2, 3, 4, 5)]
+merge(nhanes("CBC_H")[c("SEQN", "LBXHCT")],
+      nhanes("COT_H")[c("SEQN", "LBXHCT")], by = "SEQN") |> head()
+```
+
+
+## Quality control reports
+
+Getting a comprehensive picture of the issues relevant for a
+particular variable may take some work, as seen in the above
+examples. However, much of the preliminary work can be automated, and
+the `qc_var()` function in the `phonto` package dowa precisely this.
+
+The report for the `LBCBHC` variable can be generated using the
+following call.
+
+```{r}
+qc_var("LBCBHC")
+```
+
+Similarly, the reports for `PHAFSTMN` (where the issues flagged are
+relatively benign) and `LBXHCT` (where they are not) are obtained as
+follows.
+
+```{r}
+qc_var("PHAFSTMN")
+qc_var("LBXHCT")
+```
+
+As we can see, these reports give an incomplete but suggestive initial
+list of potential issues, which can be followed up on by the analyst
+if necessary.
+
+Other useful checks that have not yet been implemented but are planned
+include:
+
+* Special codes in numeric variables: For numeric variables, special
+  codes are sometimes used to indicate unusual values. A common use is
+  to have special codes to disambiguate various types of missing
+  responses (e.g., `"Refused"` and `"Don't know"`). Some of these are
+  already converted to `NA` values by default, but others may remain.
+
+* One particular instance of special codes represent data coarsening,
+  that is, clubbing of numeric values over a range (e.g., ages over 80
+  are usually replaced by 80).
+
+The plan is to report the presence of such codes in variable QC
+reports.
+
+## Variables that are potentially skipped
+
+Some variables in a table may be skipped depending on the response to
+a previous question. This information is recorded in the variable
+codebooks. For example, in table `WHQ`, if the response to `WHD060` is
+"Yes", then subsequent questions are skipped until `WHQ090` is
+reached.
+
+```{r}
+nhanesCodebook("WHQ", "WHD060")
+```
+
+This information, while useful, does not directly tell us _which_
+variables were skipped. This may be important for the analyst to know,
+because a variable that was skipped is recorded as a missing value,
+whereas we may actually have additional information based on whether
+it was skipped or not. In the above example, the immediately following
+variable is `WHQ070`.
+
+```{r}
+nhanesCodebook("WHQ", "WHQ070")
+```
+
+This codebook gives no indication of whether this question could have
+been skipped for some participants. However, from the previous
+codebook, was can infer that out of the 518 missing values, 508 were
+presumably from those that said "Yes" to `WHD060`, and these are
+qualitatively different from the remaining 10. While the question of
+_how_ to address such situations is for the analyst to answer, it
+would be useful to flag variables that are potentially skipped.
+
+The `get_skip_info()` function in the `phonto` package reports the
+variables that are potentially skipped in any given table. The
+following code applies it on the `WHQ` table.
+
+```{r}
+get_skip_info("WHQ")
+```
+
+
+## Searching variables
+
+Having access to all variable descriptions in a single dataset makes
+search operations convenient. For example, 
+
+```{r}
+all_var |> within({ Description <- tolower(Description) }) |>
+    subset(endsWith(TableName, "_C") &
+           (grepl("hypertension", Description) |
+            grepl("blood pressure", Description)),
+           select = c(1, 2, 5))
+```
+
+Information in this table can be supplemented using the
+`nhanesTableSummary()` function, which computes further information
+such as the variable type and number of non-missing observations; see
+[this vignette](search-tables.html) for more details and links to
+publicly accessible online search interfaces.
+
+

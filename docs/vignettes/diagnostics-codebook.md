@@ -35,13 +35,13 @@ str(all_cb)
 ```
 
 ```
-'data.frame':	177220 obs. of  7 variables:
- $ Variable        : chr  "DMAETHN" "DMAETHN" "DMARACE" "DMARACE" ...
- $ TableName       : chr  "DEMO" "DEMO" "DEMO" "DEMO" ...
- $ CodeOrValue     : chr  "1" "." "1" "." ...
- $ ValueDescription: chr  "Value Imputed" "Missing" "Value Imputed" "Missing" ...
- $ Count           : int  2 9963 2 9963 8069 1146 737 1 1 11 ...
- $ Cumulative      : int  2 9965 2 9965 8069 9215 9952 9953 9954 9965 ...
+'data.frame':	202018 obs. of  7 variables:
+ $ Variable        : chr  "WTSA2YR" "WTSA2YR" "WTSA2YR" "URX1NP" ...
+ $ TableName       : chr  "AA_H" "AA_H" "AA_H" "AA_H" ...
+ $ CodeOrValue     : chr  "16284.37488 to 530325.34726" "0" "." "0.91 to 441" ...
+ $ ValueDescription: chr  "Range of Values" "No Lab Result" "Missing" "Range of Values" ...
+ $ Count           : int  2724 31 0 2478 277 1776 702 0 277 2488 ...
+ $ Cumulative      : int  2724 2755 2755 2478 2755 1776 2478 2478 2755 2488 ...
  $ SkipToItem      : chr  NA NA NA NA ...
 ```
 
@@ -95,7 +95,7 @@ table(maybe_numeric)
 ```
 maybe_numeric
 FALSE  TRUE 
-68980   490 
+76764   480 
 ```
 
 We will focus on these variables for now.
@@ -107,7 +107,7 @@ str(problem_vars)
 ```
 
 ```
- chr [1:235] "AUXR1K2L" "AUXR1K2R" "AUXR3KR" "BAXFTC12" "WTSPH01" "WTSPH02" ...
+ chr [1:183] "AUXR1K2L" "AUXR8KR" "AUXR2KR" "AUXR1K2R" "AUXR3KR" "BAXFTC12" ...
 ```
 
 ```r
@@ -117,7 +117,7 @@ length(num_cb_byVar <- numeric_cb |>
 ```
 
 ```
-[1] 235
+[1] 183
 ```
 
 Let's start by summarizing these to keep only the unique
@@ -137,60 +137,48 @@ numNumeric <- function(d) {
 ```
 
 ```
-AUXR1K2R  AUXR2KR  AUXR3KR  AUXR8KR BAXFTC12 CVDR3TIM  DR2LANG DRD370JQ  DUQ350Q 
+AUXR1K2R  AUXR2KR  AUXR3KR  AUXR8KR BAXFTC12 CVDR3TIM  DR2LANG DRD370JQ  DUQ310Q 
        1        1        1        1        1        1        1        1        1 
-  DUQ390   DXXSPY  LBDBANO  LBDEONO   LBDRPI   LBXV2P   LBXVDX   LBXVTP  MCQ240D 
+ DUQ350Q   DUQ390   DXXSPY  LBDBANO  LBDEONO   LBDRPI   LBXV2P   LBXVDX   LBXVTP 
        1        1        1        1        1        1        1        1        1 
-MCQ240dk MCQ240DK  MCQ240H  MCQ240K  MCQ240l  MCQ240L  MCQ240m  MCQ240q  MCQ240v 
+ MCQ240D  MCQ240H  MCQ240K  MCQ240M  MCQ240Q  MCQ240V OSD030CC OSD030CD  OSD110H 
        1        1        1        1        1        1        1        1        1 
- MCQ240y OSD030cc OSD030cd  OSD110h  PFD069L   SSDBZP   SXQ267   SXQ410   SXQ550 
+ PFD069L   SSDBZP SSMTBRPS SSMTBRSG SSWT0306   SXQ267   SXQ410   SXQ550   SXQ836 
        1        1        1        1        1        1        1        1        1 
-  SXQ836   SXQ841   URX1DC   URXMTO   URXOMO   URXP09   URXPTU   URXTCV   URXUBE 
+  SXQ841   URX1DC   URXMTO   URXOMO   URXP09   URXPTU   URXTCV   URXUBE WTSAF2YR 
        1        1        1        1        1        1        1        1        1 
-WTSAF2YR WTSAF4YR  WTSHM01  WTSHM02  WTSHM03  WTSHM04  WTSHM05  WTSHM06  WTSHM07 
+WTSAF4YR  WTSPH01  WTSPH02  WTSPH03  WTSPH04  WTSPH05  WTSPH06  WTSPH07  WTSPH08 
        1        1        1        1        1        1        1        1        1 
- WTSHM08  WTSHM09  WTSHM10  WTSHM11  WTSHM12  WTSHM13  WTSHM14  WTSHM15  WTSHM16 
+ WTSPH09  WTSPH10  WTSPH11  WTSPH12  WTSPH13  WTSPH14  WTSPH15  WTSPH16  WTSPH17 
        1        1        1        1        1        1        1        1        1 
- WTSHM17  WTSHM18  WTSHM19  WTSHM20  WTSHM21  WTSHM22  WTSHM23  WTSHM24  WTSHM25 
+ WTSPH18  WTSPH19  WTSPH20  WTSPH21  WTSPH22  WTSPH23  WTSPH24  WTSPH25  WTSPH26 
        1        1        1        1        1        1        1        1        1 
- WTSHM26  WTSHM27  WTSHM28  WTSHM29  WTSHM30  WTSHM31  WTSHM32  WTSHM33  WTSHM34 
+ WTSPH27  WTSPH28  WTSPH29  WTSPH30  WTSPH31  WTSPH32  WTSPH33  WTSPH34  WTSPH35 
        1        1        1        1        1        1        1        1        1 
- WTSHM35  WTSHM36  WTSHM37  WTSHM38  WTSHM39  WTSHM40  WTSHM41  WTSHM42  WTSHM43 
+ WTSPH36  WTSPH37  WTSPH38  WTSPH39  WTSPH40  WTSPH41  WTSPH42  WTSPH43  WTSPH44 
        1        1        1        1        1        1        1        1        1 
- WTSHM44  WTSHM45  WTSHM46  WTSHM47  WTSHM48  WTSHM49  WTSHM50  WTSHM51  WTSHM52 
+ WTSPH45  WTSPH46  WTSPH47  WTSPH48  WTSPH49  WTSPH50  WTSPH51  WTSPH52  WTSPO01 
        1        1        1        1        1        1        1        1        1 
- WTSPH01  WTSPH02  WTSPH03  WTSPH04  WTSPH05  WTSPH06  WTSPH07  WTSPH08  WTSPH09 
+ WTSPO02  WTSPO03  WTSPO04  WTSPO05  WTSPO06  WTSPO07  WTSPO08  WTSPO09  WTSPO10 
        1        1        1        1        1        1        1        1        1 
- WTSPH10  WTSPH11  WTSPH12  WTSPH13  WTSPH14  WTSPH15  WTSPH16  WTSPH17  WTSPH18 
+ WTSPO11  WTSPO12  WTSPO13  WTSPO14  WTSPO15  WTSPO16  WTSPO17  WTSPO18  WTSPO19 
        1        1        1        1        1        1        1        1        1 
- WTSPH19  WTSPH20  WTSPH21  WTSPH22  WTSPH23  WTSPH24  WTSPH25  WTSPH26  WTSPH27 
+ WTSPO20  WTSPO21  WTSPO22  WTSPO23  WTSPO24  WTSPO25  WTSPO26  WTSPO27  WTSPO28 
        1        1        1        1        1        1        1        1        1 
- WTSPH28  WTSPH29  WTSPH30  WTSPH31  WTSPH32  WTSPH33  WTSPH34  WTSPH35  WTSPH36 
+ WTSPO29  WTSPO30  WTSPO31  WTSPO32  WTSPO33  WTSPO34  WTSPO35  WTSPO36  WTSPO37 
        1        1        1        1        1        1        1        1        1 
- WTSPH37  WTSPH38  WTSPH39  WTSPH40  WTSPH41  WTSPH42  WTSPH43  WTSPH44  WTSPH45 
+ WTSPO38  WTSPO39  WTSPO40  WTSPO41  WTSPO42  WTSPO43  WTSPO44  WTSPO45  WTSPO46 
        1        1        1        1        1        1        1        1        1 
- WTSPH46  WTSPH47  WTSPH48  WTSPH49  WTSPH50  WTSPH51  WTSPH52  WTSPO01  WTSPO02 
-       1        1        1        1        1        1        1        1        1 
- WTSPO03  WTSPO04  WTSPO05  WTSPO06  WTSPO07  WTSPO08  WTSPO09  WTSPO10  WTSPO11 
-       1        1        1        1        1        1        1        1        1 
- WTSPO12  WTSPO13  WTSPO14  WTSPO15  WTSPO16  WTSPO17  WTSPO18  WTSPO19  WTSPO20 
-       1        1        1        1        1        1        1        1        1 
- WTSPO21  WTSPO22  WTSPO23  WTSPO24  WTSPO25  WTSPO26  WTSPO27  WTSPO28  WTSPO29 
-       1        1        1        1        1        1        1        1        1 
- WTSPO30  WTSPO31  WTSPO32  WTSPO33  WTSPO34  WTSPO35  WTSPO36  WTSPO37  WTSPO38 
-       1        1        1        1        1        1        1        1        1 
- WTSPO39  WTSPO40  WTSPO41  WTSPO42  WTSPO43  WTSPO44  WTSPO45  WTSPO46  WTSPO47 
-       1        1        1        1        1        1        1        1        1 
- WTSPO48  WTSPO49  WTSPO50  WTSPO51  WTSPO52 AUXR1K2L DRD370PQ   DUQ340   DUQ360 
-       1        1        1        1        1        2        2        2        2 
- DUQ400Q MCQ240AA  MCQ240b  MCQ240T OSD030bf OSD030bg  OSD110f   SMD415  SMD415A 
+ WTSPO47  WTSPO48  WTSPO49  WTSPO50  WTSPO51  WTSPO52 AUXR1K2L DRD370PQ   DUQ340 
+       1        1        1        1        1        1        2        2        2 
+  DUQ360  DUQ400Q MCQ240AA MCQ240DK  MCQ240L  MCQ240T OSD030BG  OSD110F   SMD415 
        2        2        2        2        2        2        2        2        2 
-  URX2DC DMDHHSZA DMDHHSZE  MCQ240Y OSD030ce  OSQ020a  RHQ602Q DMDHHSZB  MCQ240B 
-       2        3        3        3        3        3        3        4        4 
-OSD030ac  OSQ020c DMDFMSIZ DMDHHSIZ   HUD080  OSQ020b  ECD070A   HOD050   HSQ580 
-       4        5        6        6        6        7       12       12       12 
-  KID221 
-      24 
+ SMD415A   URX2DC DMDHHSZA DMDHHSZE OSD030BF OSD030CE  OSQ020A  RHQ602Q DMDHHSZB 
+       2        2        3        3        3        3        3        3        4 
+ MCQ240Y OSD030AC DMDFMSIZ DMDHHSIZ   HUD080  MCQ240B  OSQ020C  OSQ020B  ECD070A 
+       4        4        6        6        6        6        6        7       12 
+  HOD050   HSQ580   KID221 
+      12       12       24 
 ```
 
 To get a sense of the problem cases, we look at the variables with 10
@@ -204,316 +192,328 @@ num_cb_byVar[ names(which(nnum >= 10)) ]
 ```
 $ECD070A
        Variable TableName CodeOrValue  ValueDescription Count
-11426   ECD070A       ECQ           1                 1    36
-11427   ECD070A       ECQ           2                 2    19
-11428   ECD070A       ECQ           3                 3    39
-11429   ECD070A       ECQ           4                 4    89
-11430   ECD070A       ECQ           5                 5   264
-11431   ECD070A       ECQ           6                 6   869
-11432   ECD070A       ECQ           7                 7  1317
-11433   ECD070A       ECQ           8                 8   805
-11434   ECD070A       ECQ           9                 9   237
-11435   ECD070A       ECQ          10                10    87
-11436   ECD070A       ECQ          11                11    15
-11437   ECD070A       ECQ          12                12     1
-11438   ECD070A       ECQ          13 13 pounds or more     3
-11439   ECD070A       ECQ          77           Refused     2
-11440   ECD070A       ECQ          99        Don't know   133
-11441   ECD070A       ECQ           .           Missing     5
-24935   ECD070A     ECQ_B     1 to 12   Range of Values  4257
-24936   ECD070A     ECQ_B          13 13 pounds or more     6
-24937   ECD070A     ECQ_B        7777           Refused     0
-24938   ECD070A     ECQ_B        9999        Don't know   141
-24939   ECD070A     ECQ_B           .           Missing     1
-44406   ECD070A     ECQ_C     1 to 12   Range of Values  3791
-44407   ECD070A     ECQ_C          13 13 pounds or more     2
-44408   ECD070A     ECQ_C        7777           Refused     1
-44409   ECD070A     ECQ_C        9999        Don't know   113
-44410   ECD070A     ECQ_C           .           Missing     2
-62850   ECD070A     ECQ_D     1 to 12   Range of Values  4071
-62851   ECD070A     ECQ_D          13 13 pounds or more     4
-62852   ECD070A     ECQ_D        7777           Refused     1
-62853   ECD070A     ECQ_D        9999        Don't know   131
-62854   ECD070A     ECQ_D           .           Missing     2
-76836   ECD070A     ECQ_E     1 to 12   Range of Values  3538
-76837   ECD070A     ECQ_E          13 13 pounds or more     4
-76838   ECD070A     ECQ_E        7777           Refused     0
-76839   ECD070A     ECQ_E        9999        Don't know    60
-76840   ECD070A     ECQ_E           .           Missing     1
-96383   ECD070A     ECQ_F     1 to 12   Range of Values  3578
-96384   ECD070A     ECQ_F          13 13 pounds or more     8
-96385   ECD070A     ECQ_F        7777           Refused     0
-96386   ECD070A     ECQ_F        9999        Don't know    62
-96387   ECD070A     ECQ_F           .           Missing     0
-112807  ECD070A     ECQ_G     1 to 12   Range of Values  3505
-112808  ECD070A     ECQ_G          13 13 pounds or more     3
-112809  ECD070A     ECQ_G        7777           Refused     1
-112810  ECD070A     ECQ_G        9999        Don't know    72
-112811  ECD070A     ECQ_G           .           Missing     0
-140370  ECD070A     ECQ_H     1 to 12   Range of Values  3622
-140371  ECD070A     ECQ_H          13 13 pounds or more     0
-140372  ECD070A     ECQ_H        7777           Refused     0
-140373  ECD070A     ECQ_H        9999        Don't know    88
-140374  ECD070A     ECQ_H           .           Missing     1
-158622  ECD070A     ECQ_I     4 to 10   Range of Values  3436
-158623  ECD070A     ECQ_I           3  3 pounds or less    80
-158624  ECD070A     ECQ_I          11 11 pounds or more    10
-158625  ECD070A     ECQ_I        7777           Refused     2
-158626  ECD070A     ECQ_I        9999        Don't know   116
-158627  ECD070A     ECQ_I           .           Missing     0
-173893  ECD070A     ECQ_J     4 to 10   Range of Values  2926
-173894  ECD070A     ECQ_J           3  3 pounds or less    66
-173895  ECD070A     ECQ_J          11 11 pounds or more    15
-173896  ECD070A     ECQ_J        7777           Refused     0
-173897  ECD070A     ECQ_J        9999        Don't know    85
-173898  ECD070A     ECQ_J           .           Missing     1
+72819   ECD070A  EC24_K_R     4 to 10   Range of Values   375
+72820   ECD070A  EC24_K_R           3  3 pounds or less    10
+72821   ECD070A  EC24_K_R          11 11 pounds or more     0
+72822   ECD070A  EC24_K_R        7777           Refused     0
+72823   ECD070A  EC24_K_R        9999        Don't know     4
+72824   ECD070A  EC24_K_R           .           Missing     0
+72870   ECD070A       ECQ           1                 1    36
+72871   ECD070A       ECQ           2                 2    19
+72872   ECD070A       ECQ           3                 3    39
+72873   ECD070A       ECQ           4                 4    89
+72874   ECD070A       ECQ           5                 5   264
+72875   ECD070A       ECQ           6                 6   869
+72876   ECD070A       ECQ           7                 7  1317
+72877   ECD070A       ECQ           8                 8   805
+72878   ECD070A       ECQ           9                 9   237
+72879   ECD070A       ECQ          10                10    87
+72880   ECD070A       ECQ          11                11    15
+72881   ECD070A       ECQ          12                12     1
+72882   ECD070A       ECQ          13 13 pounds or more     3
+72883   ECD070A       ECQ          77           Refused     2
+72884   ECD070A       ECQ          99        Don't know   133
+72885   ECD070A       ECQ           .           Missing     5
+72956   ECD070A     ECQ_B     1 to 12   Range of Values  4257
+72957   ECD070A     ECQ_B          13 13 pounds or more     6
+72958   ECD070A     ECQ_B        7777           Refused     0
+72959   ECD070A     ECQ_B        9999        Don't know   141
+72960   ECD070A     ECQ_B           .           Missing     1
+73023   ECD070A     ECQ_C     1 to 12   Range of Values  3791
+73024   ECD070A     ECQ_C          13 13 pounds or more     2
+73025   ECD070A     ECQ_C        7777           Refused     1
+73026   ECD070A     ECQ_C        9999        Don't know   113
+73027   ECD070A     ECQ_C           .           Missing     2
+73089   ECD070A     ECQ_D     1 to 12   Range of Values  4071
+73090   ECD070A     ECQ_D          13 13 pounds or more     4
+73091   ECD070A     ECQ_D        7777           Refused     1
+73092   ECD070A     ECQ_D        9999        Don't know   131
+73093   ECD070A     ECQ_D           .           Missing     2
+73162   ECD070A     ECQ_E     1 to 12   Range of Values  3538
+73163   ECD070A     ECQ_E          13 13 pounds or more     4
+73164   ECD070A     ECQ_E        7777           Refused     0
+73165   ECD070A     ECQ_E        9999        Don't know    60
+73166   ECD070A     ECQ_E           .           Missing     1
+73213   ECD070A     ECQ_F     1 to 12   Range of Values  3578
+73214   ECD070A     ECQ_F          13 13 pounds or more     8
+73215   ECD070A     ECQ_F        7777           Refused     0
+73216   ECD070A     ECQ_F        9999        Don't know    62
+73217   ECD070A     ECQ_F           .           Missing     0
+73259   ECD070A     ECQ_G     1 to 12   Range of Values  3505
+73260   ECD070A     ECQ_G          13 13 pounds or more     3
+73261   ECD070A     ECQ_G        7777           Refused     1
+73262   ECD070A     ECQ_G        9999        Don't know    72
+73263   ECD070A     ECQ_G           .           Missing     0
+73305   ECD070A     ECQ_H     1 to 12   Range of Values  3622
+73306   ECD070A     ECQ_H          13 13 pounds or more     0
+73307   ECD070A     ECQ_H        7777           Refused     0
+73308   ECD070A     ECQ_H        9999        Don't know    88
+73309   ECD070A     ECQ_H           .           Missing     1
+73351   ECD070A     ECQ_I     4 to 10   Range of Values  3436
+73352   ECD070A     ECQ_I           3  3 pounds or less    80
+73353   ECD070A     ECQ_I          11 11 pounds or more    10
+73354   ECD070A     ECQ_I        7777           Refused     2
+73355   ECD070A     ECQ_I        9999        Don't know   116
+73356   ECD070A     ECQ_I           .           Missing     0
+73398   ECD070A     ECQ_J     4 to 10   Range of Values  2926
+73399   ECD070A     ECQ_J           3  3 pounds or less    66
+73400   ECD070A     ECQ_J          11 11 pounds or more    15
+73401   ECD070A     ECQ_J        7777           Refused     0
+73402   ECD070A     ECQ_J        9999        Don't know    85
+73403   ECD070A     ECQ_J           .           Missing     1
+146578  ECD070A     P_ECQ     4 to 10   Range of Values  5056
+146579  ECD070A     P_ECQ           3  3 pounds or less   129
+146580  ECD070A     P_ECQ          11 11 pounds or more    23
+146581  ECD070A     P_ECQ        7777           Refused     0
+146582  ECD070A     P_ECQ        9999        Don't know   155
+146583  ECD070A     P_ECQ           .           Missing     2
 
 $HOD050
-       Variable TableName CodeOrValue ValueDescription Count
-11725    HOD050       HOQ     1 to 12  Range of Values  9709
-11726    HOD050       HOQ          13       13 or More    70
-11727    HOD050       HOQ         777          Refused    12
-11728    HOD050       HOQ         999       Don't know    13
-11729    HOD050       HOQ           .          Missing   161
-25473    HOD050     HOQ_B     1 to 12  Range of Values 10725
-25474    HOD050     HOQ_B          13       13 or More    93
-25475    HOD050     HOQ_B         777          Refused    19
-25476    HOD050     HOQ_B         999       Don't know    28
-25477    HOD050     HOQ_B           .          Missing   174
-44820    HOD050     HOQ_C     1 to 12  Range of Values  9944
-44821    HOD050     HOQ_C          13       13 or more    27
-44822    HOD050     HOQ_C         777          Refused    10
-44823    HOD050     HOQ_C         999       Don't know     8
-44824    HOD050     HOQ_C           .          Missing   133
-63427    HOD050     HOQ_D     1 to 12  Range of Values 10150
-63428    HOD050     HOQ_D          13       13 or more    69
-63429    HOD050     HOQ_D         777          Refused     5
-63430    HOD050     HOQ_D         999       Don't know    15
-63431    HOD050     HOQ_D           .          Missing   109
-80551    HOD050     HOQ_E     1 to 12  Range of Values  9977
-80552    HOD050     HOQ_E          13       13 or more    62
-80553    HOD050     HOQ_E         777          Refused     4
-80554    HOD050     HOQ_E         999       Don't know    12
-80555    HOD050     HOQ_E           .          Missing    94
-98759    HOD050     HOQ_F     1 to 12  Range of Values 10348
-98760    HOD050     HOQ_F          13       13 or more    97
-98761    HOD050     HOQ_F         777          Refused    13
-98762    HOD050     HOQ_F         999       Don't know    11
-98763    HOD050     HOQ_F           .          Missing    68
-113746   HOD050     HOQ_G           1                1    63
-113747   HOD050     HOQ_G           2                2   241
-113748   HOD050     HOQ_G           3                3   924
-113749   HOD050     HOQ_G           4                4  1863
-113750   HOD050     HOQ_G           5                5  1972
-113751   HOD050     HOQ_G           6                6  1709
-113752   HOD050     HOQ_G           7                7  1117
-113753   HOD050     HOQ_G           8                8   776
-113754   HOD050     HOQ_G           9                9   410
-113755   HOD050     HOQ_G          10               10   309
-113756   HOD050     HOQ_G          11               11   162
-113757   HOD050     HOQ_G          12               12    67
-113758   HOD050     HOQ_G          13       13 or more    90
-113759   HOD050     HOQ_G         777          Refused     4
-113760   HOD050     HOQ_G         999       Don't know     0
-113761   HOD050     HOQ_G           .          Missing    49
-140914   HOD050     HOQ_H           1                1    88
-140915   HOD050     HOQ_H           2                2   202
-140916   HOD050     HOQ_H           3                3   683
-140917   HOD050     HOQ_H           4                4  1613
-140918   HOD050     HOQ_H           5                5  2093
-140919   HOD050     HOQ_H           6                6  1922
-140920   HOD050     HOQ_H           7                7  1272
-140921   HOD050     HOQ_H           8                8   853
-140922   HOD050     HOQ_H           9                9   574
-140923   HOD050     HOQ_H          10               10   343
-140924   HOD050     HOQ_H          11               11   197
-140925   HOD050     HOQ_H          12               12   108
-140926   HOD050     HOQ_H          13       13 or more    85
-140927   HOD050     HOQ_H         777          Refused    16
-140928   HOD050     HOQ_H         999       Don't know     5
-140929   HOD050     HOQ_H           .          Missing   121
-157813   HOD050     HOQ_I           1                1    49
-157814   HOD050     HOQ_I           2                2   204
-157815   HOD050     HOQ_I           3                3   831
-157816   HOD050     HOQ_I           4                4  1810
-157817   HOD050     HOQ_I           5                5  2071
-157818   HOD050     HOQ_I           6                6  1728
-157819   HOD050     HOQ_I           7                7  1130
-157820   HOD050     HOQ_I           8                8   773
-157821   HOD050     HOQ_I           9                9   434
-157822   HOD050     HOQ_I          10               10   323
-157823   HOD050     HOQ_I          11               11   133
-157824   HOD050     HOQ_I          12               12    71
-157825   HOD050     HOQ_I          13       13 or more    51
-157826   HOD050     HOQ_I         777          Refused    34
-157827   HOD050     HOQ_I         999       Don't know     0
-157828   HOD050     HOQ_I           .          Missing   329
-172577   HOD050     HOQ_J           1                1    78
-172578   HOD050     HOQ_J           2                2   198
-172579   HOD050     HOQ_J           3                3   713
-172580   HOD050     HOQ_J           4                4  1693
-172581   HOD050     HOQ_J           5                5  1848
-172582   HOD050     HOQ_J           6                6  1562
-172583   HOD050     HOQ_J           7                7  1115
-172584   HOD050     HOQ_J           8                8   670
-172585   HOD050     HOQ_J           9                9   415
-172586   HOD050     HOQ_J          10               10   276
-172587   HOD050     HOQ_J          11               11    79
-172588   HOD050     HOQ_J          12               12    51
-172589   HOD050     HOQ_J          13       13 or more    47
-172590   HOD050     HOQ_J         777          Refused     8
-172591   HOD050     HOQ_J         999       Don't know    27
-172592   HOD050     HOQ_J           .          Missing   474
+      Variable TableName CodeOrValue ValueDescription Count
+86830   HOD050       HOQ     1 to 12  Range of Values  9709
+86831   HOD050       HOQ          13       13 or More    70
+86832   HOD050       HOQ         777          Refused    12
+86833   HOD050       HOQ         999       Don't know    13
+86834   HOD050       HOQ           .          Missing   161
+86927   HOD050     HOQ_B     1 to 12  Range of Values 10725
+86928   HOD050     HOQ_B          13       13 or More    93
+86929   HOD050     HOQ_B         777          Refused    19
+86930   HOD050     HOQ_B         999       Don't know    28
+86931   HOD050     HOQ_B           .          Missing   174
+87024   HOD050     HOQ_C     1 to 12  Range of Values  9944
+87025   HOD050     HOQ_C          13       13 or more    27
+87026   HOD050     HOQ_C         777          Refused    10
+87027   HOD050     HOQ_C         999       Don't know     8
+87028   HOD050     HOQ_C           .          Missing   133
+87120   HOD050     HOQ_D     1 to 12  Range of Values 10150
+87121   HOD050     HOQ_D          13       13 or more    69
+87122   HOD050     HOQ_D         777          Refused     5
+87123   HOD050     HOQ_D         999       Don't know    15
+87124   HOD050     HOQ_D           .          Missing   109
+87195   HOD050     HOQ_E     1 to 12  Range of Values  9977
+87196   HOD050     HOQ_E          13       13 or more    62
+87197   HOD050     HOQ_E         777          Refused     4
+87198   HOD050     HOQ_E         999       Don't know    12
+87199   HOD050     HOQ_E           .          Missing    94
+87234   HOD050     HOQ_F     1 to 12  Range of Values 10348
+87235   HOD050     HOQ_F          13       13 or more    97
+87236   HOD050     HOQ_F         777          Refused    13
+87237   HOD050     HOQ_F         999       Don't know    11
+87238   HOD050     HOQ_F           .          Missing    68
+87264   HOD050     HOQ_G           1                1    63
+87265   HOD050     HOQ_G           2                2   241
+87266   HOD050     HOQ_G           3                3   924
+87267   HOD050     HOQ_G           4                4  1863
+87268   HOD050     HOQ_G           5                5  1972
+87269   HOD050     HOQ_G           6                6  1709
+87270   HOD050     HOQ_G           7                7  1117
+87271   HOD050     HOQ_G           8                8   776
+87272   HOD050     HOQ_G           9                9   410
+87273   HOD050     HOQ_G          10               10   309
+87274   HOD050     HOQ_G          11               11   162
+87275   HOD050     HOQ_G          12               12    67
+87276   HOD050     HOQ_G          13       13 or more    90
+87277   HOD050     HOQ_G         777          Refused     4
+87278   HOD050     HOQ_G         999       Don't know     0
+87279   HOD050     HOQ_G           .          Missing    49
+87286   HOD050     HOQ_H           1                1    88
+87287   HOD050     HOQ_H           2                2   202
+87288   HOD050     HOQ_H           3                3   683
+87289   HOD050     HOQ_H           4                4  1613
+87290   HOD050     HOQ_H           5                5  2093
+87291   HOD050     HOQ_H           6                6  1922
+87292   HOD050     HOQ_H           7                7  1272
+87293   HOD050     HOQ_H           8                8   853
+87294   HOD050     HOQ_H           9                9   574
+87295   HOD050     HOQ_H          10               10   343
+87296   HOD050     HOQ_H          11               11   197
+87297   HOD050     HOQ_H          12               12   108
+87298   HOD050     HOQ_H          13       13 or more    85
+87299   HOD050     HOQ_H         777          Refused    16
+87300   HOD050     HOQ_H         999       Don't know     5
+87301   HOD050     HOQ_H           .          Missing   121
+87308   HOD050     HOQ_I           1                1    49
+87309   HOD050     HOQ_I           2                2   204
+87310   HOD050     HOQ_I           3                3   831
+87311   HOD050     HOQ_I           4                4  1810
+87312   HOD050     HOQ_I           5                5  2071
+87313   HOD050     HOQ_I           6                6  1728
+87314   HOD050     HOQ_I           7                7  1130
+87315   HOD050     HOQ_I           8                8   773
+87316   HOD050     HOQ_I           9                9   434
+87317   HOD050     HOQ_I          10               10   323
+87318   HOD050     HOQ_I          11               11   133
+87319   HOD050     HOQ_I          12               12    71
+87320   HOD050     HOQ_I          13       13 or more    51
+87321   HOD050     HOQ_I         777          Refused    34
+87322   HOD050     HOQ_I         999       Don't know     0
+87323   HOD050     HOQ_I           .          Missing   329
+87330   HOD050     HOQ_J           1                1    78
+87331   HOD050     HOQ_J           2                2   198
+87332   HOD050     HOQ_J           3                3   713
+87333   HOD050     HOQ_J           4                4  1693
+87334   HOD050     HOQ_J           5                5  1848
+87335   HOD050     HOQ_J           6                6  1562
+87336   HOD050     HOQ_J           7                7  1115
+87337   HOD050     HOQ_J           8                8   670
+87338   HOD050     HOQ_J           9                9   415
+87339   HOD050     HOQ_J          10               10   276
+87340   HOD050     HOQ_J          11               11    79
+87341   HOD050     HOQ_J          12               12    51
+87342   HOD050     HOQ_J          13       13 or more    47
+87343   HOD050     HOQ_J         777          Refused     8
+87344   HOD050     HOQ_J         999       Don't know    27
+87345   HOD050     HOQ_J           .          Missing   474
 
 $HSQ580
-       Variable TableName CodeOrValue ValueDescription Count
-11007    HSQ580       HSQ     1 to 12  Range of Values   238
-11008    HSQ580       HSQ          77          Refused     0
-11009    HSQ580       HSQ          99       Don't know     8
-11010    HSQ580       HSQ           .          Missing  8586
-24589    HSQ580     HSQ_B     1 to 12  Range of Values   272
-24590    HSQ580     HSQ_B          77          Refused     0
-24591    HSQ580     HSQ_B          99       Don't know     2
-24592    HSQ580     HSQ_B           .          Missing 10108
-44001    HSQ580     HSQ_C     1 to 12  Range of Values   233
-44002    HSQ580     HSQ_C          77          Refused     0
-44003    HSQ580     HSQ_C          99       Don't know     3
-44004    HSQ580     HSQ_C           .          Missing  9299
-61746    HSQ580     HSQ_D     1 to 12  Range of Values   235
-61747    HSQ580     HSQ_D          77          Refused     0
-61748    HSQ580     HSQ_D          99       Don't know     4
-61749    HSQ580     HSQ_D           .          Missing  9201
-76954    HSQ580     HSQ_E     1 to 12  Range of Values   242
-76955    HSQ580     HSQ_E          77          Refused     0
-76956    HSQ580     HSQ_E          99       Don't know     5
-76957    HSQ580     HSQ_E           .          Missing  9060
-98461    HSQ580     HSQ_F     1 to 12  Range of Values   338
-98462    HSQ580     HSQ_F          77          Refused     0
-98463    HSQ580     HSQ_F          99       Don't know     3
-98464    HSQ580     HSQ_F           .          Missing  9494
-114444   HSQ580     HSQ_G     1 to 12  Range of Values   261
-114445   HSQ580     HSQ_G          77          Refused     0
-114446   HSQ580     HSQ_G          99       Don't know     0
-114447   HSQ580     HSQ_G           .          Missing  8695
-141559   HSQ580     HSQ_H           1                1    39
-141560   HSQ580     HSQ_H           2                2    38
-141561   HSQ580     HSQ_H           3                3    28
-141562   HSQ580     HSQ_H           4                4    20
-141563   HSQ580     HSQ_H           5                5    13
-141564   HSQ580     HSQ_H           6                6    29
-141565   HSQ580     HSQ_H           7                7    19
-141566   HSQ580     HSQ_H           8                8    11
-141567   HSQ580     HSQ_H           9                9    11
-141568   HSQ580     HSQ_H          10               10    13
-141569   HSQ580     HSQ_H          11               11    17
-141570   HSQ580     HSQ_H          12               12    18
-141571   HSQ580     HSQ_H          77          Refused     0
-141572   HSQ580     HSQ_H          99       Don't know     4
-141573   HSQ580     HSQ_H           .          Missing  9162
-158006   HSQ580     HSQ_I           1                1    42
-158007   HSQ580     HSQ_I           2                2    34
-158008   HSQ580     HSQ_I           3                3    22
-158009   HSQ580     HSQ_I           4                4    29
-158010   HSQ580     HSQ_I           5                5    15
-158011   HSQ580     HSQ_I           6                6    29
-158012   HSQ580     HSQ_I           7                7    13
-158013   HSQ580     HSQ_I           8                8    12
-158014   HSQ580     HSQ_I           9                9     7
-158015   HSQ580     HSQ_I          10               10    10
-158016   HSQ580     HSQ_I          11               11     5
-158017   HSQ580     HSQ_I          12               12    10
-158018   HSQ580     HSQ_I          77          Refused     0
-158019   HSQ580     HSQ_I          99       Don't know     2
-158020   HSQ580     HSQ_I           .          Missing  8935
-172557   HSQ580     HSQ_J           1                1    53
-172558   HSQ580     HSQ_J           2                2    35
-172559   HSQ580     HSQ_J           3                3    23
-172560   HSQ580     HSQ_J           4                4    33
-172561   HSQ580     HSQ_J           5                5    11
-172562   HSQ580     HSQ_J           6                6    40
-172563   HSQ580     HSQ_J           7                7    15
-172564   HSQ580     HSQ_J           8                8    16
-172565   HSQ580     HSQ_J           9                9     7
-172566   HSQ580     HSQ_J          10               10    12
-172567   HSQ580     HSQ_J          11               11    18
-172568   HSQ580     HSQ_J          12               12     6
-172569   HSQ580     HSQ_J          77          Refused     0
-172570   HSQ580     HSQ_J          99       Don't know     5
-172571   HSQ580     HSQ_J           .          Missing  8092
+      Variable TableName CodeOrValue ValueDescription Count
+90108   HSQ580       HSQ     1 to 12  Range of Values   238
+90109   HSQ580       HSQ          77          Refused     0
+90110   HSQ580       HSQ          99       Don't know     8
+90111   HSQ580       HSQ           .          Missing  8586
+90160   HSQ580     HSQ_B     1 to 12  Range of Values   272
+90161   HSQ580     HSQ_B          77          Refused     0
+90162   HSQ580     HSQ_B          99       Don't know     2
+90163   HSQ580     HSQ_B           .          Missing 10108
+90212   HSQ580     HSQ_C     1 to 12  Range of Values   233
+90213   HSQ580     HSQ_C          77          Refused     0
+90214   HSQ580     HSQ_C          99       Don't know     3
+90215   HSQ580     HSQ_C           .          Missing  9299
+90264   HSQ580     HSQ_D     1 to 12  Range of Values   235
+90265   HSQ580     HSQ_D          77          Refused     0
+90266   HSQ580     HSQ_D          99       Don't know     4
+90267   HSQ580     HSQ_D           .          Missing  9201
+90324   HSQ580     HSQ_E     1 to 12  Range of Values   242
+90325   HSQ580     HSQ_E          77          Refused     0
+90326   HSQ580     HSQ_E          99       Don't know     5
+90327   HSQ580     HSQ_E           .          Missing  9060
+90384   HSQ580     HSQ_F     1 to 12  Range of Values   338
+90385   HSQ580     HSQ_F          77          Refused     0
+90386   HSQ580     HSQ_F          99       Don't know     3
+90387   HSQ580     HSQ_F           .          Missing  9494
+90444   HSQ580     HSQ_G     1 to 12  Range of Values   261
+90445   HSQ580     HSQ_G          77          Refused     0
+90446   HSQ580     HSQ_G          99       Don't know     0
+90447   HSQ580     HSQ_G           .          Missing  8695
+90484   HSQ580     HSQ_H           1                1    39
+90485   HSQ580     HSQ_H           2                2    38
+90486   HSQ580     HSQ_H           3                3    28
+90487   HSQ580     HSQ_H           4                4    20
+90488   HSQ580     HSQ_H           5                5    13
+90489   HSQ580     HSQ_H           6                6    29
+90490   HSQ580     HSQ_H           7                7    19
+90491   HSQ580     HSQ_H           8                8    11
+90492   HSQ580     HSQ_H           9                9    11
+90493   HSQ580     HSQ_H          10               10    13
+90494   HSQ580     HSQ_H          11               11    17
+90495   HSQ580     HSQ_H          12               12    18
+90496   HSQ580     HSQ_H          77          Refused     0
+90497   HSQ580     HSQ_H          99       Don't know     4
+90498   HSQ580     HSQ_H           .          Missing  9162
+90535   HSQ580     HSQ_I           1                1    42
+90536   HSQ580     HSQ_I           2                2    34
+90537   HSQ580     HSQ_I           3                3    22
+90538   HSQ580     HSQ_I           4                4    29
+90539   HSQ580     HSQ_I           5                5    15
+90540   HSQ580     HSQ_I           6                6    29
+90541   HSQ580     HSQ_I           7                7    13
+90542   HSQ580     HSQ_I           8                8    12
+90543   HSQ580     HSQ_I           9                9     7
+90544   HSQ580     HSQ_I          10               10    10
+90545   HSQ580     HSQ_I          11               11     5
+90546   HSQ580     HSQ_I          12               12    10
+90547   HSQ580     HSQ_I          77          Refused     0
+90548   HSQ580     HSQ_I          99       Don't know     2
+90549   HSQ580     HSQ_I           .          Missing  8935
+90586   HSQ580     HSQ_J           1                1    53
+90587   HSQ580     HSQ_J           2                2    35
+90588   HSQ580     HSQ_J           3                3    23
+90589   HSQ580     HSQ_J           4                4    33
+90590   HSQ580     HSQ_J           5                5    11
+90591   HSQ580     HSQ_J           6                6    40
+90592   HSQ580     HSQ_J           7                7    15
+90593   HSQ580     HSQ_J           8                8    16
+90594   HSQ580     HSQ_J           9                9     7
+90595   HSQ580     HSQ_J          10               10    12
+90596   HSQ580     HSQ_J          11               11    18
+90597   HSQ580     HSQ_J          12               12     6
+90598   HSQ580     HSQ_J          77          Refused     0
+90599   HSQ580     HSQ_J          99       Don't know     5
+90600   HSQ580     HSQ_J           .          Missing  8092
 
 $KID221
-      Variable TableName                         CodeOrValue   ValueDescription
-40971   KID221  L11PSA_C Age at diagnosis of prostate cancer Value was recorded
-40972   KID221  L11PSA_C                                 777            Refused
-40973   KID221  L11PSA_C                                 999         Don't know
-40974   KID221  L11PSA_C                           < blank >            Missing
-59151   KID221     PSA_D                                   .                  .
-59152   KID221     PSA_D                                  54                 54
-59153   KID221     PSA_D                                  58                 58
-59154   KID221     PSA_D                                  59                 59
-59155   KID221     PSA_D                                  60                 60
-59156   KID221     PSA_D                                  61                 61
-59157   KID221     PSA_D                                  62                 62
-59158   KID221     PSA_D                                  63                 63
-59159   KID221     PSA_D                                  64                 64
-59160   KID221     PSA_D                                  65                 65
-59161   KID221     PSA_D                                  66                 66
-59162   KID221     PSA_D                                  67                 67
-59163   KID221     PSA_D                                  68                 68
-59164   KID221     PSA_D                                  69                 69
-59165   KID221     PSA_D                                  70                 70
-59166   KID221     PSA_D                                  71                 71
-59167   KID221     PSA_D                                  72                 72
-59168   KID221     PSA_D                                  73                 73
-59169   KID221     PSA_D                                  75                 75
-59170   KID221     PSA_D                                  76                 76
-59171   KID221     PSA_D                                  77                 77
-59172   KID221     PSA_D                                  78                 78
-59173   KID221     PSA_D                                  79                 79
-59174   KID221     PSA_D                                  80                 80
-59175   KID221     PSA_D                                  81                 81
-59176   KID221     PSA_D                       85 or greater      85 or greater
-59177   KID221     PSA_D                           < blank >            Missing
-90484   KID221     PSA_F                             8 to 85    Range of Values
-90485   KID221     PSA_F                                 777            Refused
-90486   KID221     PSA_F                                 999         Don't know
-90487   KID221     PSA_F                                   .            Missing
-      Count
-40971    56
-40972     0
-40973     0
-40974  1451
-59151     0
-59152     0
-59153     0
-59154     0
-59155     0
-59156     0
-59157     0
-59158     0
-59159     0
-59160     0
-59161     0
-59162     0
-59163     0
-59164     0
-59165     0
-59166     0
-59167     0
-59168     0
-59169     0
-59170     0
-59171     0
-59172     0
-59173     0
-59174     0
-59175     0
-59176     3
-59177     0
-90484    95
-90485     0
-90486     0
-90487  1881
+       Variable TableName                         CodeOrValue   ValueDescription
+95207    KID221  L11PSA_C Age at diagnosis of prostate cancer Value was recorded
+95208    KID221  L11PSA_C                                 777            Refused
+95209    KID221  L11PSA_C                                 999         Don't know
+95210    KID221  L11PSA_C                           < blank >            Missing
+162578   KID221     PSA_D                                   .                  .
+162579   KID221     PSA_D                                  54                 54
+162580   KID221     PSA_D                                  58                 58
+162581   KID221     PSA_D                                  59                 59
+162582   KID221     PSA_D                                  60                 60
+162583   KID221     PSA_D                                  61                 61
+162584   KID221     PSA_D                                  62                 62
+162585   KID221     PSA_D                                  63                 63
+162586   KID221     PSA_D                                  64                 64
+162587   KID221     PSA_D                                  65                 65
+162588   KID221     PSA_D                                  66                 66
+162589   KID221     PSA_D                                  67                 67
+162590   KID221     PSA_D                                  68                 68
+162591   KID221     PSA_D                                  69                 69
+162592   KID221     PSA_D                                  70                 70
+162593   KID221     PSA_D                                  71                 71
+162594   KID221     PSA_D                                  72                 72
+162595   KID221     PSA_D                                  73                 73
+162596   KID221     PSA_D                                  75                 75
+162597   KID221     PSA_D                                  76                 76
+162598   KID221     PSA_D                                  77                 77
+162599   KID221     PSA_D                                  78                 78
+162600   KID221     PSA_D                                  79                 79
+162601   KID221     PSA_D                                  80                 80
+162602   KID221     PSA_D                                  81                 81
+162603   KID221     PSA_D                       85 or greater      85 or greater
+162604   KID221     PSA_D                           < blank >            Missing
+162725   KID221     PSA_F                             8 to 85    Range of Values
+162726   KID221     PSA_F                                 777            Refused
+162727   KID221     PSA_F                                 999         Don't know
+162728   KID221     PSA_F                                   .            Missing
+       Count
+95207     56
+95208      0
+95209      0
+95210   1451
+162578     0
+162579     0
+162580     0
+162581     0
+162582     0
+162583     0
+162584     0
+162585     0
+162586     0
+162587     0
+162588     0
+162589     0
+162590     0
+162591     0
+162592     0
+162593     0
+162594     0
+162595     0
+162596     0
+162597     0
+162598     0
+162599     0
+162600     0
+162601     0
+162602     0
+162603     3
+162604     0
+162725    95
+162726     0
+162727     0
+162728  1881
 ```
 
 ## What to do about these?
@@ -586,10 +586,42 @@ These are used below to find potential problems in importing codebooks.
 ```r
 tables <- nhanesQuery("select TableName from Metadata.QuestionnaireDescriptions")$TableName
 status <- lapply(tables, find_conversion_problems)
+```
+
+```
+Error in cb[[v]][[v]]: subscript out of bounds
+```
+
+```r
 names(status) <- tables
+```
+
+```
+Error: object 'status' not found
+```
+
+```r
 keep <- sapply(status, length) > 0 # tables with some issues
+```
+
+```
+Error in eval(expr, envir, enclos): object 'status' not found
+```
+
+```r
 status <- status[keep]
+```
+
+```
+Error in eval(expr, envir, enclos): object 'status' not found
+```
+
+```r
 tables <- tables[keep]
+```
+
+```
+Error in eval(expr, envir, enclos): object 'keep' not found
 ```
 
 ## Tables with no useful codebook in the database
@@ -597,11 +629,18 @@ tables <- tables[keep]
 
 ```r
 no_codebook <- sapply(status, identical, "INVALID CODEBOOK")
+```
+
+```
+Error in eval(expr, envir, enclos): object 'status' not found
+```
+
+```r
 cat(format(tables[no_codebook]), fill = TRUE)
 ```
 
 ```
-ALB_CR_G TELO_A   TELO_B   SSSAL_D 
+Error in eval(expr, envir, enclos): object 'no_codebook' not found
 ```
 
 `ALB_CR_G` is a known example where there are no translation tables;
@@ -619,8 +658,19 @@ be accounted for during analysis. They are listed below for reference.
 ```r
 labels_df <- status[!no_codebook] |>
     do.call(what = c) |> do.call(what = rbind)
+```
+
+```
+Error in eval(expr, envir, enclos): object 'status' not found
+```
+
+```r
 ## keep only value and description
 labels_df <- labels_df[1:2]
+```
+
+```
+Error in eval(expr, envir, enclos): object 'labels_df' not found
 ```
 
 Next, we count the number of variables each description occurs in, and
@@ -629,7 +679,21 @@ sort by frequency.
 
 ```r
 labels_df <- subset(labels_df, Value.Description != "Range of Values")
+```
+
+```
+Error in eval(expr, envir, enclos): object 'labels_df' not found
+```
+
+```r
 labels_split <- split(labels_df, ~ Value.Description)
+```
+
+```
+Error in eval(expr, envir, enclos): object 'labels_df' not found
+```
+
+```r
 labels_summary <-
     lapply(labels_split,
            function(d) with(d,
@@ -642,160 +706,25 @@ labels_summary <-
     do.call(what = rbind)
 ```
 
+```
+Error in eval(expr, envir, enclos): object 'labels_split' not found
+```
+
 
 ```r
 options(width = 200)
 rownames(labels_summary) <- NULL
+```
+
+```
+Error: object 'labels_summary' not found
+```
+
+```r
 labels_summary[order(labels_summary$Count, decreasing = TRUE), ]
 ```
 
 ```
-                                             Desc Count                          Codes
-92                                        Missing   816                              .
-136                                       Refused   443 77/777/7777/77777/777777/77777
-73                                     Don't know   394 99/999/9999/99999/999999/99999
-1                                               0   162                              0
-67                              Compliance <= 0.2    32                            555
-68                               Could not obtain    32                            888
-59                                          900 +    27                            900
-83                              Less than 1 month    26                          0/666
-70       Day 1 dietary recall not done/incomplete    24                              0
-71       Day 2 dietary recall not done/incomplete    24                              0
-104                                         Never    22                              0
-60                          95 cigarettes or more    21                             95
-122                                          None    18                              0
-134                 Provider did not specify goal    18                           6666
-27                                   2000 or more    17                           2000
-3                             1 cigarette or less    15                              1
-108                        Never on a daily basis    15                              0
-131    Participants 6+ years with no lab specimen    13                              0
-29                                      3 or More    12                              3
-146           Value greater than or equal to 5.00    12                              5
-45                                      7 or more    11                              7
-53                              80 years or older    11                             80
-6                                    1-14 minutes    10                             14
-49                                     70 or more    10                             70
-54                                  8400 and over    10                           8400
-74                                     Don't Know    10                           9999
-80         First Below Detection Limit Fill Value    10             0.01/0.18/0.25/1.4
-111             Never smoked cigarettes regularly    10                              0
-118                               No modification    10                              0
-119                        No time spent outdoors    10                              0
-121                                Non-Respondent    10                              0
-137       Second Below Detection Limit Fill Value    10           0.009/0.21/0.28/1.25
-141                           Still breastfeeding    10                              0
-142                        Still drinking formula    10                              0
-9                                     100 or more     9                            100
-64               Below Detection Limit Fill Value     9                  0.14/1.25/2/4
-98                    More than 21 meals per week     9                           5555
-28                                      3 or more     8                              3
-84                               Less than 1 year     8                            666
-88                             Less than one hour     8                              0
-4                                 1 month or less     7                              1
-18                              13 pounds or more     7                             13
-24                               20 or more times     7                             20
-39                                6 years or less     7                              6
-47              7 or more people in the Household     7                              7
-57                              85 years or older     7                             85
-76                            Don't know/not sure     7                           9999
-81         First Fill Value of Limit of Detection     7 -0.001/-0.01/-0.02/-0.03/-0.07
-138       Second Fill Value of Limit of Detection     7 -0.004/-0.02/-0.04/-0.05/-0.23
-8                                           100 +     6                            100
-10                                     11 or more     6                             11
-13                              11 years or under     6                             11
-21                              19 years or under     6                             19
-43                              60 years or older     6                             60
-62         At or below detection limit fill value     6       0.01/0.04/0.07/0.21/6.36
-77                                      Dont Know     6                           9999
-95               More than 1095 days (3-year) old     6                         666666
-105                    Never had cholesterol test     6                           6666
-107                            Never heard of LDL     6                           5555
-110                Never smoked a whole cigarette     6                             55
-126   Participants 12+ years with no lab specimen     6                              0
-135                                        Refuse     6                            777
-14                               12 hours or more     5                             12
-23                                     20 or more     5                             20
-38                                6 times or more     5                              6
-40                               6 years or under     5                              6
-63  At work or at school 9 to 5 seven days a week     5                           3333
-72                  Does not work or go to school     5                           3333
-82                             Hasn't started yet     5                              0
-15                            12 years or younger     4                             12
-16                                     13 or more     4                             13
-32                                     40 or more     4                             40
-46                 7 or more people in the Family     4                              7
-69  Current HH FS benefits recipient last receive     4                          55555
-90                               Less than weekly     4                           6666
-103                 More than 90 times in 30 days     4                           6666
-120 Non-current HH FS benefits recipient last rec     4                          66666
-133       PIR value greater than or equal to 5.00     4                              5
-145                                    Ungradable     4                              2
-11                                     11 or More     3                             11
-33                                     40 or More     3                             40
-36                               50 years or more     3                          66666
-56                                    85 or older     3                             85
-61                                     95 or more     3                             95
-78                                        English     3                              1
-79                            English and Spanish     3                              3
-89                             Less than one year     3                            666
-94                   More than 1 year unspecified     3                            555
-109                 Never smoked a pipe regularly     3                              0
-112                 Never smoked cigars regularly     3                              0
-113          Never used chewing tobacco regularly     3                              0
-114                    Never used snuff regularly     3                              0
-115 No Lab Result or Not Fasting for 8 to <24 hou     3                              0
-116                                No lab samples     3                              0
-123                              Not MEC Examined     3                              0
-125                                         Other     3                              4
-140                                       Spanish     3                              2
-144                 Unable to do activity (blind)     3                            666
-12                              11 pounds or more     2                             11
-17                                     13 or More     2                             13
-19                               14 hours or more     2                             14
-20                              15 drinks or more     2                             15
-26                              20 years or older     2                             20
-30                               3 pounds or less     2                              3
-35                             480 Months or more     2                            480
-37                               500 mg or higher     2                            500
-41                             60 minutes or more     2                             60
-44                             600 Months or more     2                            600
-50                                      70 to 150     2                             70
-51                               80 Hours or more     2                             80
-55                            85 or greater years     2                             85
-65                 Below First Limit of Detection     2                        0.1/0.5
-66                Below Second Limit of Detection     2                       0.14/0.7
-75               Don't know what is 'whole grain'     2                       66666666
-86                              Less than monthly     2                          66666
-91                              Less then 3 hours     2                              2
-93                                More than $1000     2                          55555
-97                                   More than 21     2                           5555
-100                            More than 300 days     2                          55555
-101               More than 365 days (1-year) old     2                         666666
-102               More than 730 days (2-year) old     2                         666666
-106                       Never heard of A1C test     2                            666
-117                                No Lab samples     2                              0
-124                  Not tested in last 12 months     2                              0
-128    Participants 3+ years with no lab specimen     2                              0
-139                          Single person family     2                            666
-2                                      0-5 Months     1                              5
-5                                  1 year or less     1                              1
-7                                       1-5 Hours     1                              5
-22                                20 days or more     1                             20
-25                                      20 to 150     1                             20
-31                                      4 or more     1                              4
-34                                   400 and over     1                            400
-42                              60 or more months     1                            666
-48                                7 years or less     1                              7
-52                            80 or greater years     1                             80
-58                                     9 or fewer     1                              9
-85                      Less than 10 years of age     1                              1
-87                              Less than one day     1                              0
-96                     More than 20 times a month     1                             30
-99                    More than 21 times per week     1                           5555
-127      Participants 3+ years with no Lab Result     1                              0
-129 Participants 3+ years with no surplus lab spe     1                              0
-130      Participants 6+ years with no Lab Result     1                              0
-132   Participants 6+ years with no lab specimen.     1                              0
-143        Third Fill Value of Limit of Detection     1                          -0.03
+Error in eval(expr, envir, enclos): object 'labels_summary' not found
 ```
 

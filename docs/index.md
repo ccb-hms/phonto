@@ -11,6 +11,8 @@ title: 'Phonto: Homepage'
 
 - [Accessing NHANES Data Locally](vignettes/nhanes-local.html)
 
+- [Workflows enabled by docker](vignettes/docker-examples.html)
+
 - [Search Interface for NHANES Tables and Variables](vignettes/search-tables.html)
 
 - [Building Variables defs](vignettes/VariableClassification.html)
