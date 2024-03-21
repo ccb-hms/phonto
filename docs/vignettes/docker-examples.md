@@ -40,18 +40,6 @@ some relevant tools in the `phonto` package that could be useful to
 practitioners.
 
 
-
-- Combining data across cycles
-
-- Consistency checks:
-
-	- Across cycles: change in units
-
-	- Within cycles: Variables appearing in multiple tables
-
-- Variables that are potentially skipped
-
-
 ## Combining data across cycles
 
 
