@@ -18,9 +18,9 @@ con <- nhanesA:::cn()
 ## For schema-based backends (SQL Server / Postgresql)
 
 ## Tables in Metadata schema 
-MD <- c("Metadata.QuestionnaireDescriptions",
-        "Metadata.QuestionnaireVariables", 
-        "Metadata.VariableCodebook")
+MD <- c('"Metadata"."QuestionnaireDescriptions"',
+        '"Metadata"."QuestionnaireVariables"', 
+        '"Metadata"."VariableCodebook"')
 
 ## Selected Tables in Raw and Translated schemas
 
@@ -28,8 +28,8 @@ NH_TABLES <-
     c("DEMO", "DEMO_C", "AUXAR_J", "BPX_D", "POOLTF_E", "PCBPOL_D",
       "DRXIFF_B")
 
-RAW <- paste0("Raw.", NH_TABLES)
-TRANSLATED <- paste0("Translated.", NH_TABLES)
+RAW <- paste0('"Raw"."', NH_TABLES, '"')
+TRANSLATED <- paste0('"Translated"."', NH_TABLES, '"')
 
 
 if (attr(class(con), "package") == "RMariaDB") {
@@ -38,11 +38,18 @@ if (attr(class(con), "package") == "RMariaDB") {
     TRANSLATED <- paste0("Nhanes", TRANSLATED)
 }
 
+extractTable <- function(con, dbtable) {
+    sql <- sprintf("SELECT * FROM %s", dbtable)
+    DBI::dbGetQuery(con, sql)
+}
 
 for (dbtable in c(MD, RAW, TRANSLATED)) {
     cat("---- ", dbtable, " ----", fill = TRUE)
-    d <- extractTable(con, dbtable)
-    print(sort(names(d)))
-    print(dim(d))
+    try(
+    {
+        d <- extractTable(con, dbtable)
+        print(sort(names(d)))
+        print(dim(d))
+    })
 }
 
