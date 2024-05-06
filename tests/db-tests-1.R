@@ -38,9 +38,10 @@ if (attr(class(con), "package") == "RMariaDB") {
     TRANSLATED <- paste0("Nhanes", TRANSLATED)
 }
 
+
 for (dbtable in c(MD, RAW, TRANSLATED)) {
     cat("---- ", dbtable, " ----", fill = TRUE)
-    d <- DBI::dbReadTable(con, dbtable)
+    d <- extractTable(con, dbtable)
     print(sort(names(d)))
     print(dim(d))
 }
