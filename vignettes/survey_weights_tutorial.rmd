@@ -115,6 +115,7 @@ We create a survey design object to incorporate the complex survey design into o
 It's crucial to create your survey design object prior to subsetting your data. This ensures that the complex survey design features, such as stratification and clustering, are accurately captured and applied to the entire dataset, thereby maintaining the integrity of subsequent analyses.
 
 ```{r}
+df = df[!is.null(df$MEC4YR) & !is.na(df$MEC4YR),]  # remove missing values in `weights'
 nhanesDesign <- svydesign(id = ~SDMVPSU,  # Primary Sampling Units (PSU)
                           strata  = ~SDMVSTRA, # Stratification used in the survey
                           weights = ~MEC4YR,   # Survey weights

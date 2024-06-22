@@ -62,66 +62,74 @@ if(is.null(tables_n_cols) | length(tables_n_cols) <1) return (NULL)
 names(tables_n_cols) = .convertTranslatedTable(names(tables_n_cols),translated)
 cols_to_tables = .convertColunms(tables_n_cols,translated)
 
+# Define the schema-qualified table references
+metadata_questionnaire_descriptions <- dplyr::tbl(cn(), I(MetadataTable("QuestionnaireDescriptions")))
 
-  # create SEQN with years
-  # want to create a sub sqls like:
-  # SELECT SEQN,  BeginYear, EndYear
-  # FROM (
-  #   SELECT SEQN
-  #   FROM DEMO_C
-  # ) DEMO_C
-  # JOIN Metadata.QuestionnaireDescriptions QD ON QD.TableName = 'DEMO_C'
-  seqn_year = rep("", length(tables_n_cols))
-  for (i in 1:length(tables_n_cols)){
-    tb_name = names(tables_n_cols)[i]
-    tb = unlist(strsplit(tb_name, "\\."))[2] # removed prefix, Translated. or Raw.
-    temp_sql = paste0("SELECT SEQN, BeginYear, EndYear
-    FROM (
-        SELECT SEQN FROM ", tb_name,
-        ") ", tb,
-        " JOIN Metadata.QuestionnaireDescriptions QD ON QD.TableName='",tb ,"'")
-    seqn_year[i] = temp_sql
+
+
+# Get unique columns
+unique_columns <- unique(unlist(tables_n_cols))
+
+# Create a list to store unioned queries for each unique set of columns
+unioned_queries <- list()
+
+# Process each unique set of columns
+for (cols in unique(tables_n_cols)) {
+  # Get tables that have the same set of columns
+  tables_with_cols <- names(tables_n_cols)[sapply(tables_n_cols, function(x) all(x == cols))]
+
+  # Create a unioned query for the tables with the same set of columns
+  unioned_query <- purrr::map(tables_with_cols, function(tb_name) {
+    dplyr::tbl(cn(), I(tb_name)) |>
+      dplyr::select(SEQN, dplyr::all_of(cols))
+  }) |>
+    purrr::reduce(dplyr::union_all)
+
+  unioned_queries[[toString(cols)]] <- unioned_query
+}
+
+
+
+
+
+
+# Placeholder for the combined query
+unifiedTB <- NULL
+
+# Iterate over each table name and perform the union_all operation
+for (tb_name in names(tables_n_cols)) {
+  tb = unlist(strsplit(tb_name, "\\."))[2] # removed prefix, Translated. or Raw.
+  tb = gsub("\"|\'", "", tb)
+  temp_query <- dplyr::tbl(cn(), I(tb_name)) |>
+    dplyr::select(SEQN) |>
+    dplyr::mutate(TableName = tb) |>
+    dplyr::left_join(metadata_questionnaire_descriptions, by = "TableName") |>
+    dplyr::select(SEQN, BeginYear, EndYear)
+  if (is.null(unifiedTB)) {
+    unifiedTB <- temp_query
+  } else {
+    unifiedTB <- dplyr::union_all(unifiedTB, temp_query)
   }
+}
+
+# Collect the final result
+unifiedTB = unifiedTB |> dplyr::distinct()
 
 
+# # # # Create individual column queries
+final_query = unifiedTB
 
-  sql = "WITH unifiedTB AS ("
-  sql = paste0(sql, paste0(paste0(seqn_year, collapse = " UNION ALL "),"),"))
+for (un in unioned_queries) {
+  final_query = final_query |> dplyr::left_join(un, by = "SEQN")
+}
 
 
-  # create union sql
-  i = 1
-  for (cn in names(cols_to_tables)) {
-    sql = paste(sql,LETTERS[i],"AS","(SELECT", cn," FROM ",cols_to_tables[[cn]][1])
-    i = i+1
-    if(length(cols_to_tables[[cn]])>1){
-      for (j in 2:length(cols_to_tables[[cn]])) {
-        tb1 = cols_to_tables[[cn]][j]
-        sql = paste(sql,"UNION ALL SELECT", cn," FROM ",cols_to_tables[[cn]][j])
-      }
-    }
-    sql = paste0(sql,"),")
-  }
+final_cols <- unique(unlist(tables_n_cols))
+final_query <- final_query |>
+  dplyr::select(SEQN, dplyr::all_of(final_cols), BeginYear, EndYear) |>
+  dplyr::mutate('Begin.Year' = BeginYear)
 
-  sql = substring(sql,1,nchar(sql)-1)
-
-  # tidy columns set
-  final_cols = unique(unlist(tables_n_cols))
-  final_cols = toString(sprintf("%s", unlist(final_cols)))
-  final_cols = paste0(" DISTINCT unifiedTB.SEQN, ",final_cols,",BeginYear AS 'Begin.Year', EndYear")
-
-  #joint query sql
-  query_sql = paste("SELECT",final_cols,"FROM unifiedTB")
-  for (i in 1:length(cols_to_tables)) {
-    query_sql = paste0(query_sql," LEFT JOIN ",LETTERS[i]," ON unifiedTB.SEQN=",LETTERS[i],".SEQN")
-  }
-
-  # put the sql together
-  sql = paste0(sql, "
-             ",query_sql)
-
-  nhanesQuery(sql)
-
+final_query |> dplyr::collect() |> as.data.frame() # return data frame
 
 }
 
@@ -149,48 +157,33 @@ cols_to_tables = .convertColunms(tables_n_cols,translated)
    stop("Please make sure the tables and chave the same columns")
  }
 
-  seqn_year = rep("", length(tables_n_cols))
-  for (i in 1:length(tables_n_cols)){
-    tb_name = names(tables_n_cols)[i]
-    tb = unlist(strsplit(tb_name, "\\."))[2] # removed prefix, Translated. or Raw.
-    temp_sql = paste0("SELECT SEQN, BeginYear, EndYear
-    FROM (
-        SELECT SEQN FROM ", tb_name,
-        ") ", tb,
-        " JOIN Metadata.QuestionnaireDescriptions QD ON QD.TableName='",tb ,"'")
-    seqn_year[i] = temp_sql
-  }
+metadata_questionnaire_descriptions <- dplyr::tbl(cn(), I(MetadataTable("QuestionnaireDescriptions")))
 
+# Create SEQN, BeginYear, and EndYear for each table
+unifiedTB = purrr::map(names(tables_n_cols), function(tb_name) {
+  tb = unlist(strsplit(tb_name, "\\."))[2] # removed prefix, Translated. or Raw.
+  tb = gsub("\"|\'", "", tb)
+  dplyr::tbl(cn(), I(tb_name)) |>
+    dplyr::select(SEQN) |>
+    dplyr::mutate(TableName = tb) |>
+    dplyr::left_join(metadata_questionnaire_descriptions, by = "TableName") |>
+    dplyr::select(SEQN, BeginYear, EndYear)
+}) |> purrr::reduce(dplyr::union_all) |>  dplyr::distinct()
 
+# Union all tables with the same columns
+unioned_query = purrr::map(names(tables_n_cols), function(tb_name) {
+  dplyr::tbl(cn(), I(tb_name)) |>
+    dplyr::select(SEQN, dplyr::all_of(unique(unlist(tables_n_cols))))
+}) |>
+  purrr::reduce(dplyr::union_all)
+# print(unioned_query)
 
-  sql = "WITH unifiedTB AS ("
-  sql = paste0(sql, paste0(paste0(seqn_year, collapse = " UNION ALL "),"),"))
+# Join with unifiedTB to get the final result
+final_query = unifiedTB |>
+  dplyr::left_join(unioned_query, by = "SEQN")
 
-
-
-
- # create union sql
-
-  # tidy columns set
-cols = unique(unlist(tables_n_cols))
-cols = toString(sprintf("%s", unlist(cols)))
-table_names = names(tables_n_cols)
- union_sql <- paste("SELECT SEQN,",cols,
-               "FROM", table_names[1])
-  if(length(table_names)>=2){
-    for(tl_n in table_names[2:length(table_names)]){
-      union_sql = paste0(union_sql," UNION ALL SELECT SEQN,",cols ,
-                   " FROM ",tl_n)
-    }
-
-  }
-
-   # put the sql together
-  sql = paste0(sql, "UTables AS (",union_sql,") ")
-  final_cols = paste0(" DISTINCT unifiedTB.SEQN, ",cols,",BeginYear AS 'Begin.Year', EndYear")
-
-  sql = paste0(sql, "SELECT ",final_cols," FROM unifiedTB LEFT JOIN UTables ON unifiedTB.SEQN=UTables.SEQN")
-  nhanesQuery(sql)
+# Collect the results into a data frame
+final_query |> dplyr::collect() |> as.data.frame()
 
 }
 
@@ -252,8 +245,7 @@ checkDataConsistency = function(table1,table2){
 #' @examples nhanesNrow("BMX_I")
 nhanesNrow = function(tb_name){
   .checkTableNames(tb_name)
-  sql_str = paste0("SELECT COUNT(*) FROM Raw.",tb_name)
-  nhanesQuery(sql_str)[1,1]
+  dplyr::tbl(cn(), I(RawTable(tb_name))) |> dplyr::collect() |> nrow()
 }
 
 
@@ -267,7 +259,7 @@ nhanesNrow = function(tb_name){
 #'
 #' @examples nhanesNcol("BMX_I")
 nhanesNcol = function(tb_name,translated=TRUE){
-  length(nhanesColnames(tb_name))
+  dplyr::tbl(cn(), I(RawTable(tb_name))) |> dplyr::collect() |> ncol()
 }
 
 
@@ -283,10 +275,7 @@ nhanesNcol = function(tb_name,translated=TRUE){
 #' @examples nhanesColnames("BMX_I")
 nhanesColnames = function(tb_name){
   .checkTableNames(tb_name)
-  sql_str = paste0("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE
-                      TABLE_SCHEMA='raw' AND
-                      TABLE_NAME = '",tb_name,"'")
-  nhanesQuery(sql_str)$COLUMN_NAME
+  dplyr::tbl(cn(), I(RawTable(tb_name))) |> colnames()
 }
 
 #' Dimensions of NHANES table
@@ -300,7 +289,7 @@ nhanesColnames = function(tb_name){
 #' @examples nhanesDim("BMX_I")
 nhanesDim = function(nh_table,translated=TRUE){
   .checkTableNames(nh_table)
-  c(nhanesNrow(nh_table),length(nhanesColnames(nh_table)))
+  dplyr::tbl(cn(), I(RawTable(nh_table))) |> dim()
 }
 
 #' Return the First of an NHANES table
@@ -317,8 +306,7 @@ nhanesDim = function(nh_table,translated=TRUE){
 nhanesHead = function(nh_table,n=5,translated=TRUE){
   .checkTableNames(nh_table)
   nh_table = .convertTranslatedTable(nh_table,translated)
-  sql = paste0("SELECT TOP(",n, ") * FROM ",nh_table)
-  nhanesQuery(sql)
+  dplyr::tbl(cn(), I(nh_table)) |> dplyr::collect() |> head(n)
 }
 
 
@@ -337,11 +325,7 @@ nhanesHead = function(nh_table,n=5,translated=TRUE){
 nhanesTail= function(nh_table,n=5,translated=TRUE){
   .checkTableNames(nh_table)
   nh_table = .convertTranslatedTable(nh_table,translated)
-
-  sql = paste0("SELECT TOP(",n, ") * FROM ",nh_table," ORDER BY SEQN DESC")
-  df = nhanesQuery(sql)
-  df = df[order(df$SEQN),]
-  df
+  dplyr::tbl(cn(), I(nh_table)) |> dplyr::collect() |> tail(n)
 
 }
 

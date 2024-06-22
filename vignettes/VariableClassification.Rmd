@@ -23,15 +23,15 @@ We first load `phonto`, and extract all questions together with the variable nam
 
 ```{r cars}
 library(phonto)
- t1 = paste0("SELECT DISTINCT TableName, Variable, Description, SaSLabel FROM  Metadata.QuestionnaireVariables")
-xx = nhanesQuery(t1)
+ # t1 = paste0("SELECT TableName, Variable, Description, SaSLabel FROM ",phonto:::MetadataTable("QuestionnaireVariables"))
+xx = phonto:::metadata_var() |> dplyr::select(TableName, Variable, Description, SasLabel)
 #make a vector to store our variable labels
 outPut = rep(NA, nrow(xx))
 apply(xx,2, function(x) sum(is.na(x)))
 ## we can see that only Description and SaSLabel are missing
 ##  TableName    Variable Description    SaSLabel
 ##          0           0         505         338
-missLab = is.na(xx$SaSLabel) |is.na(xx$Description)
+missLab = is.na(xx$SasLabel) |is.na(xx$Description)
 usedIndex = which(missLab)
 outPut[missLab] = "Missing"
 ```
@@ -51,7 +51,7 @@ And we can see already that some of the variables that start with WT have either
  ##now for Interview questions - eg what language was it done in etc
  ##unlikely to be relevant, but maybe
  
- g1 = grep("*[Ii]nterview\\??$", xx$SaSLabel)
+ g1 = grep("*[Ii]nterview\\??$", xx$SasLabel)
  outPut[g1] = "Interview"
  
  ##comments - most variables end with an LC but not all...so we also
@@ -69,7 +69,7 @@ Another set of variables that are not likely to be phenotypes are the interview 
 g1 = grep("DR[12D]EXMER", xx$Variable)
 outPut[g1] = "Interviewer ID code"
 
-g2 = grep("[Rr]ecall [Ss]tatus", xx$SaSLabel)
+g2 = grep("[Rr]ecall [Ss]tatus", xx$SasLabel)
 outPut[g2] = "Recall Status"
 
 g3 = grep("*LANG*", xx$Variable)

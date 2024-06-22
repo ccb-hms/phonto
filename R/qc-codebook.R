@@ -14,32 +14,50 @@
 
 
 
-.where_clause <- function(variable = NULL, table = NULL)
-{
-    case <- 1L + length(variable) + 2 * length(table)
-    switch(case,
+.where_clause = function(variable = NULL, table = NULL) {
+    case = 1L + length(variable) + 2 * length(table)
+    where_clause = switch(case,
            "",
-           sprintf("where Variable = '%s'", variable),
-           sprintf("where TableName = '%s'", table),
-           sprintf("where Variable = '%s' and TableName = '%s'", variable, table))
+           sprintf("Variable == '%s'", variable),
+           sprintf("TableName == '%s'", table),
+           sprintf("Variable == '%s' & TableName == '%s'", variable, table))
+    return(where_clause)
 }
 
-metadata_cb <- function(variable = NULL, table = NULL)
-{
-    nhanesQuery(paste("select * from Metadata.VariableCodebook",
-                      .where_clause(variable, table)))
-}
-metadata_var <- function(variable = NULL, table = NULL)
-{
-    nhanesQuery(paste("select * from Metadata.QuestionnaireVariables",
-                      .where_clause(variable, table)))
-}
-metadata_tab <- function(table = NULL)
-{
-    nhanesQuery(paste("select * from Metadata.QuestionnaireDescriptions",
-                      .where_clause(NULL, table)))
-}
+metadata_cb = function(variable = NULL, table = NULL) {
+    where_clause = .where_clause(variable, table)
     
+    query = dplyr::tbl(cn(), I(MetadataTable("VariableCodebook"))) 
+    
+    if (where_clause != "") {
+        query = query |> filter(eval(parse(text = where_clause)))
+    }
+    
+    query |> dplyr::collect() |> as.data.frame()
+}
+ 
+metadata_var = function(variable = NULL, table = NULL) {
+    where_clause = .where_clause(variable, table)
+    
+    query = dplyr::tbl(cn(), I(MetadataTable("QuestionnaireVariables")))
+    
+    if (where_clause != "") {
+        query  = query |> dplyr::filter(eval(parse(text = where_clause)))
+    }
+    query |> dplyr::collect() |> as.data.frame()
+}
+
+metadata_tab = function(table = NULL) {
+    where_clause = .where_clause(NULL, table)
+    
+    query = dplyr::tbl(cn(), I(MetadataTable("QuestionnaireDescriptions")))
+    
+    if (where_clause != "") {
+        query = query |> dplyr::filter(eval(parse(text = where_clause)))
+    }
+    
+    query |> dplyr::collect() |> as.data.frame()
+}
 
 
 ## The specific types of discrepancies we look for are:
